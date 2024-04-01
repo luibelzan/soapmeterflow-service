@@ -17,7 +17,7 @@ server.on("message", function (msg, rinfo) {
     console.log("Parse: " + snmp2.parse(msg));
 });
 
-server.bind(162);
+server.bind(1162);
 
 
 var snmp = require ("net-snmp");
