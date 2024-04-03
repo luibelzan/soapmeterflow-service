@@ -37,20 +37,32 @@ xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 export const getData = async (req: Request, res: Response) => {
 
     try {
+		 const fechaHoraActual = new Date();
+
+		// Obtener los componentes de la fecha y hora
+		const dia = fechaHoraActual.getDate();
+		const mes = fechaHoraActual.getMonth() + 1; // Sumamos 1 porque los meses se indexan desde 0
+		const año = fechaHoraActual.getFullYear();
+		const hora = fechaHoraActual.getHours();
+		const minutos = fechaHoraActual.getMinutes();
+		const segundos = fechaHoraActual.getSeconds();
+		const fechaFormateada = `${dia}/${mes}/${año} ${hora}:${minutos}:${segundos}`;
         const { body } = req;
-        console.log('Trama recibida')
+        console.log('Trama recibida ', fechaFormateada)
 
         // Verificar si el cuerpo de la solicitud contiene datos
         if (body) {
-            const report = body['S:Envelope']?.['S:Body']?.[0]?.['Report']?.[0]?.['Payload']?.[0] ||
-                          body['SOAP-ENV:Envelope']?.['SOAP-ENV:Body']?.[0]?.['ns2:Report']?.[0]?.['ns2:Payload']?.[0];
+            const report = body?.['S:Envelope']?.['S:Body']?.[0]?.['Report']?.[0]?.['Payload']?.[0] ||
+                          body?.['SOAP-ENV:Envelope']?.['SOAP-ENV:Body']?.[0]?.['ns2:Report']?.[0]?.['ns2:Payload']?.[0] ||
+                          body?.['SOAP-ENV:Envelope']?.['SOAP-ENV:Body']?.[0]?.['ns1:Report']?.[0]?.['ns1:Payload']?.[0];
+			
             
-            if (report?.Report !==undefined) {
+            if (report !== undefined) {
                 console.log('Evento encontrado. Parseando evento...')
                 const parsedReport = await parseXml(report);
                 console.log('Evento parseado')
                 await processReport(parsedReport);
-            }
+            } 
         }
 		if(body['S:Envelope']?.['S:Body']?.[0]?.['Report']?.[0]?.['Payload']?.[0]) {
 			res.set('Content-Type', 'application/xml');

@@ -20,6 +20,8 @@ try {
     
   // Ruta de prueba para recibir solicitudes
   app.post('/WS_STGSoapService', getData);
+  app.post('/WS_STG/WS_STG.asmx', getData);
+  app.post('/WS_DC/WS_DC.asmx', getData);
   
 
   app.listen(PORT, () => {
