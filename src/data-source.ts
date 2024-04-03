@@ -5,6 +5,7 @@ import { S15 } from "./entities/S15"
 import { S31 } from "./entities/S31"
 import { S63 } from "./entities/S63"
 import { S65 } from "./entities/S65"
+import { S02 } from "./entities/S02"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -15,7 +16,7 @@ export const AppDataSource = new DataSource({
     database: "pruebas",
     synchronize: true,
     logging: false,
-    entities: [S13, S15, S31, S63, S65],
+    entities: [S02, S13, S15, S31, S63, S65],
     migrations: [],
     subscribers: [],
 })
