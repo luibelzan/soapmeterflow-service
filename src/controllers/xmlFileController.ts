@@ -3,6 +3,7 @@ import fs from 'fs';
 import { T_S02_TEMP } from '../entities/T_S02_TEMP';
 import { AppDataSource } from '../data-source';
 import { T_S04_TEMP } from '../entities/T_S04_TEMP';
+import { T_S09_TEMP } from '../entities/T_s09_TEMP';
 
 
 // Ruta al archivo XML
@@ -95,7 +96,23 @@ async function processS04(report: any, mag: number, reportDate: string): Promise
 
 async function processS09(report: any, mag: number, reportDate: string): Promise<void> {
     report.forEach((elem: any) => {
-        console.log('Event S09');
+        const s09Repository = AppDataSource.getRepository(T_S09_TEMP);
+        if(elem.S09 != undefined) {
+            for(let i=0; i<Object.keys(elem.S09).length; i++) {
+                try {
+                    var s09 = new T_S09_TEMP();
+                    s09.cnt_id = elem.$.Id;
+                    s09.fh = elem.S09[i].$.Fh;
+                    s09.h = elem.S09[i].$.Fh;
+                    s09.et = elem.S09[i].$.Et;
+                    s09.c = elem.S09[i].$.C;
+                    s09.d1 =  elem?.S09[i]?.D1
+                    s09Repository.save(s09);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
     })
 }
 
