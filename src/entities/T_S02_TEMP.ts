@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryColumn, Column, Generated } from 'typeorm'
 
 @Entity()
-export class S02 {
+export class T_S02_TEMP {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn('uuid', { generated: 'uuid' })
+    @Generated('uuid')
     id: number;
 
     @Column()

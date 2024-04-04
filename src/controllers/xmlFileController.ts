@@ -1,6 +1,6 @@
 import { parseString } from 'xml2js';
 import fs from 'fs';
-import { S02 } from '../entities/S02';
+import { T_S02_TEMP } from '../entities/T_S02_TEMP';
 import { AppDataSource } from '../data-source';
 
 
@@ -74,23 +74,24 @@ async function processS05(report: any, mag: number, reportDate: string): Promise
 async function processS02(report: any, mag: number, reportDate: string): Promise<void> {
     report.forEach(elem => {
         //console.log(elem);
-        const s02Repository = AppDataSource.getRepository(S02);
-        var s02 = new S02();
+        const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
         if(elem.S02 != undefined) {
-            s02.cntId = elem.$.Id;
-            s02.magn = parseInt(elem.$.Magn);
-            s02.fh = elem.S02[0].$.Fh;
-            s02.hor = elem.S02[0].$.Fh;
-            s02.bc = parseInt(elem.S02[0].$.Bc);
-            s02.ai = parseInt(elem.S02[0].$.AI);
-            s02.ae = parseInt(elem.S02[0].$.AE);
-            s02.r1 = parseInt(elem.S02[0].$.R1);
-            s02.r2 = parseInt(elem.S02[0].$.R2);
-            s02.r3 = parseInt(elem.S02[0].$.R3);
-            s02.r4 = parseInt(elem.S02[0].$.R4);
-            s02.origen = 'STG';
-            s02Repository.save(s02);
-            //console.log(s02);
+            for(let i=0; i<Object.keys(elem.S02).length; i++) {
+                var s02 = new T_S02_TEMP();
+                s02.cntId = elem.$.Id;
+                s02.magn = parseInt(elem.$.Magn);
+                s02.fh = elem.S02[i].$.Fh;
+                s02.hor = elem.S02[i].$.Fh;
+                s02.bc = parseInt(elem.S02[i].$.Bc);
+                s02.ai = parseInt(elem.S02[i].$.AI);
+                s02.ae = parseInt(elem.S02[i].$.AE);
+                s02.r1 = parseInt(elem.S02[i].$.R1);
+                s02.r2 = parseInt(elem.S02[i].$.R2);
+                s02.r3 = parseInt(elem.S02[i].$.R3);
+                s02.r4 = parseInt(elem.S02[i].$.R4);
+                s02.origen = 'STG';
+                s02Repository.save(s02);
+            }
         }
         
         
