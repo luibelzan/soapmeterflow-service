@@ -19,7 +19,7 @@ export class T_S02_TEMP {
     hor: string;
 
     @Column()
-    bc: number;
+    bc: string;
 
     @Column()
     ai: number;

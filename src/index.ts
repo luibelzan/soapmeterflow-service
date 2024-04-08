@@ -15,21 +15,23 @@ const PORT = 8080;
 const dir = '../public/resources';
 var readFiles = [];
 
-function readFile() {
-  fs.readdir(dir, (err, files) => {
-    if(err) {
-      console.error('Error al leer la carpeta: ', err);
-      return;
-    }
-    files.forEach(file => {
+async function readFile() {
+  try {
+    const files = await fs.promises.readdir(dir);
+    
+    for (const file of files) {
       const fileDir = path.join(dir, file);
-      if(!readFiles.includes(fileDir)) {
+      
+      if (!readFiles.includes(fileDir)) {
         console.log('Nuevo archivo detectado: ', file);
-        parseFile(file);
+        await parseFile(file);
       }
-    });
+    }
+    
     readFiles = files.map(file => path.join(dir, file));
-  })
+  } catch (err) {
+    console.error('Error al leer la carpeta: ', err);
+  }
 }
 
 try {
@@ -58,7 +60,7 @@ try {
 
 try {
   AppDataSource.initialize().then(async () => {
-  readFile();
+  await readFile();
   setInterval(readFile, 5000);
 
   }).catch(error => console.log(error))
