@@ -7,9 +7,10 @@ import { T_S09_TEMP } from '../entities/T_S09_TEMP';
 import { T_S05_TEMP } from '../entities/T_S05_TEMP';
 
 
-export async function parseFile(file: any): Promise<void> {
+export async function parseFile(filePath: any): Promise<void> {
     try {
-        const filePath = '../public/resources/' + file;
+        const trozosDir = filePath.split('/');
+        const file = trozosDir[trozosDir.length-1];
         const trozos = file.split('_');
         const idRpt = trozos[2];
         const mag = trozos[3];
