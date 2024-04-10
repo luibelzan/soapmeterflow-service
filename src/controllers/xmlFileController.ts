@@ -5,6 +5,7 @@ import { AppDataSource } from '../data-source';
 import { T_S04_TEMP } from '../entities/T_S04_TEMP';
 import { T_S09_TEMP } from '../entities/T_S09_TEMP';
 import { T_S05_TEMP } from '../entities/T_S05_TEMP';
+import { T_G01_TEMP } from '../entities/T_G01_TEMP';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -21,11 +22,20 @@ export async function parseFile(filePath: any): Promise<void> {
         
         // Parsear el XML
         const result = await parseXml(data);
-        
-        const elements = result?.Report?.Cnc[0]?.Cnt;
-        if (elements !== undefined) {
-            await processReport(elements, idRpt, mag, reportDate);
+
+        // Procesamos el reporte dependiendo de si es un SXX o un GXX
+        if(idRpt.toLowerCase().startsWith("s")) {
+            const elements = result?.Report?.Cnc[0]?.Cnt;
+            if (elements !== undefined) {
+                await processReport(elements, idRpt, mag, reportDate);
+            }
+        } else {
+            const elements = result?.Report?.Cnc;
+            if (elements !== undefined) {
+                await processReport(elements, idRpt, mag, reportDate);
+            }
         }
+        
     } catch (error) {
         console.error(`Error al leer o analizar el archivo XML: ${error}`);
     }
@@ -57,6 +67,27 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             break;
         case 'S02':
             await processS02(report, mag, reportDate);
+            break;
+        case 'G01':
+            await processG01(report, mag, reportDate);
+            break;
+        case 'G02':
+            //await processG02(report, mag, reportDate);
+            break;
+        case 'G03':
+            //await processG03(report, mag, reportDate);
+            break;
+        case 'G04':
+            //await processG04(report, mag, reportDate);
+            break;
+        case 'G05':
+            //await processG05(report, mag, reportDate);
+            break;
+        case 'G06':
+            //await processG06(report, mag, reportDate);
+            break;
+        case 'G07':
+            //await processG07(report, mag, reportDate);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -185,4 +216,28 @@ async function processS02(report: any, mag: number, reportDate: string): Promise
             }
         } 
     };
+}
+
+async function processG01(report: any, mag: number, reportDate: string): Promise<void> {
+    const g01Repository = AppDataSource.getRepository(T_G01_TEMP);
+    for(const elem of report) {
+        if(elem.G01 != undefined) {
+            for(let i=0; i<Object.keys(elem.G01).length; i++) {
+                try{
+                    var g01 = new T_G01_TEMP();
+                    g01.cnc_id = elem.$.Id;
+                    g01.fh = elem.G01[i].$.Fh;
+                    g01.h = elem.G01[i].$.Fh;
+                    g01.amed = elem.G01[i].$.Amed;
+                    g01.amax = elem.G01[i].$.Amax;
+                    g01.tot = elem.G01[i].$.Tot;
+                    g01.aperc = elem.G01[i].$.Aperc;
+                    await g01Repository.save(g01);
+                    console.log('G01 insertado')
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
 }
