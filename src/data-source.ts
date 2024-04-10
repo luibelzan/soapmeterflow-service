@@ -11,6 +11,7 @@ import { T_S09_TEMP } from "./entities/T_S09_TEMP"
 import { T_S05_TEMP } from "./entities/T_S05_TEMP"
 import { T_G01_TEMP } from "./entities/T_G01_TEMP"
 import { T_G02_TEMP } from "./entities/T_G02_TEMP"
+import { T_G03_TEMP } from "./entities/T_G03_TEMP"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -21,7 +22,7 @@ export const AppDataSource = new DataSource({
     database: "pruebas",
     synchronize: true,
     logging: false,
-    entities: [T_S02_TEMP, S13, S15, S31, S63, S65, T_S04_TEMP, T_S09_TEMP, T_S05_TEMP, T_G01_TEMP, T_G02_TEMP],
+    entities: [T_S02_TEMP, S13, S15, S31, S63, S65, T_S04_TEMP, T_S09_TEMP, T_S05_TEMP, T_G01_TEMP, T_G02_TEMP, T_G03_TEMP],
     migrations: [],
     subscribers: [],
 })

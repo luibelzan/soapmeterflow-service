@@ -13,6 +13,9 @@ export class T_G03_TEMP {
     fh: string;
 
     @Column()
+    h: string;
+
+    @Column()
     avvph1_lv: number;
 
     @Column()
@@ -21,13 +24,13 @@ export class T_G03_TEMP {
     @Column()
     avvph3_lv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     aviph1_lv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     aviph2_lv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     aviph3_lv: number;
 
     @Column()
@@ -51,7 +54,7 @@ export class T_G03_TEMP {
     @Column()
     avvph3_mv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     avineutral: number;
 
     @Column()

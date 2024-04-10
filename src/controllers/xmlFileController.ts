@@ -7,6 +7,7 @@ import { T_S09_TEMP } from '../entities/T_S09_TEMP';
 import { T_S05_TEMP } from '../entities/T_S05_TEMP';
 import { T_G01_TEMP } from '../entities/T_G01_TEMP';
 import { T_G02_TEMP } from '../entities/T_G02_TEMP';
+import { T_G03_TEMP } from '../entities/T_G03_TEMP';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -76,7 +77,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processG02(report, mag, reportDate);
             break;
         case 'G03':
-            //await processG03(report, mag, reportDate);
+            await processG03(report, mag, reportDate);
             break;
         case 'G04':
             //await processG04(report, mag, reportDate);
@@ -249,7 +250,7 @@ async function processG02(report: any, mag: number, reportDate: string): Promise
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G02).length; i++) {
                 try {
-                var g02 = new T_G02_TEMP;
+                var g02 = new T_G02_TEMP();
                 g02.cnt_id = elem.$.Id;
                 g02.fh = elem.G02[i].$.Fh;
                 g02.h = elem.G02[i].$.Fh;
@@ -257,8 +258,47 @@ async function processG02(report: any, mag: number, reportDate: string): Promise
                 g02.nchanges = elem.G02[i].$.Nchanges;
                 g02.aconc = elem.G02[i].$.Aconc;
                 g02.atimeperc = elem.G02[i].$.Atimeperc;
-                g02Repository.save(g02);
+                await g02Repository.save(g02);
                 console.log('G02 insertado');
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG03(report: any, mag: number, reportDate: string): Promise<void> {
+    const g03Repository = AppDataSource.getRepository(T_G03_TEMP);
+    for(const elem of report[0].Cnt) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G03).length; i++) {
+                try {
+                    var g03 = new T_G03_TEMP;
+                    g03.cnt_id = elem.$.Id;
+                    g03.fh = elem.G03[i].$.Fh;
+                    g03.h = elem.G03[i].$.Fh;
+                    g03.avvph1_lv = elem.G03[i].$.AvVph1_lv;
+                    g03.avvph2_lv = elem.G03[i].$.AvVph2_lv;
+                    g03.avvph3_lv = elem.G03[i].$.AvVph3_lv;
+                    g03.aviph1_lv = elem.G03[i].$.AvIph1_lv;
+                    g03.aviph2_lv = elem.G03[i].$.AvIph2_lv;
+                    g03.aviph3_lv = elem.G03[i].$.AvIph3_lv;
+                    g03.avpplus_triph = elem.G03[i].$.AvPplus_triph;
+                    g03.avpminus_triph = elem.G03[i].$.AvPminus_triph;
+                    g03.avqplus_triph = elem.G03[i].$.AvQplus_triph;
+                    g03.avqminus_triph = elem.G03[i].$.AvQminus_triph;
+                    g03.avvph1_mv = elem.G03[i].$.AvVph1_mv;
+                    g03.avvph2_mv = elem.G03[i].$.AvVph2_mv;
+                    g03.avvph3_mv = elem.G03[i].$.AvVph3_mv;
+                    g03.avineutral = elem.G03[i].$.AvIneutral;
+                    g03.avv0_comp = elem.G03[i].$.AvVo_comp;
+                    g03.avv1_comp = elem.G03[i].$.AvV1_comp;
+                    g03.avv2_comp = elem.G03[i].$.AvV2_comp;
+                    g03.avvhs = elem.G03[i].$.AvVhs;
+                    g03.bc = elem.G03[i].$.Bc;
+                    g03Repository.save(g03);
+                    console.log('G03 insertado');
                 } catch(err) {
                     console.error(err);
                 }
