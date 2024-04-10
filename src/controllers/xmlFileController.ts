@@ -6,6 +6,7 @@ import { T_S04_TEMP } from '../entities/T_S04_TEMP';
 import { T_S09_TEMP } from '../entities/T_S09_TEMP';
 import { T_S05_TEMP } from '../entities/T_S05_TEMP';
 import { T_G01_TEMP } from '../entities/T_G01_TEMP';
+import { T_G02_TEMP } from '../entities/T_G02_TEMP';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -72,7 +73,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processG01(report, mag, reportDate);
             break;
         case 'G02':
-            //await processG02(report, mag, reportDate);
+            await processG02(report, mag, reportDate);
             break;
         case 'G03':
             //await processG03(report, mag, reportDate);
@@ -234,6 +235,30 @@ async function processG01(report: any, mag: number, reportDate: string): Promise
                     g01.aperc = elem.G01[i].$.Aperc;
                     await g01Repository.save(g01);
                     console.log('G01 insertado')
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG02(report: any, mag: number, reportDate: string): Promise<void> {
+    const g02Repository = AppDataSource.getRepository(T_G02_TEMP);
+    for(const elem of report[0].Cnt) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G02).length; i++) {
+                try {
+                var g02 = new T_G02_TEMP;
+                g02.cnt_id = elem.$.Id;
+                g02.fh = elem.G02[i].$.Fh;
+                g02.h = elem.G02[i].$.Fh;
+                g02.atime = elem.G02[i].$.Atime;
+                g02.nchanges = elem.G02[i].$.Nchanges;
+                g02.aconc = elem.G02[i].$.Aconc;
+                g02.atimeperc = elem.G02[i].$.Atimeperc;
+                g02Repository.save(g02);
+                console.log('G02 insertado');
                 } catch(err) {
                     console.error(err);
                 }

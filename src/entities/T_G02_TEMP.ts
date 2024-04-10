@@ -13,6 +13,9 @@ export class T_G02_TEMP {
     fh: string;
 
     @Column()
+    h: string;
+
+    @Column()
     atime: number;
 
     @Column()
@@ -21,6 +24,6 @@ export class T_G02_TEMP {
     @Column()
     aconc: number;
 
-    @Column()
+    @Column({ type: 'float'})
     atimeperc: number;
 }
