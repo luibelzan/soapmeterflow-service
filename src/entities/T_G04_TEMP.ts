@@ -13,6 +13,9 @@ export class T_G04_TEMP {
     fh: string;
 
     @Column()
+    h: string;
+
+    @Column()
     maxvph1_lv: number;
 
     @Column()
@@ -21,13 +24,13 @@ export class T_G04_TEMP {
     @Column()
     maxvph3_lv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     maxiph1_lv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     maxiph2_lv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     maxiph3_lv: number;
 
     @Column()
@@ -51,7 +54,7 @@ export class T_G04_TEMP {
     @Column()
     maxvph3_mv: number;
 
-    @Column()
+    @Column({ type: 'float'})
     maxineutral: number;
 
     @Column()

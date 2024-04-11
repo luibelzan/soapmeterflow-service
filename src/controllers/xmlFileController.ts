@@ -8,6 +8,8 @@ import { T_S05_TEMP } from '../entities/T_S05_TEMP';
 import { T_G01_TEMP } from '../entities/T_G01_TEMP';
 import { T_G02_TEMP } from '../entities/T_G02_TEMP';
 import { T_G03_TEMP } from '../entities/T_G03_TEMP';
+import { T_G04_TEMP } from '../entities/T_G04_TEMP';
+import { T_G05_TEMP } from '../entities/T_G05_TEMP';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -80,7 +82,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processG03(report, mag, reportDate);
             break;
         case 'G04':
-            //await processG04(report, mag, reportDate);
+            await processG04(report, mag, reportDate);
             break;
         case 'G05':
             //await processG05(report, mag, reportDate);
@@ -297,10 +299,66 @@ async function processG03(report: any, mag: number, reportDate: string): Promise
                     g03.avv2_comp = elem.G03[i].$.AvV2_comp;
                     g03.avvhs = elem.G03[i].$.AvVhs;
                     g03.bc = elem.G03[i].$.Bc;
-                    g03Repository.save(g03);
+                    await g03Repository.save(g03);
                     console.log('G03 insertado');
                 } catch(err) {
                     console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG04(report: any, mag: number, reportDate: string): Promise<void> {
+    const g04Repository = AppDataSource.getRepository(T_G04_TEMP);
+    for(const elem of report[0].Cnt) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G04).length; i++) {
+                try {
+                    var g04 = new T_G04_TEMP();
+                    g04.cnt_id = elem.$.Id;
+                    g04.fh = elem.G04[i].$.Fh;
+                    g04.h = elem.G04[i].$.Fh;
+                    g04.maxvph1_lv = elem.G04[i].$.MaxVph1_lv;
+                    g04.maxvph2_lv = elem.G04[i].$.MaxVph2_lv;
+                    g04.maxvph3_lv = elem.G04[i].$.MaxVph3_lv;
+                    g04.maxiph1_lv = elem.G04[i].$.MaxIph1_lv;
+                    g04.maxiph2_lv = elem.G04[i].$.MaxIph2_lv;
+                    g04.maxiph3_lv = elem.G04[i].$.MaxIph3_lv;
+                    g04.maxpplus_triph = elem.G04[i].$.MaxPplus_triph;
+                    g04.maxpminus_triph = elem.G04[i].$.MaxPminus_triph;
+                    g04.maxqplus_triph = elem.G04[i].$.MaxQplus_triph;
+                    g04.maxqminus_triph = elem.G04[i].$.MaxQminus_triph;
+                    g04.maxvph1_mv = elem.G04[i].$.MaxVph1_mv;
+                    g04.maxvph2_mv = elem.G04[i].$.MaxVph2_mv;
+                    g04.maxvph3_mv = elem.G04[i].$.MaxVph3_mv;
+                    g04.maxineutral = elem.G04[i].$.MaxIneutral;
+                    g04.maxv0_comp = elem.G04[i].$.MaxVo_comp;
+                    g04.maxv1_comp = elem.G04[i].$.MaxV1_comp;
+                    g04.maxv2_comp = elem.G04[i].$.MaxV2_comp;
+                    g04.maxvhs = elem.G04[i].$.MaxVhs;
+                    g04.bc = elem.G04[i].$.Bc;
+                    await g04Repository.save(g04);
+                    console.log('G04 insertado');
+                } catch(err) {
+                    console.error(err);
+                }
+                
+            }
+        }
+    }
+}
+
+async function processG05(report: any, mag: number, reportDate: string): Promise<void> {
+    const g04Repository = AppDataSource.getRepository(T_G05_TEMP);
+    for(const elem of report[0].Cnt) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G04).length; i++) {
+                try {
+                    var g05 = new T_G05_TEMP();
+                
+                } catch(err) {
+
                 }
             }
         }
