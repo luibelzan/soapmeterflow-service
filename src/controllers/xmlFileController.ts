@@ -11,6 +11,7 @@ import { T_G03_TEMP } from '../entities/T_G03_TEMP';
 import { T_G04_TEMP } from '../entities/T_G04_TEMP';
 import { T_G05_TEMP } from '../entities/T_G05_TEMP';
 import { T_G06_TEMP } from '../entities/T_G06_TEMP';
+import { T_G07_TEMP } from '../entities/T_G07_TEMP';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -92,7 +93,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processG06(report, mag, reportDate);
             break;
         case 'G07':
-            //await processG07(report, mag, reportDate);
+            await processG07(report, mag, reportDate);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -238,7 +239,7 @@ async function processG01(report: any, mag: number, reportDate: string): Promise
                     g01.tot = elem.G01[i].$.Tot;
                     g01.aperc = elem.G01[i].$.Aperc;
                     await g01Repository.save(g01);
-                    console.log('G01 insertado')
+                    //console.log('G01 insertado')
                 } catch(err) {
                     console.error(err);
                 }
@@ -262,7 +263,7 @@ async function processG02(report: any, mag: number, reportDate: string): Promise
                 g02.aconc = elem.G02[i].$.Aconc;
                 g02.atimeperc = elem.G02[i].$.Atimeperc;
                 await g02Repository.save(g02);
-                console.log('G02 insertado');
+                //console.log('G02 insertado');
                 } catch(err) {
                     console.error(err);
                 }
@@ -301,7 +302,7 @@ async function processG03(report: any, mag: number, reportDate: string): Promise
                     g03.avvhs = elem.G03[i].$.AvVhs;
                     g03.bc = elem.G03[i].$.Bc;
                     await g03Repository.save(g03);
-                    console.log('G03 insertado');
+                    //console.log('G03 insertado');
                 } catch(err) {
                     console.error(err);
                 }
@@ -340,7 +341,7 @@ async function processG04(report: any, mag: number, reportDate: string): Promise
                     g04.maxvhs = elem.G04[i].$.MaxVhs;
                     g04.bc = elem.G04[i].$.Bc;
                     await g04Repository.save(g04);
-                    console.log('G04 insertado');
+                    //console.log('G04 insertado');
                 } catch(err) {
                     console.error(err);
                 }
@@ -379,8 +380,8 @@ async function processG05(report: any, mag: number, reportDate: string): Promise
                     g05.minv2_comp = elem.G05[i].$.MinV2_comp;
                     g05.minvhs = elem.G05[i].$.MinVhs;
                     g05.bc = elem.G05[i].$.Bc;
-                    g05Repository.save(g05);
-                    console.log('G05 insertado');
+                    await g05Repository.save(g05);
+                    //console.log('G05 insertado');
                 } catch(err) {
                     console.error(err);
                 }
@@ -418,8 +419,42 @@ async function processG06(report: any, mag: number, reportDate: string): Promise
                     g06.momv2_comp = elem.G06[i].$.MomV2_comp;
                     g06.momvhs = elem.G06[i].$.MomVhs;
                     g06.bc = elem.G06[i].$.Bc;
-                    g06Repository.save(g06);
-                    console.log('G06 insertado');
+                    await g06Repository.save(g06);
+                    //console.log('G06 insertado');
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG07(report: any, mag: number, reportDate: string): Promise<void> {
+    const g07Repository = AppDataSource.getRepository(T_G07_TEMP);
+    for(const elem of report[0].Cnt) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G07).length; i++) {
+                try {
+                    var g07 = new T_G07_TEMP();
+                    g07.cnt_id = elem.$.Id;
+                    g07.fh = elem.G07[i].$.Fh;
+                    g07.h = elem.G07[i].$.Fh;
+                    g07.unbal = elem.G07[i].$.Unbal;
+                    g07.harm3_ph1 = elem.G07[i].$.Harm3_ph1;
+                    g07.harm3_ph2 = elem.G07[i].$.Harm3_ph2;
+                    g07.harm3_ph3 = elem.G07[i].$.Harm3_ph3;
+                    g07.harm5_ph1 = elem.G07[i].$.Harm5_ph1;
+                    g07.harm5_ph2 = elem.G07[i].$.Harm5_ph2;
+                    g07.harm5_ph3 = elem.G07[i].$.Harm5_ph3;
+                    g07.harm7_ph1 = elem.G07[i].$.Harm7_ph1;
+                    g07.harm7_ph2 = elem.G07[i].$.Harm7_ph2;
+                    g07.harm7_ph3 = elem.G07[i].$.Harm7_ph3;
+                    g07.thd_ph1 = elem.G07[i].$.Thd_ph1;
+                    g07.thd_ph2 = elem.G07[i].$.Thd_ph2;
+                    g07.thd_ph3 = elem.G07[i].$.Thd_ph3;
+                    g07.bc = elem.G07[i].$.Bc;
+                    await g07Repository.save(g07);
+                    //console.log('G07 insertado');
                 } catch(err) {
                     console.error(err);
                 }

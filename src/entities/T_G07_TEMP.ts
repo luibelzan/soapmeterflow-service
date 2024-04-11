@@ -15,7 +15,7 @@ export class T_G07_TEMP {
     @Column()
     h: string;
 
-    @Column()
+    @Column({ type: 'float' })
     unbal: number;
 
     @Column()
@@ -25,7 +25,7 @@ export class T_G07_TEMP {
     harm3_ph2: number;
 
     @Column()
-    harm_ph3: number;
+    harm3_ph3: number;
 
     @Column()
     harm5_ph1: number;
