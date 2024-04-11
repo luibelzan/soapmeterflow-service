@@ -24,13 +24,13 @@ export class T_G05_TEMP {
     @Column()
     minvph3_lv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     miniph1_lv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     miniph2_lv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     miniph3_lv: number;
 
     @Column()
@@ -54,7 +54,7 @@ export class T_G05_TEMP {
     @Column()
     minvph3_mv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     minineutral: number;
 
     @Column()

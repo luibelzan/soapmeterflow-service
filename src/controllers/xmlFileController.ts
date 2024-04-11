@@ -85,7 +85,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processG04(report, mag, reportDate);
             break;
         case 'G05':
-            //await processG05(report, mag, reportDate);
+            await processG05(report, mag, reportDate);
             break;
         case 'G06':
             //await processG06(report, mag, reportDate);
@@ -350,15 +350,38 @@ async function processG04(report: any, mag: number, reportDate: string): Promise
 }
 
 async function processG05(report: any, mag: number, reportDate: string): Promise<void> {
-    const g04Repository = AppDataSource.getRepository(T_G05_TEMP);
+    const g05Repository = AppDataSource.getRepository(T_G05_TEMP);
     for(const elem of report[0].Cnt) {
         if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G04).length; i++) {
+            for(let i=0; i<Object.keys(elem.G05).length; i++) {
                 try {
                     var g05 = new T_G05_TEMP();
-                
+                    g05.cnt_id = elem.$.Id;
+                    g05.fh = elem.G05[i].$.Fh;
+                    g05.h = elem.G05[i].$.Fh;
+                    g05.minvph1_lv = elem.G05[i].$.MinVph1_lv;
+                    g05.minvph2_lv = elem.G05[i].$.MinVph2_lv;
+                    g05.minvph3_lv = elem.G05[i].$.MinVph3_lv;
+                    g05.miniph1_lv = elem.G05[i].$.MinIph1_lv;
+                    g05.miniph2_lv = elem.G05[i].$.MinIph2_lv;
+                    g05.miniph3_lv = elem.G05[i].$.MinIph3_lv;
+                    g05.minpplus_triph = elem.G05[i].$.MinPplus_triph;
+                    g05.minpminus_triph = elem.G05[i].$.MinPminus_triph;
+                    g05.minqplus_triph = elem.G05[i].$.MinQplus_triph;
+                    g05.minqminus_triph = elem.G05[i].$.MinQminus_triph;
+                    g05.minvph1_mv = elem.G05[i].$.MinVph1_mv;
+                    g05.minvph2_mv = elem.G05[i].$.MinVph2_mv;
+                    g05.minvph3_mv = elem.G05[i].$.MinVph3_mv;
+                    g05.minineutral = elem.G05[i].$.MinIneutral;
+                    g05.minv0_comp = elem.G05[i].$.MinVo_comp;
+                    g05.minv1_comp = elem.G05[i].$.MinV1_comp;
+                    g05.minv2_comp = elem.G05[i].$.MinV2_comp;
+                    g05.minvhs = elem.G05[i].$.MinVhs;
+                    g05.bc = elem.G05[i].$.Bc;
+                    g05Repository.save(g05);
+                    console.log('G05 insertado');
                 } catch(err) {
-
+                    console.error(err);
                 }
             }
         }
