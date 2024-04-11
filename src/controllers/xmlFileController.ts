@@ -10,6 +10,7 @@ import { T_G02_TEMP } from '../entities/T_G02_TEMP';
 import { T_G03_TEMP } from '../entities/T_G03_TEMP';
 import { T_G04_TEMP } from '../entities/T_G04_TEMP';
 import { T_G05_TEMP } from '../entities/T_G05_TEMP';
+import { T_G06_TEMP } from '../entities/T_G06_TEMP';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -88,7 +89,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processG05(report, mag, reportDate);
             break;
         case 'G06':
-            //await processG06(report, mag, reportDate);
+            await processG06(report, mag, reportDate);
             break;
         case 'G07':
             //await processG07(report, mag, reportDate);
@@ -380,6 +381,45 @@ async function processG05(report: any, mag: number, reportDate: string): Promise
                     g05.bc = elem.G05[i].$.Bc;
                     g05Repository.save(g05);
                     console.log('G05 insertado');
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG06(report: any, mag: number, reportDate: string): Promise<void> {
+    const g06Repository = AppDataSource.getRepository(T_G06_TEMP);
+    for(const elem of report[0].Cnt) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G06).length; i++) {
+                try {
+                    var g06 = new T_G06_TEMP();
+                    g06.cnt_id = elem.$.Id;
+                    g06.fh = elem.G06[i].$.Fh;
+                    g06.h = elem.G06[i].$.Fh;
+                    g06.momvph1_lv = elem.G06[i].$.MomVph1_lv;
+                    g06.momvph2_lv = elem.G06[i].$.MomVph2_lv;
+                    g06.momvph3_lv = elem.G06[i].$.MomVph3_lv;
+                    g06.momiph1_lv = elem.G06[i].$.MomIph1_lv;
+                    g06.momiph2_lv = elem.G06[i].$.MomIph2_lv;
+                    g06.momiph3_lv = elem.G06[i].$.MomIph3_lv;
+                    g06.mompplus_triph = elem.G06[i].$.MomPplus_triph;
+                    g06.mompminus_triph = elem.G06[i].$.MomPminus_triph;
+                    g06.momqplus_triph = elem.G06[i].$.MomQplus_triph;
+                    g06.momqminus_triph = elem.G06[i].$.MomQminus_triph;
+                    g06.momvph1_mv = elem.G06[i].$.MomVph1_mv;
+                    g06.momvph2_mv = elem.G06[i].$.MomVph2_mv;
+                    g06.momvph3_mv = elem.G06[i].$.MomVph3_mv;
+                    g06.momineutral = elem.G06[i].$.MomIneutral;
+                    g06.momv0_comp = elem.G06[i].$.MomVo_comp;
+                    g06.momv1_comp = elem.G06[i].$.MomV1_comp;
+                    g06.momv2_comp = elem.G06[i].$.MomV2_comp;
+                    g06.momvhs = elem.G06[i].$.MomVhs;
+                    g06.bc = elem.G06[i].$.Bc;
+                    g06Repository.save(g06);
+                    console.log('G06 insertado');
                 } catch(err) {
                     console.error(err);
                 }

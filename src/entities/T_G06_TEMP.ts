@@ -24,13 +24,13 @@ export class T_G06_TEMP {
     @Column()
     momvph3_lv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momiph1_lv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momiph2_lv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momiph3_lv: number;
 
     @Column()
@@ -54,7 +54,7 @@ export class T_G06_TEMP {
     @Column()
     momvph3_mv: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momineutral: number;
 
     @Column()
