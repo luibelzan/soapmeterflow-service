@@ -11,7 +11,7 @@ export class T_S05_TEMP {
     cnt_id: string;
 
     @Column()
-    fh: string;
+    fh: Date;
 
     @Column()
     ctr: number;

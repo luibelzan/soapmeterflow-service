@@ -10,10 +10,7 @@ export class T_G01_TEMP {
     cnc_id: string;
 
     @Column()
-    fh: string;
-
-    @Column()
-    h: string;
+    fh: Date;
 
     @Column()
     amed: number;

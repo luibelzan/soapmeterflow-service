@@ -10,16 +10,10 @@ export class T_S04_TEMP {
     cnt_id: string;
 
     @Column()
-    fh_i: string;
+    fh_i: Date;
 
     @Column()
-    h_i: string;
-
-    @Column()
-    fh_f: string;
-
-    @Column()
-    h_f: string;
+    fh_f: Date;
 
     @Column()
     ctr: number;
@@ -31,10 +25,7 @@ export class T_S04_TEMP {
     mx: number;
 
     @Column()
-    fx: string;
-    
-    @Column()
-    hx: string;
+    fx: Date;
 
     @Column()
     aia: number;

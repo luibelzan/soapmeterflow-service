@@ -13,10 +13,7 @@ export class T_S02_TEMP {
     magn: number;
 
     @Column()
-    fh: string;
-
-    @Column()
-    hor: string;
+    fh: Date;
 
     @Column()
     bc: string;

@@ -2,6 +2,7 @@ import { parseString } from 'xml2js';
 import fs from 'fs';
 import { T_S02_TEMP } from '../entities/T_S02_TEMP';
 import { AppDataSource } from '../data-source';
+import { parseDate, isValidDate } from '../utils';
 import { T_S04_TEMP } from '../entities/T_S04_TEMP';
 import { T_S09_TEMP } from '../entities/T_S09_TEMP';
 import { T_S05_TEMP } from '../entities/T_S05_TEMP';
@@ -109,15 +110,16 @@ async function processS04(report: any, mag: number, reportDate: string): Promise
                 try {
                     var s04 = new T_S04_TEMP();
                     s04.cnt_id = elem.$.Id;
-                    s04.fh_i = elem.S04[i].$.Fhi;
-                    s04.h_i = elem.S04[i].$.Fhi;
-                    s04.fh_f = elem.S04[i].$.Fhf;
-                    s04.h_f = elem.S04[i].$.Fhf;
+                    s04.fh_i = parseDate(elem.S04[i].$.Fhi);
+                    s04.fh_f = parseDate(elem.S04[i].$.Fhf);
                     s04.ctr = elem.S04[i].$.Ctr;
                     s04.pt = elem.S04[i].$.Pt;
                     s04.mx = elem.S04[i].$.Mx;
-                    s04.fx = elem.S04[i].$.Fx;
-                    s04.hx = elem.S04[i].$.Fx;
+                    if(isValidDate(elem.S04[i].$.Fx)) {
+                        s04.fx = parseDate(elem.S04[i].$.Fx);
+                    } else {
+                        s04.fx = parseDate('20000101000000');
+                    }
                     s04.aia = elem.S04[i].Value[0].$.AIa;
                     s04.aea = elem.S04[i].Value[0].$.AEa;
                     s04.r1a = elem.S04[i].Value[0].$.R1a;
@@ -147,8 +149,7 @@ async function processS09(report: any, mag: number, reportDate: string): Promise
                 try {
                     var s09 = new T_S09_TEMP();
                     s09.cnt_id = elem.$.Id;
-                    s09.fh = elem.S09[i].$.Fh;
-                    s09.h = elem.S09[i].$.Fh;
+                    s09.fh = parseDate(elem.S09[i].$.Fh);
                     s09.et = elem.S09[i].$.Et;
                     s09.c = elem.S09[i].$.C;
                     s09.d1 =  elem?.S09[i]?.D1
@@ -169,7 +170,7 @@ async function processS05(report: any, mag: number, reportDate: string): Promise
                 try {
                     var s05 = new T_S05_TEMP();
                     s05.cnt_id = elem.$.Id;
-                    s05.fh = elem.S05[i].$.Fh;
+                    s05.fh = parseDate(elem.S05[i].$.Fh);
                     s05.ctr = elem.S05[i].$.Ctr;
                     s05.pt = elem.S05[i].$.Pt;
                     s05.aia = elem.S05[i].Value[0].$.AIa;
@@ -197,8 +198,7 @@ async function processS02(report: any, mag: number, reportDate: string): Promise
                     var s02 = new T_S02_TEMP();
                     s02.cnt_id = elem.$.Id;
                     s02.magn = parseInt(elem.$.Magn);
-                    s02.fh = elem.S02[i].$.Fh;
-                    s02.hor = elem.S02[i].$.Fh;
+                    s02.fh = parseDate(elem.S02[i].$.Fh);
                     s02.bc = elem.S02[i].$.Bc;
                     s02.ai = parseInt(elem.S02[i].$.AI);
                     s02.ae = parseInt(elem.S02[i].$.AE);
@@ -207,15 +207,7 @@ async function processS02(report: any, mag: number, reportDate: string): Promise
                     s02.r3 = parseInt(elem.S02[i].$.R3);
                     s02.r4 = parseInt(elem.S02[i].$.R4);
                     s02.origen = 'STG';
-                    const dia = fechaHoraActual.getDate();
-                    const mes = fechaHoraActual.getMonth() + 1; // Sumamos 1 porque los meses se indexan desde 0
-                    const año = fechaHoraActual.getFullYear();
-                    const hora = fechaHoraActual.getHours();
-                    const minutos = fechaHoraActual.getMinutes();
-                    const segundos = fechaHoraActual.getSeconds();
-                    const fechaFormateada = `${dia}/${mes}/${año} ${hora}:${minutos}:${segundos}`;
                     await s02Repository.save(s02);
-                    console.log('Evento insertado ', fechaFormateada);
                 } catch(err) {
                     console.error(err);
                 }
@@ -232,8 +224,7 @@ async function processG01(report: any, mag: number, reportDate: string): Promise
                 try{
                     var g01 = new T_G01_TEMP();
                     g01.cnc_id = elem.$.Id;
-                    g01.fh = elem.G01[i].$.Fh;
-                    g01.h = elem.G01[i].$.Fh;
+                    g01.fh = parseDate(elem.G01[i].$.Fh);
                     g01.amed = elem.G01[i].$.Amed;
                     g01.amax = elem.G01[i].$.Amax;
                     g01.tot = elem.G01[i].$.Tot;
@@ -256,8 +247,7 @@ async function processG02(report: any, mag: number, reportDate: string): Promise
                 try {
                 var g02 = new T_G02_TEMP();
                 g02.cnt_id = elem.$.Id;
-                g02.fh = elem.G02[i].$.Fh;
-                g02.h = elem.G02[i].$.Fh;
+                g02.fh = parseDate(elem.G02[i].$.Fh);
                 g02.atime = elem.G02[i].$.Atime;
                 g02.nchanges = elem.G02[i].$.Nchanges;
                 g02.aconc = elem.G02[i].$.Aconc;
@@ -280,8 +270,7 @@ async function processG03(report: any, mag: number, reportDate: string): Promise
                 try {
                     var g03 = new T_G03_TEMP;
                     g03.cnt_id = elem.$.Id;
-                    g03.fh = elem.G03[i].$.Fh;
-                    g03.h = elem.G03[i].$.Fh;
+                    g03.fh = parseDate(elem.G03[i].$.Fh);
                     g03.avvph1_lv = elem.G03[i].$.AvVph1_lv;
                     g03.avvph2_lv = elem.G03[i].$.AvVph2_lv;
                     g03.avvph3_lv = elem.G03[i].$.AvVph3_lv;
@@ -319,8 +308,7 @@ async function processG04(report: any, mag: number, reportDate: string): Promise
                 try {
                     var g04 = new T_G04_TEMP();
                     g04.cnt_id = elem.$.Id;
-                    g04.fh = elem.G04[i].$.Fh;
-                    g04.h = elem.G04[i].$.Fh;
+                    g04.fh = parseDate(elem.G04[i].$.Fh);
                     g04.maxvph1_lv = elem.G04[i].$.MaxVph1_lv;
                     g04.maxvph2_lv = elem.G04[i].$.MaxVph2_lv;
                     g04.maxvph3_lv = elem.G04[i].$.MaxVph3_lv;
@@ -359,8 +347,7 @@ async function processG05(report: any, mag: number, reportDate: string): Promise
                 try {
                     var g05 = new T_G05_TEMP();
                     g05.cnt_id = elem.$.Id;
-                    g05.fh = elem.G05[i].$.Fh;
-                    g05.h = elem.G05[i].$.Fh;
+                    g05.fh = parseDate(elem.G05[i].$.Fh);
                     g05.minvph1_lv = elem.G05[i].$.MinVph1_lv;
                     g05.minvph2_lv = elem.G05[i].$.MinVph2_lv;
                     g05.minvph3_lv = elem.G05[i].$.MinVph3_lv;
@@ -398,8 +385,7 @@ async function processG06(report: any, mag: number, reportDate: string): Promise
                 try {
                     var g06 = new T_G06_TEMP();
                     g06.cnt_id = elem.$.Id;
-                    g06.fh = elem.G06[i].$.Fh;
-                    g06.h = elem.G06[i].$.Fh;
+                    g06.fh = parseDate(elem.G06[i].$.Fh);
                     g06.momvph1_lv = elem.G06[i].$.MomVph1_lv;
                     g06.momvph2_lv = elem.G06[i].$.MomVph2_lv;
                     g06.momvph3_lv = elem.G06[i].$.MomVph3_lv;
@@ -437,8 +423,7 @@ async function processG07(report: any, mag: number, reportDate: string): Promise
                 try {
                     var g07 = new T_G07_TEMP();
                     g07.cnt_id = elem.$.Id;
-                    g07.fh = elem.G07[i].$.Fh;
-                    g07.h = elem.G07[i].$.Fh;
+                    g07.fh = parseDate(elem.G07[i].$.Fh);
                     g07.unbal = elem.G07[i].$.Unbal;
                     g07.harm3_ph1 = elem.G07[i].$.Harm3_ph1;
                     g07.harm3_ph2 = elem.G07[i].$.Harm3_ph2;

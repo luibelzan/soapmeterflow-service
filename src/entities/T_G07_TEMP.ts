@@ -10,10 +10,7 @@ export class T_G07_TEMP {
     cnt_id: string;
 
     @Column()
-    fh: string;
-
-    @Column()
-    h: string;
+    fh: Date;
 
     @Column({ type: 'float' })
     unbal: number;

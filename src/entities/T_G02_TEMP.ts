@@ -10,10 +10,7 @@ export class T_G02_TEMP {
     cnt_id: string;
 
     @Column()
-    fh: string;
-
-    @Column()
-    h: string;
+    fh: Date;
 
     @Column()
     atime: number;
