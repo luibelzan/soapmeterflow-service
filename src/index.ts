@@ -1,42 +1,17 @@
 import { getData } from "./controllers/EventsController";
-import { parseFile } from "./controllers/xmlFileController";
+import { readFile } from "./utils";
 import express from 'express';
 import { AppDataSource } from "./data-source"
 
 
 const bodyParser = require('body-parser');
 const bodyParserXml = require('body-parser-xml');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const PORT = 8080;
+const interval = 5000;
 
 const principalDir = '../public/resources';
-var readFiles = [];
-
-async function readFile(dir: string) {
-  try {
-    const files = await fs.promises.readdir(dir);
-    
-    for (const file of files) {
-      const fileDir = path.join(dir, file);
-      const stats = await fs.promises.stat(fileDir);
-      if(stats.isDirectory()) {
-        await readFile(fileDir);
-      } else {
-        if (!readFiles.includes(fileDir)) {
-          console.log('Nuevo archivo detectado: ', fileDir);
-          await parseFile(fileDir);
-          readFiles.push(fileDir);
-        }
-      }
-    }
-    
-  } catch (err) {
-    console.error('Error al leer la carpeta: ', err);
-  }
-}
 
 try {
   //Conexion con la base de datos
@@ -65,9 +40,14 @@ try {
 try {
   AppDataSource.initialize().then(async () => {
   await readFile(principalDir);
+
   setInterval(() => {
     readFile(principalDir); // Pasar el directorio como parámetro a readFile
-  }, 5000);
+  }, interval);
+
+  setInterval(() => {
+    // Funcion que inserta en tabla definitiva
+  }, interval);
   
   }).catch(error => console.log(error))
 } catch(err) {

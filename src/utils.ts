@@ -1,3 +1,30 @@
+import { parseFile } from "./controllers/xmlFileController";
+const fs = require('fs');
+const path = require('path');
+var readFiles = [];
+
+export async function readFile(dir: string) {
+    try {
+      const files = await fs.promises.readdir(dir);
+      
+      for (const file of files) {
+        const fileDir = path.join(dir, file);
+        const stats = await fs.promises.stat(fileDir);
+        if(stats.isDirectory()) {
+          await readFile(fileDir);
+        } else {
+          if (!readFiles.includes(fileDir)) {
+            console.log('Nuevo archivo detectado: ', fileDir);
+            await parseFile(fileDir);
+            readFiles.push(fileDir);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error al leer la carpeta: ', err);
+    }
+  }
+
 export function parseDate(fh: string): Date {
     try {
         const year = Number(fh.substring(0, 4));
@@ -31,3 +58,5 @@ export function isValidDate(dateString: string): boolean {
     // Verificar si la fecha es válida
     return !isNaN(date.getTime());
 }
+
+
