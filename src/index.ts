@@ -1,4 +1,5 @@
 import { getData } from "./controllers/EventsController";
+import { readFile } from "./utils";
 import express from 'express';
 import { AppDataSource } from "./data-source"
 
@@ -7,8 +8,10 @@ const bodyParser = require('body-parser');
 const bodyParserXml = require('body-parser-xml');
 
 const app = express();
-const host = '192.168.1.5:8080';
 const PORT = 8080;
+const interval = 5000;
+
+const principalDir = '../public/resources';
 
 try {
   //Conexion con la base de datos
@@ -32,5 +35,18 @@ try {
 
 } catch(error) {
   console.error('Error al conectar con la base de datos:' , error);
+}
+
+try {
+  AppDataSource.initialize().then(async () => {
+  await readFile(principalDir);
+
+  setInterval(() => {
+    readFile(principalDir); // Pasar el directorio como parámetro a readFile
+  }, interval);
+    
+  }).catch(error => console.log(error))
+} catch(err) {
+  console.error('Error al leer los archivos: ', err);
 }
 
