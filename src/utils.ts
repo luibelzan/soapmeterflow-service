@@ -58,5 +58,3 @@ export function isValidDate(dateString: string): boolean {
     // Verificar si la fecha es válida
     return !isNaN(date.getTime());
 }
-
-

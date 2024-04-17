@@ -120,18 +120,33 @@ async function processS04(report: any, mag: number, reportDate: string): Promise
                     } else {
                         s04.fx = parseDate('20000101000000');
                     }
-                    s04.aia = elem.S04[i].Value[0].$.AIa;
-                    s04.aea = elem.S04[i].Value[0].$.AEa;
-                    s04.r1a = elem.S04[i].Value[0].$.R1a;
-                    s04.r2a = elem.S04[i].Value[0].$.R2a;
-                    s04.r3a = elem.S04[i].Value[0].$.R3a;
-                    s04.r4a = elem.S04[i].Value[0].$.R4a;
-                    s04.aii = elem.S04[i].Value[1].$.AIi;
-                    s04.aei = elem.S04[i].Value[1].$.AEi;
-                    s04.r1i = elem.S04[i].Value[1].$.R1i;
-                    s04.r2i = elem.S04[i].Value[1].$.R2i;
-                    s04.r3i = elem.S04[i].Value[1].$.R3i;
-                    s04.r4i = elem.S04[i].Value[1].$.R4i;
+                    if(elem.S04[i].Value[0].$.AIa != undefined) {
+                        s04.aia = elem.S04[i].Value[0].$.AIa;
+                        s04.aea = elem.S04[i].Value[0].$.AEa;
+                        s04.r1a = elem.S04[i].Value[0].$.R1a;
+                        s04.r2a = elem.S04[i].Value[0].$.R2a;
+                        s04.r3a = elem.S04[i].Value[0].$.R3a;
+                        s04.r4a = elem.S04[i].Value[0].$.R4a;
+                        s04.aii = elem.S04[i].Value[1].$.AIi;
+                        s04.aei = elem.S04[i].Value[1].$.AEi;
+                        s04.r1i = elem.S04[i].Value[1].$.R1i;
+                        s04.r2i = elem.S04[i].Value[1].$.R2i;
+                        s04.r3i = elem.S04[i].Value[1].$.R3i;
+                        s04.r4i = elem.S04[i].Value[1].$.R4i;
+                    } else {
+                        s04.aia = elem.S04[i].Value[1].$.AIa;
+                        s04.aea = elem.S04[i].Value[1].$.AEa;
+                        s04.r1a = elem.S04[i].Value[1].$.R1a;
+                        s04.r2a = elem.S04[i].Value[1].$.R2a;
+                        s04.r3a = elem.S04[i].Value[1].$.R3a;
+                        s04.r4a = elem.S04[i].Value[1].$.R4a;
+                        s04.aii = elem.S04[i].Value[0].$.AIi;
+                        s04.aei = elem.S04[i].Value[0].$.AEi;
+                        s04.r1i = elem.S04[i].Value[0].$.R1i;
+                        s04.r2i = elem.S04[i].Value[0].$.R2i;
+                        s04.r3i = elem.S04[i].Value[0].$.R3i;
+                        s04.r4i = elem.S04[i].Value[0].$.R4i;
+                    }
                     await s04Repository.save(s04);
                 } catch(err) {
                     console.error(err);

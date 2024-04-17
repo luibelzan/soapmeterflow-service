@@ -44,11 +44,7 @@ try {
   setInterval(() => {
     readFile(principalDir); // Pasar el directorio como parámetro a readFile
   }, interval);
-
-  setInterval(() => {
-    // Funcion que inserta en tabla definitiva
-  }, interval);
-  
+    
   }).catch(error => console.log(error))
 } catch(err) {
   console.error('Error al leer los archivos: ', err);
