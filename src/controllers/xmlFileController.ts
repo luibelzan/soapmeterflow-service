@@ -13,6 +13,11 @@ import { T_G04_TEMP } from '../entities/T_G04_TEMP';
 import { T_G05_TEMP } from '../entities/T_G05_TEMP';
 import { T_G06_TEMP } from '../entities/T_G06_TEMP';
 import { T_G07_TEMP } from '../entities/T_G07_TEMP';
+import { T_G56 } from '../entities/T_G56';
+import { T_G57 } from '../entities/T_G57';
+import { T_G58 } from '../entities/T_G58';
+import { T_S93 } from '../entities/T_S93';
+import { T_S94 } from '../entities/T_S94';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -30,17 +35,9 @@ export async function parseFile(filePath: any): Promise<void> {
         // Parsear el XML
         const result = await parseXml(data);
 
-        // Procesamos el reporte dependiendo de si es un SXX o un GXX
-        if(idRpt.toLowerCase().startsWith("s")) {
-            const elements = result?.Report?.Cnc[0]?.Cnt;
-            if (elements !== undefined) {
-                await processReport(elements, idRpt, mag, reportDate);
-            }
-        } else {
-            const elements = result?.Report?.Cnc;
-            if (elements !== undefined) {
-                await processReport(elements, idRpt, mag, reportDate);
-            }
+        const elements = result?.Report;
+        if (elements !== undefined) {
+            await processReport(elements, idRpt, mag, reportDate);
         }
         
     } catch (error) {
@@ -104,7 +101,7 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
 
 async function processS04(report: any, mag: number, reportDate: string): Promise<void> {
     const s04Repository = AppDataSource.getRepository(T_S04_TEMP);
-    for (const elem of report) {
+    for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S04 != undefined) {
             for(let i=0; i<Object.keys(elem.S04).length; i++) {
                 try {
@@ -158,7 +155,7 @@ async function processS04(report: any, mag: number, reportDate: string): Promise
 
 async function processS09(report: any, mag: number, reportDate: string): Promise<void> {
     const s09Repository = AppDataSource.getRepository(T_S09_TEMP);
-    for (const elem of report) {
+    for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S09 != undefined) {
             for(let i=0; i<Object.keys(elem.S09).length; i++) {
                 try {
@@ -179,7 +176,7 @@ async function processS09(report: any, mag: number, reportDate: string): Promise
 
 async function processS05(report: any, mag: number, reportDate: string): Promise<void> {
     const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
-    for (const elem of report) {
+    for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S05 != undefined) {
             for(let i=0; i<Object.keys(elem.S05).length; i++) {
                 try {
@@ -206,7 +203,7 @@ async function processS05(report: any, mag: number, reportDate: string): Promise
 async function processS02(report: any, mag: number, reportDate: string): Promise<void> {
     const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
     const fechaHoraActual = new Date();
-    for (const elem of report) {
+    for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S02 != undefined) {
             for(let i=0; i<Object.keys(elem.S02).length; i++) {
                 try{
@@ -233,7 +230,7 @@ async function processS02(report: any, mag: number, reportDate: string): Promise
 
 async function processG01(report: any, mag: number, reportDate: string): Promise<void> {
     const g01Repository = AppDataSource.getRepository(T_G01_TEMP);
-    for(const elem of report) {
+    for(const elem of report?.Cnc) {
         if(elem.G01 != undefined) {
             for(let i=0; i<Object.keys(elem.G01).length; i++) {
                 try{
@@ -256,7 +253,7 @@ async function processG01(report: any, mag: number, reportDate: string): Promise
 
 async function processG02(report: any, mag: number, reportDate: string): Promise<void> {
     const g02Repository = AppDataSource.getRepository(T_G02_TEMP);
-    for(const elem of report[0].Cnt) {
+    for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G02).length; i++) {
                 try {
@@ -279,7 +276,7 @@ async function processG02(report: any, mag: number, reportDate: string): Promise
 
 async function processG03(report: any, mag: number, reportDate: string): Promise<void> {
     const g03Repository = AppDataSource.getRepository(T_G03_TEMP);
-    for(const elem of report[0].Cnt) {
+    for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G03).length; i++) {
                 try {
@@ -317,7 +314,7 @@ async function processG03(report: any, mag: number, reportDate: string): Promise
 
 async function processG04(report: any, mag: number, reportDate: string): Promise<void> {
     const g04Repository = AppDataSource.getRepository(T_G04_TEMP);
-    for(const elem of report[0].Cnt) {
+    for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G04).length; i++) {
                 try {
@@ -356,7 +353,7 @@ async function processG04(report: any, mag: number, reportDate: string): Promise
 
 async function processG05(report: any, mag: number, reportDate: string): Promise<void> {
     const g05Repository = AppDataSource.getRepository(T_G05_TEMP);
-    for(const elem of report[0].Cnt) {
+    for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G05).length; i++) {
                 try {
@@ -394,7 +391,7 @@ async function processG05(report: any, mag: number, reportDate: string): Promise
 
 async function processG06(report: any, mag: number, reportDate: string): Promise<void> {
     const g06Repository = AppDataSource.getRepository(T_G06_TEMP);
-    for(const elem of report[0].Cnt) {
+    for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G06).length; i++) {
                 try {
@@ -432,7 +429,7 @@ async function processG06(report: any, mag: number, reportDate: string): Promise
 
 async function processG07(report: any, mag: number, reportDate: string): Promise<void> {
     const g07Repository = AppDataSource.getRepository(T_G07_TEMP);
-    for(const elem of report[0].Cnt) {
+    for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G07).length; i++) {
                 try {
@@ -455,6 +452,183 @@ async function processG07(report: any, mag: number, reportDate: string): Promise
                     g07.bc = elem.G07[i].$.Bc;
                     await g07Repository.save(g07);
                     //console.log('G07 insertado');
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+
+async function processG56(report: any, mag: number, reportDate: string): Promise<void> {
+    const g56Repository = AppDataSource.getRepository(T_G56);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G56).length; i++) {
+                try {
+                    var g56 = new T_G56();
+                    g56.rtu_id = report.Rtu[0].$.Id;
+                    g56.lvs_id = elem.$.Id;
+                    g56.lvs_pos = elem.$.Pos;
+                    g56.fh = parseDate(elem.G56[i].$.Fh);
+                    g56.avgcph1 = elem.G56[i].$.AvgCph1;
+                    g56.avgvph1 = elem.G56[i].$.AvgVph1;
+                    g56.avgpimph1 = elem.G56[i].$.AvgPimph1;
+                    g56.avgpexph1 = elem.G56[i].$.AvgPexph1; 
+                    g56.avgqimph1 = elem.G56[i].$.AvgQimph1;
+                    g56.avgqexph1 = elem.G56[i].$.AvgQexph1;
+                    g56.avgpf1 = elem.G56[i].$.AvgPF1;
+                    g56.avgcph2 = elem.G56[i].$.AvgCph2;
+                    g56.avgvph2 = elem.G56[i].$.AvgVph2;
+                    g56.avgpimph2 = elem.G56[i].$.AvgPimph2;
+                    g56.avgpexph2 = elem.G56[i].$.AvgPexph2;
+                    g56.avgqimph2 = elem.G56[i].$.AvgQimph2;
+                    g56.avgqexph2 = elem.G56[i].$.AvgQexph2;
+                    g56.avgpf2 = elem.G56[i].$.AvgPF2;
+                    g56.avgcph3 = elem.G56[i].$.AvgCph3;
+                    g56.avgvph3 = elem.G56[i].$.AvgVph3;
+                    g56.avgpimph3 = elem.G56[i].$.AvgPimph3;
+                    g56.avgpexph3 = elem.G56[i].$.AvgPexph3;
+                    g56.avgqimph3 = elem.G56[i].$.AvgQimph3;
+                    g56.avgqexph3 = elem.G56[i].$.AvgQexph3;
+                    g56.avgpf3 = elem.G56[i].$.AvgPF3;
+                    g56.avgcn = elem.G56[i].$.AvgCn;
+                    g56.temp = elem.G56[i].$.Temp;
+                    g56.bc = elem.G56[i].$.Bc;
+                    await g56Repository.save(g56);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG57(report: any, mag: number, reportDate: string): Promise<void> {
+    const g57Repository = AppDataSource.getRepository(T_G57);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G57).length; i++) {
+                try {
+                    var g57 = new T_G57();
+                    g57.rtu_id = report.Rtu[0].$.Id;
+                    g57.lvs_id = elem.$.Id;
+                    g57.lvs_pos = elem.$.Pos;
+                    g57.fh = parseDate(elem.G57[i].$.Fh);
+                    g57.maxcph1 = elem.G57[i].$.MaxCph1;
+                    g57.maxvph1 = elem.G57[i].$.MaxVph1;
+                    g57.maxpimph1 = elem.G57[i].$.MaxPimph1;
+                    g57.maxpexph1 = elem.G57[i].$.MaxPexph1;
+                    g57.maxqimph1 = elem.G57[i].$.MaxQimph1;
+                    g57.maxqexph1 = elem.G57[i].$.MaxQexph1;
+                    g57.maxpf1 = elem.G57[i].$.MaxPF1;
+                    g57.maxcph2 = elem.G57[i].$.MaxCph2;
+                    g57.maxvph2 = elem.G57[i].$.MaxVph2;
+                    g57.maxpimph2 = elem.G57[i].$.MaxPimph2;
+                    g57.maxpexph2 = elem.G57[i].$.MaxPexph2;
+                    g57.maxqimph2 = elem.G57[i].$.MaxQimph2;
+                    g57.maxqexph2 = elem.G57[i].$.MaxQexph2;
+                    g57.maxpf2 = elem.G57[i].$.MaxPF2;
+                    g57.maxcph3 = elem.G57[i].$.MaxCph3;
+                    g57.maxvph3 = elem.G57[i].$.MaxVph3;
+                    g57.maxpimph3 = elem.G57[i].$.MaxPimph3;
+                    g57.maxpexph3 = elem.G57[i].$.MaxPexph3;
+                    g57.maxqimph3 = elem.G57[i].$.MaxQimph3;
+                    g57.maxqexph3 = elem.G57[i].$.MaxQexph3;
+                    g57.maxpf3 = elem.G57[i].$.MaxPF3;
+                    g57.maxcn = elem.G57[i].$.MaxCn;
+                    g57.bc = elem.G57[i].$.Bc;
+                    await g57Repository.save(g57);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG58(report: any, mag: number, reportDate: string): Promise<void> {
+    const g58Repository = AppDataSource.getRepository(T_G58);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G58).length; i++) {
+                try {
+                    var g58 = new T_G58();
+                    g58.rtu_id = report.Rtu[0].$.Id;
+                    g58.lvs_id = elem.$.Id;
+                    g58.lvs_pos = elem.$.Pos;
+                    g58.fh = parseDate(elem.G58[i].$.Fh);
+                    g58.mincph1 = elem.G58[i].$.MinCph1;
+                    g58.minvph1 = elem.G58[i].$.MinVph1;
+                    g58.minpimph1 = elem.G58[i].$.MinPimph1;
+                    g58.minpexph1 = elem.G58[i].$.MinPexph1;
+                    g58.minqimph1 = elem.G58[i].$.MinQimph1;
+                    g58.minqexph1 = elem.G58[i].$.MinQexph1;
+                    g58.minpf1 = elem.G58[i].$.MinPF1;
+                    g58.mincph2 = elem.G58[i].$.MinCph2;
+                    g58.minvph2 = elem.G58[i].$.MinVph2;
+                    g58.minpimph2 = elem.G58[i].$.MinPimph2;
+                    g58.minpexph2 = elem.G58[i].$.MinPexph2;
+                    g58.minqimph2 = elem.G58[i].$.MinQimph2;
+                    g58.minqexph2 = elem.G58[i].$.MinQexph2;
+                    g58.minpf2 = elem.G58[i].$.MinPF2;
+                    g58.mincph3 = elem.G58[i].$.MinCph3;
+                    g58.minvph3 = elem.G58[i].$.MinVph3;
+                    g58.minpimph3 = elem.G58[i].$.MinPimph3;
+                    g58.minpexph3 = elem.G58[i].$.MinPexph3;
+                    g58.minqimph3 = elem.G58[i].$.MinQimph3;
+                    g58.minqexph3 = elem.G58[i].$.MinQexph3;
+                    g58.minpf3 = elem.G58[i].$.MinPF3;
+                    g58.mimcn = elem.G58[i].$.MimCn;
+                    g58.bc = elem.G58[i].$.Bc;
+                    await g58Repository.save(g58);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS93(report: any, mag: number, reportDate: string): Promise<void> {
+    const s93Repository = AppDataSource.getRepository(T_S93);
+    for(const elem of report?.Rtu) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S93).length; i++) {
+                try {
+                    var s93 = new T_S93();
+                    s93.rtu_id = elem.$.Id;
+                    s93.fh = parseDate(elem.S93[i].$.Fh);
+                    s93.vr = elem.S93[i].$.Vr;
+                    s93.vs = elem.S93[i].$.Vs;
+                    s93.vt = elem.S93[i].$.Vt;
+                    s93.bc = elem.S93[i].$.Bc;
+                    await s93Repository.save(s93);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+
+async function processS94(report: any, mag: number, reportDate: string): Promise<void> {
+    const s94Repository = AppDataSource.getRepository(T_S94);
+    for(const elem of report?.Rtu) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S94).length; i++) {
+                try {
+                    var s94 = new T_S94();
+                    s94.rtu_id = elem.$.Id;
+                    s94.tp = elem.S94[i].$.Tp;
+                    s94.fh = parseDate(elem.S94[i].$.Fh);
+                    s94.fr = elem.S94[i].$.Fr;
+                    s94.fs = elem.S94[i].$.Fs;
+                    s94.ft = elem.S94[i].$.Ft;
+                    s94.bc = elem.S94[i].$.Bc;
+                    await s94Repository.save(s94);
                 } catch(err) {
                     console.error(err);
                 }
