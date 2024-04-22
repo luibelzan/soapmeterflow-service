@@ -88,7 +88,7 @@ export class T_S96 {
     hr_h25: number;
 
     @Column({ type: 'float' })
-    thd: number;
+    hr_thd: number;
 
     @Column()
     hr_bc: number;

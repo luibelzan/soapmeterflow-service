@@ -18,6 +18,8 @@ import { T_G57 } from '../entities/T_G57';
 import { T_G58 } from '../entities/T_G58';
 import { T_S93 } from '../entities/T_S93';
 import { T_S94 } from '../entities/T_S94';
+import { T_S96 } from '../entities/T_S96';
+import { T_S97 } from '../entities/T_S97';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -92,6 +94,27 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             break;
         case 'G07':
             await processG07(report, mag, reportDate);
+            break;
+        case 'G56':
+            await processG56(report, mag, reportDate);
+            break;
+        case 'G57':
+            await processG57(report, mag, reportDate);
+            break;
+        case 'G58':
+            await processG58(report, mag, reportDate);
+            break;
+        case 'S93':
+            await processS93(report, mag, reportDate);
+            break;
+        case 'S94':
+            await processS94(report, mag, reportDate);
+            break;
+        case 'S96':
+            await processS96(report, mag, reportDate);
+            break;
+        case 'S97':
+            await processS97(report, mag, reportDate);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -629,6 +652,132 @@ async function processS94(report: any, mag: number, reportDate: string): Promise
                     s94.ft = elem.S94[i].$.Ft;
                     s94.bc = elem.S94[i].$.Bc;
                     await s94Repository.save(s94);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS96(report: any, mag: number, reportDate: string): Promise<void> {
+    const s96Repository = AppDataSource.getRepository(T_S96);
+    for(const elem of report?.Rtu) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S96).length; i++) {
+                try {
+                    var s96 = new T_S96;
+                    s96.rtu_id = elem.$.Id;
+                    s96.fh = parseDate(elem.S96[i].$.Fh);
+                    s96.hr_h1 = elem.S96[i].Hr[0].$.h1;
+                    s96.hr_h2 = elem.S96[i].Hr[0].$.h2;
+                    s96.hr_h3 = elem.S96[i].Hr[0].$.h3;
+                    s96.hr_h4 = elem.S96[i].Hr[0].$.h4;
+                    s96.hr_h5 = elem.S96[i].Hr[0].$.h5;
+                    s96.hr_h5 = elem.S96[i].Hr[0].$.h5;
+                    s96.hr_h6 = elem.S96[i].Hr[0].$.h6;
+                    s96.hr_h7 = elem.S96[i].Hr[0].$.h7;
+                    s96.hr_h8 = elem.S96[i].Hr[0].$.h8;
+                    s96.hr_h9 = elem.S96[i].Hr[0].$.h9;
+                    s96.hr_h10 = elem.S96[i].Hr[0].$.h10;
+                    s96.hr_h11 = elem.S96[i].Hr[0].$.h11;
+                    s96.hr_h12 = elem.S96[i].Hr[0].$.h12;
+                    s96.hr_h13 = elem.S96[i].Hr[0].$.h13;
+                    s96.hr_h14 = elem.S96[i].Hr[0].$.h14;
+                    s96.hr_h15 = elem.S96[i].Hr[0].$.h15;
+                    s96.hr_h16 = elem.S96[i].Hr[0].$.h16;
+                    s96.hr_h17 = elem.S96[i].Hr[0].$.h17;
+                    s96.hr_h18 = elem.S96[i].Hr[0].$.h18;
+                    s96.hr_h19 = elem.S96[i].Hr[0].$.h19;
+                    s96.hr_h20 = elem.S96[i].Hr[0].$.h20;
+                    s96.hr_h21 = elem.S96[i].Hr[0].$.h21;
+                    s96.hr_h22 = elem.S96[i].Hr[0].$.h22;
+                    s96.hr_h23 = elem.S96[i].Hr[0].$.h23;
+                    s96.hr_h24 = elem.S96[i].Hr[0].$.h24;
+                    s96.hr_h25 = elem.S96[i].Hr[0].$.h25;
+                    s96.hr_thd = elem.S96[i].Hr[0].$.thd;
+                    s96.hr_bc = elem.S96[i].Hr[0].$.Bc;
+
+                    s96.hs_h1 = elem.S96[i].Hs[0].$.h1;
+                    s96.hs_h2 = elem.S96[i].Hs[0].$.h2;
+                    s96.hs_h3 = elem.S96[i].Hs[0].$.h3;
+                    s96.hs_h4 = elem.S96[i].Hs[0].$.h4;
+                    s96.hs_h5 = elem.S96[i].Hs[0].$.h5;
+                    s96.hs_h5 = elem.S96[i].Hs[0].$.h5;
+                    s96.hs_h6 = elem.S96[i].Hs[0].$.h6;
+                    s96.hs_h7 = elem.S96[i].Hs[0].$.h7;
+                    s96.hs_h8 = elem.S96[i].Hs[0].$.h8;
+                    s96.hs_h9 = elem.S96[i].Hs[0].$.h9;
+                    s96.hs_h10 = elem.S96[i].Hs[0].$.h10;
+                    s96.hs_h11 = elem.S96[i].Hs[0].$.h11;
+                    s96.hs_h12 = elem.S96[i].Hs[0].$.h12;
+                    s96.hs_h13 = elem.S96[i].Hs[0].$.h13;
+                    s96.hs_h14 = elem.S96[i].Hs[0].$.h14;
+                    s96.hs_h15 = elem.S96[i].Hs[0].$.h15;
+                    s96.hs_h16 = elem.S96[i].Hs[0].$.h16;
+                    s96.hs_h17 = elem.S96[i].Hs[0].$.h17;
+                    s96.hs_h18 = elem.S96[i].Hs[0].$.h18;
+                    s96.hs_h19 = elem.S96[i].Hs[0].$.h19;
+                    s96.hs_h20 = elem.S96[i].Hs[0].$.h20;
+                    s96.hs_h21 = elem.S96[i].Hs[0].$.h21;
+                    s96.hs_h22 = elem.S96[i].Hs[0].$.h22;
+                    s96.hs_h23 = elem.S96[i].Hs[0].$.h23;
+                    s96.hs_h24 = elem.S96[i].Hs[0].$.h24;
+                    s96.hs_h25 = elem.S96[i].Hs[0].$.h25;
+                    s96.hs_thd = elem.S96[i].Hs[0].$.thd;
+                    s96.hs_bc = elem.S96[i].Hs[0].$.Bc;
+
+                    s96.ht_h1 = elem.S96[i].Ht[0].$.h1;
+                    s96.ht_h2 = elem.S96[i].Ht[0].$.h2;
+                    s96.ht_h3 = elem.S96[i].Ht[0].$.h3;
+                    s96.ht_h4 = elem.S96[i].Ht[0].$.h4;
+                    s96.ht_h5 = elem.S96[i].Ht[0].$.h5;
+                    s96.ht_h5 = elem.S96[i].Ht[0].$.h5;
+                    s96.ht_h6 = elem.S96[i].Ht[0].$.h6;
+                    s96.ht_h7 = elem.S96[i].Ht[0].$.h7;
+                    s96.ht_h8 = elem.S96[i].Ht[0].$.h8;
+                    s96.ht_h9 = elem.S96[i].Ht[0].$.h9;
+                    s96.ht_h10 = elem.S96[i].Ht[0].$.h10;
+                    s96.ht_h11 = elem.S96[i].Ht[0].$.h11;
+                    s96.ht_h12 = elem.S96[i].Ht[0].$.h12;
+                    s96.ht_h13 = elem.S96[i].Ht[0].$.h13;
+                    s96.ht_h14 = elem.S96[i].Ht[0].$.h14;
+                    s96.ht_h15 = elem.S96[i].Ht[0].$.h15;
+                    s96.ht_h16 = elem.S96[i].Ht[0].$.h16;
+                    s96.ht_h17 = elem.S96[i].Ht[0].$.h17;
+                    s96.ht_h18 = elem.S96[i].Ht[0].$.h18;
+                    s96.ht_h19 = elem.S96[i].Ht[0].$.h19;
+                    s96.ht_h20 = elem.S96[i].Ht[0].$.h20;
+                    s96.ht_h21 = elem.S96[i].Ht[0].$.h21;
+                    s96.ht_h22 = elem.S96[i].Ht[0].$.h22;
+                    s96.ht_h23 = elem.S96[i].Ht[0].$.h23;
+                    s96.ht_h24 = elem.S96[i].Ht[0].$.h24;
+                    s96.ht_h25 = elem.S96[i].Ht[0].$.h25;
+                    s96.ht_thd = elem.S96[i].Ht[0].$.thd;
+                    s96.ht_bc = elem.S96[i].Ht[0].$.Bc;
+                    await s96Repository.save(s96);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS97(report: any, mag: number, reportDate: string): Promise<void> {
+    const s97Repository = AppDataSource.getRepository(T_S97);
+    for(const elem of report?.Rtu) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S97).length; i++) {
+                try {
+                    var s97 = new T_S97();
+                    s97.rtu_id = elem.$.Id;
+                    s97.fh = parseDate(elem.S97[i].$.Fh);
+                    s97.nr = elem.S97[i].$.Nr;
+                    s97.ns = elem.S97[i].$.Ns;
+                    s97.nt = elem.S97[i].$.Nt;
+                    s97.bc = elem.S97[i].$.Bc;
+                    await s97Repository.save(s97);
                 } catch(err) {
                     console.error(err);
                 }
