@@ -20,6 +20,7 @@ import { T_S93 } from '../entities/T_S93';
 import { T_S94 } from '../entities/T_S94';
 import { T_S96 } from '../entities/T_S96';
 import { T_S97 } from '../entities/T_S97';
+import { T_S06 } from '../entities/T_S06';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -116,6 +117,8 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
         case 'S97':
             await processS97(report, mag, reportDate);
             break;
+        case 'S06':
+            await processS06(report, mag, reportDate);
         default:
             console.error(`Unknown report type: ${idRpt}`);
             break;
@@ -778,6 +781,52 @@ async function processS97(report: any, mag: number, reportDate: string): Promise
                     s97.nt = elem.S97[i].$.Nt;
                     s97.bc = elem.S97[i].$.Bc;
                     await s97Repository.save(s97);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS06(report: any, mag: number, reportDate: string): Promise<void> {
+    const s06Repository = AppDataSource.getRepository(T_S06);
+    for(const elem of report.Cnc[0].Cnt) {
+        if(elem.S06 != undefined) {
+            for(let i=0; i<Object.keys(elem.S06).length; i++) {
+                try{
+                    var s06 = new T_S06();
+                    s06.cnt_id = report.Cnc[0].$.Id;
+                    s06.cnc_id = elem.$.Id;
+                    s06.fh = parseDate(elem.S06[i].$.Fh);
+                    s06.ns = elem.S06[i].$.NS;
+                    s06.fab = elem.S06[i].$.Fab;
+                    s06.mod = elem.S06[i].$.Mod;
+					s06.af = elem.S06[i].$.Af;
+					s06.te = elem.S06[i].$.Te;
+					s06.vf = elem.S06[i].$.Vf;
+					s06.vprime = elem.S06[i].$.VPrime;
+					s06.pro = elem.S06[i].$.Pro;
+					s06.idm = elem.S06[i].$.Idm;
+					s06.mac = elem.S06[i].$.Mac;
+					s06.tp = elem.S06[i].$.Tp;
+					s06.ts = elem.S06[i].$.Ts;
+					s06.ip = elem.S06[i].$.Ip;
+					s06.is = elem.S06[i].$.Is;
+					s06.usag = elem.S06[i].$.Usag;
+					s06.uswell = elem.S06[i].$.Uswell;
+					s06.per = elem.S06[i].$.Per;
+					s06.dctcp = elem.S06[i].$.Dctcp;
+					s06.vr = elem.S06[i].$.Vr;
+					s06.ut = elem.S06[i].$.Ut;
+					s06.usubt = elem.S06[i].$.UsubT;
+					s06.usobt = elem.S06[i].$.UsobT;
+					s06.ucortet = elem.S06[i].$.UcorteT;
+					s06.autmothbill = elem.S06[i].$.AutMothBill;
+					s06.scrolldispmode = elem.S06[i].$.ScrollDispMode;
+					s06.scrolldisptime = elem.S06[i].$.ScrollDispTime;
+                    await s06Repository.save(s06);
+                    //console.log('S06 insertado')
                 } catch(err) {
                     console.error(err);
                 }
