@@ -33,7 +33,7 @@ export class T_S12 {
     @Column()
     com: string;
 
-    @Column()
+    @Column({ nullable: true })
     bat: string;
 
     @Column()

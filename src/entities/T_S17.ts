@@ -20,4 +20,7 @@ export class T_S17 {
 
     @Column()
     d1: string;
+
+    @Column({ nullable: true })
+    d2: string;
 }

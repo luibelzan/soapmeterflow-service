@@ -21,6 +21,10 @@ import { T_S94 } from '../entities/T_S94';
 import { T_S96 } from '../entities/T_S96';
 import { T_S97 } from '../entities/T_S97';
 import { T_S06 } from '../entities/T_S06';
+import { T_S14 } from '../entities/T_S14';
+import { T_S17 } from '../entities/T_S17';
+import { T_S24 } from '../entities/T_S24';
+import { T_S12 } from '../entities/T_S12';
 
 
 export async function parseFile(filePath: any): Promise<void> {
@@ -28,6 +32,7 @@ export async function parseFile(filePath: any): Promise<void> {
         const trozosDir = filePath.split('/');
         const file = trozosDir[trozosDir.length-1];
         const trozos = file.split('_');
+        const origen = trozos[1];
         const idRpt = trozos[2];
         const mag = trozos[3];
         const reportDate = trozos[4];
@@ -119,6 +124,19 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             break;
         case 'S06':
             await processS06(report, mag, reportDate);
+            break;
+        case 'S12':
+            await processS12(report, mag, reportDate);
+            break;
+        case 'S14': 
+            await processS14(report, mag, reportDate);
+            break;
+        case 'S17':
+            await processS17(report, mag, reportDate);
+            break;
+        case 'S24':
+            await processS24(report, mag, reportDate);
+            break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
             break;
@@ -827,6 +845,152 @@ async function processS06(report: any, mag: number, reportDate: string): Promise
 					s06.scrolldisptime = elem.S06[i].$.ScrollDispTime;
                     await s06Repository.save(s06);
                     //console.log('S06 insertado')
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+
+async function processS12(report: any, mag: number, reportDate: string): Promise<void> {
+    const s12Repository = AppDataSource.getRepository(T_S12);
+    const elem = report.Cnc[0];
+                try {
+                    var s12 = new T_S12();
+                    s12.cnc_id = elem.$.Id;
+                    s12.fh = parseDate(elem.S12[0].$.Fh);
+                    s12.mod = elem.S12[0].$.Mod;
+                    s12.af = elem.S12[0].$.Af;
+                    s12.te = elem.S12[0].$.Te;
+                    s12.vf = elem.S12[0].$.Vf;
+                    s12.vfcomm = elem.S12[0].$.VfComm;
+                    s12.pro = elem.S12[0].$.Pro;
+                    s12.com = elem.S12[0].$.Com;
+                    s12.ipcom = elem.S12[0].$.ipCom;
+                    s12.portws = elem.S12[0].$.PortWS;
+                    s12.ipmask = elem.S12[0].$.ipMask;
+                    s12.ipgtw = elem.S12[0].$.ipGtw;
+                    s12.ipdhcp = elem.S12[0].$.ipDhcp;
+                    s12.macplc = elem.S12[0].$.Macplc;
+                    s12.pse = elem.S12[0].$.Pse;
+                    s12.priority = elem.S12[0].$.Priority;
+                    s12.ipstg = elem.S12[0].$.IPstg;
+                    s12.ipntp = elem.S12[0].$.IPNTP;
+                    s12.ntpmaxdeviation = elem.S12[0].$.NTPMaxDeviation;
+                    s12.ipftp = elem.S12[0].$.IPftp;
+                    s12.ftpuserreport = elem.S12[0].$.FTPUserReport;
+                    s12.ipftpdcupg = elem.S12[0].$.IPftpDCUpg;
+                    s12.userftpdcupg = elem.S12[0].$.UserftpDCUpg;
+                    s12.ipftpmeterupg = elem.S12[0].$.IPftpMeterUpg;
+                    s12.userftpmeterupg = elem.S12[0].$.UserftpMeterUpg;
+                    s12.retryftp = elem.S12[0].$.RetryFtp;
+                    s12.timebetwftp = elem.S12[0].$.TimeBetwFtp;
+                    s12.timedev = elem.S12[0].$.TimeDev;
+                    s12.timedevover = elem.S12[0].$.TimeDevOver;
+                    s12.resetmsg = elem.S12[0].$.ResetMsg;
+                    s12.nummeters = elem.S12[0].$.NumMeters;
+                    s12.timesendreq = elem.S12[0].$.TimeSendReq;
+                    s12.timedisconmeter = elem.S12[0].$.TimeDisconMeter;
+                    s12.retrydisconmeter = elem.S12[0].$.RetryDisconMeter;
+                    s12.timeretryinterval = elem.S12[0].$.TimeRetryInterval;
+                    s12.ipftpCycles = elem.S12[0].$.IPftpCycles;
+                    s12.userftpcycles = elem.S12[0].$.UserftpCycles;
+                    s12.destdircycles = elem.S12[0].$.DestDirCycles;
+                    s12.meterregdata = elem.S12[0].$.MeterRegData;
+                    s12.timeoutmeterfwu = elem.S12[0].$.TimeOutMeterFwU;
+                    s12.valuescheckdelay = elem.S12[0].$.ValuesCheckDelay;
+                    s12.maxorderoutdate = elem.S12[0].$.MaxOrderOutdate;
+                    s12.timedelayrestart = elem.S12[0].$.TimeDelayRestart;
+                    s12.reportformat = elem.S12[0].$.ReportFormat;
+                    s12.slave1 = elem.S12[0].$.Slave1;
+                    s12.slave2 = elem.S12[0].$.Slave2;
+                    s12.slave3 = elem.S12[0].$.Slave3;
+                    s12.iploc = elem.S12[0].$.ipLoc;
+                    s12.ipmaskloc = elem.S12[0].$.ipMaskLoc;
+                    s12.accinactimeout = elem.S12[0].$.AccInacTimeout;
+                    s12.accsimulmax = elem.S12[0].$.AccSimulMax;
+                    s12.syncmeter = elem.S12[0].$.SyncMeter;
+                    s12.plctimeoutrm = elem.S12[0].$.PLCTimeoutRM;
+                    s12.plctimeoutf = elem.S12[0].$.PLCTimeoutF;
+                    s12.s26content = elem.S12[0].$.S26Content;
+                    await s12Repository.save(s12);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+    
+
+async function processS14(report: any, mag: number, reportDate: string): Promise<void> {
+    const s14Repository = AppDataSource.getRepository(T_S14);
+    for(const elem of report.Cnc[0].Cnt) {
+        if(elem.S14 != undefined) {
+            for(let i=0; i<Object.keys(elem.S14).length; i++) {
+                try{
+                    var s14 = new T_S14();
+                    s14.cnc_id = report.Cnc[0].$.Id;
+                    s14.cnt_id = elem.$.Id;					
+                    s14.fh = parseDate(elem.S14[i].$.Fh);
+                    s14.bc = elem.S14[i].$.Bc;
+                    s14.v1 = elem.S14[i].$.V1;
+                    s14.v2 = elem.S14[i].$.V2;
+					s14.v3 = elem.S14[i].$.V3;
+					s14.i1 = elem.S14[i].$.I1;
+					s14.i2 = elem.S14[i].$.I2;
+					s14.i3 = elem.S14[i].$.I3;
+					s14.in = elem.S14[i].$.In;
+					s14.simp = elem.S14[i].$.Simp;
+					s14.sexp = elem.S14[i].$.Sexp;					
+                    await s14Repository.save(s14);
+                    //console.log('S14 insertado')
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS17(report: any, mag: number, reportDate: string): Promise<void> {
+    const s17Repository = AppDataSource.getRepository(T_S17);
+    for(const elem of report.Cnc) {
+        if(elem.S17 != undefined) {
+            for(let i=0; i<Object.keys(elem.S17).length; i++) {
+                try{
+                    var s17 = new T_S17();
+                    s17.cnc_id = elem.$.Id;					
+                    s17.fh = parseDate(elem.S17[i].$.Fh);
+                    s17.et = elem.S17[i].$.Et;
+                    s17.c = elem.S17[i].$.C;
+                    s17.d1 = elem.S17[i].D1;
+					s17.d2 = elem.S17[i].D2;								
+                    await s17Repository.save(s17);
+                    //console.log('S17 insertado')
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS24(report: any, mag: number, reportDate: string): Promise<void> {
+    //console.log(report.Cnc[0].S24[0].Meter);
+    const S24Repository = AppDataSource.getRepository(T_S24);
+    for(const elem of report.Cnc[0].S24[0].Meter) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem).length; i++) {
+                try{
+                    var S24 = new T_S24();
+                    S24.cnc_id = report.Cnc[0].$.Id;					
+                    S24.fh = parseDate(report.Cnc[0].S24[0].$.Fh);
+                    S24.meter_id = elem.$.MeterId;
+                    S24.comstatus = elem.$.ComStatus;
+                    S24.date = parseDate(elem.$.Date);
+					S24.active = elem.$.Active;										
+                    await S24Repository.save(S24);
+                    //console.log('S24 insertado')
                 } catch(err) {
                     console.error(err);
                 }
