@@ -2,7 +2,7 @@ import { getData } from "./controllers/EventsController";
 import { readFile } from "./utils";
 import express from 'express';
 import { AppDataSource } from "./data-source"
-import { associateDatesS04, associateDatesS05, getCnc } from "./index-reading";
+import { associateDatesS02, associateDatesS04, associateDatesS05, getCnc, getDatesBtwDates } from "./index-reading";
 
 
 const bodyParser = require('body-parser');
@@ -42,8 +42,10 @@ try {
   AppDataSource.initialize().then(async () => {
   await readFile(principalDir);
   const cncs = await getCnc();
-  associateDatesS04(cncs);
-  associateDatesS05(cncs);
+  //associateDatesS04(cncs);
+  //associateDatesS05(cncs);
+  associateDatesS02(cncs);
+
 
   setInterval(() => {
     readFile(principalDir); // Pasar el directorio como parámetro a readFile

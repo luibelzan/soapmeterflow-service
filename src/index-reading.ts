@@ -4,6 +4,8 @@ import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 import { T_S04_TEMP } from "./entities/T_S04_TEMP"
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
+import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
+import { T_S02_TEMP } from "./entities/T_S02_TEMP";
 
 
 export async function getCnc(): Promise<string[]> {
@@ -11,8 +13,8 @@ export async function getCnc(): Promise<string[]> {
     const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
     try {
         const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
-        const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
-        return s04s.concat(s05);
+        //const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
+        return s04s;
     } catch(err) {
         console.error(err);
     }
@@ -75,8 +77,35 @@ export async function associateDatesS05(cnts: string[]): Promise<void> {
     }
 }
 
+export async function associateDatesS02(cnts: string[]): Promise<void> {
+    const f1 = new Date();
+    const f2 = new Date();
+    f2.setMonth(f1.getMonth()-1);
+    const dates = getDatesBtwDatesS02(f2, f1);
+    const s02ReadingIndexRepository = AppDataSource.getRepository(T_READING_INDEX_S02);
+    const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
+    const s02Fh = (await s02Repository.find()).map(s02 => s02.fh);
+    try {
+        for(const cnt of cnts) {
+            for(let i=0; i<dates.length; i++) {
+                var s02ReadingIndex = new T_READING_INDEX_S02();
+                s02ReadingIndex.cnt_id = cnt;
+                s02ReadingIndex.fh = dates[i];
+                if(s02Fh.includes(dates[i])) {
+                    s02ReadingIndex.read = 1;
+                } else {
+                    s02ReadingIndex.read = 0;
+                }
+                await s02ReadingIndexRepository.save(s02ReadingIndex);
+            }
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
 
-function getDatesBtwDates(fechaInicio: Date, fechaFin: Date): Date[] {
+
+export function getDatesBtwDates(fechaInicio: Date, fechaFin: Date): Date[] {
     const fechas: Date[] = [];
     let fechaActual: Date = new Date(fechaInicio);
 
@@ -84,9 +113,20 @@ function getDatesBtwDates(fechaInicio: Date, fechaFin: Date): Date[] {
         fechas.push(new Date(fechaActual));
         fechaActual.setDate(fechaActual.getDate() + 1);
     }
-
     return fechas;
 }
+
+export function getDatesBtwDatesS02(fechaInicio: Date, fechaFin: Date): Date[] {
+    const fechas: Date[] = [];
+    let fechaActual: Date = new Date(fechaInicio);
+    fechaActual.setHours(0, 0, 0, 0);
+    while (fechaActual <= fechaFin) {
+        fechas.push(new Date(fechaActual));
+        fechaActual.setHours(fechaActual.getHours()+1);
+    }
+    return fechas;
+}
+
 
 
 function includeDate(f1: Date[], f2: Date ): boolean {
