@@ -42,9 +42,9 @@ try {
   AppDataSource.initialize().then(async () => {
   await readFile(principalDir);
   const cncs = await getCnc();
-  //associateDatesS04(cncs);
-  //associateDatesS05(cncs);
-  associateDatesS02(cncs);
+  await associateDatesS04(cncs);
+  await associateDatesS05(cncs);
+  await associateDatesS02(cncs);
 
 
   setInterval(() => {
