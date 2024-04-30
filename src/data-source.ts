@@ -31,6 +31,7 @@ import { T_S12 } from "./entities/T_S12"
 import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04"
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05"
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02"
+import { PRUEBA } from "./entities/PRUEBA"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -42,7 +43,7 @@ export const AppDataSource = new DataSource({
     synchronize: true,
     logging: false,
     entities: [T_S02_TEMP, S13, S15, S31, S63, S65, T_S04_TEMP, T_S09_TEMP, T_S05_TEMP, T_G01_TEMP, T_G02_TEMP, T_G03_TEMP, T_G04_TEMP, T_G05_TEMP, T_G06_TEMP, T_G07_TEMP,
-        T_G56, T_G57, T_G58, T_S93, T_S94, T_S96, T_S97, T_S06, T_S12, T_S14, T_S17, T_S24, T_READING_INDEX_S04, T_READING_INDEX_S05, T_READING_INDEX_S02
+        T_G56, T_G57, T_G58, T_S93, T_S94, T_S96, T_S97, T_S06, T_S12, T_S14, T_S17, T_S24, T_READING_INDEX_S04, T_READING_INDEX_S05, T_READING_INDEX_S02, PRUEBA
     ],
     migrations: [],
     subscribers: [],

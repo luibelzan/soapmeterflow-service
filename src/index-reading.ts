@@ -6,6 +6,7 @@ import { T_S04_TEMP } from "./entities/T_S04_TEMP"
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
+import { PRUEBA } from "./entities/PRUEBA";
 
 
 export async function getCnc(): Promise<string[]> {
@@ -87,16 +88,29 @@ export async function associateDatesS02(cnts: string[]): Promise<void> {
     const s02ReadingIndexRepository = AppDataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
     const s02s = (await s02Repository.find());
+    
+    const fhRepository = AppDataSource.getRepository(PRUEBA);
+    for(const date of dates) {
+        var fecha = new PRUEBA();
+        fecha.fh = date;
+        await fhRepository.save(fecha);
+    }
+    //console.log(dates);
+    
     try {
         for(const cnt of cnts) {
-            for(let i=0; i<dates.length; i++) {
+            for(let i=0; i<dates.length; i+=24) {
                 var s02ReadingIndex = new T_READING_INDEX_S02();
                 s02ReadingIndex.cnt_id = cnt;
                 s02ReadingIndex.fh = dates[i];
-                if(includeFullDate(s02s, dates[i], cnt)) {
-                    s02ReadingIndex.read = 1;
-                } else {
-                    s02ReadingIndex.read = 0;
+                for(let j = 0; j<24; j++) {
+                    if(includeFullDate(s02s, dates[i+j], cnt)) {
+                        console.log(includeFullDate(s02s, dates[i+j], cnt), 'Indices: ', i, j, ' Fecha: ', dates[i+j]);
+                        s02ReadingIndex.read = 1;
+                    } else {
+                        s02ReadingIndex.read = 0;
+                        break;
+                    }
                 }
                 await s02ReadingIndexRepository.save(s02ReadingIndex);
             }
@@ -120,12 +134,15 @@ export function getDatesBtwDates(fechaInicio: Date, fechaFin: Date): Date[] {
 
 export function getDatesBtwDatesS02(fechaInicio: Date, fechaFin: Date): Date[] {
     const fechas: Date[] = [];
-    let fechaActual: Date = new Date(fechaInicio);
-    fechaActual.setHours(0, 0, 0, 0);
+    let fechaActual: Date = new Date(fechaInicio.getTime());
+    fechaActual.setHours(0, 0, 0, 0); // Set local time zone hours, minutes, seconds, and milliseconds to 0
+    fechaActual.setUTCHours(fechaActual.getUTCHours() + fechaActual.getTimezoneOffset() / 60); // Convert local time to UTC
+
     while (fechaActual <= fechaFin) {
-        fechas.push(new Date(fechaActual));
-        fechaActual.setHours(fechaActual.getHours()+1);
+        fechas.push(new Date(fechaActual.getTime()));
+        fechaActual.setUTCHours(fechaActual.getUTCHours() + 1);
     }
+
     return fechas;
 }
 
