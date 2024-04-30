@@ -18,22 +18,22 @@ export class T_S14 {
     @Column()
     bc: number;
 
-    @Column()
+    @Column({ type: 'float' })
     v1: number;
 
-    @Column()
+    @Column({ type: 'float' })
     v2: number;
 
-    @Column()
+    @Column({ type: 'float' })
     v3: number;
 
-    @Column()
+    @Column({ type: 'float' })
     i1: number;
 
-    @Column()
+    @Column({ type: 'float' })
     i2: number;
 
-    @Column()
+    @Column({ type: 'float' })
     i3: number;
 
     @Column()

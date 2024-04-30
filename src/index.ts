@@ -2,7 +2,7 @@ import { getData } from "./controllers/EventsController";
 import { readFile } from "./utils";
 import express from 'express';
 import { AppDataSource } from "./data-source"
-import { associateDatesS02, associateDatesS04, associateDatesS05, getCnc, getDatesBtwDates } from "./index-reading";
+import { associateDatesS02, associateDatesS04, associateDatesS05, getCncS02, getCncS04, getCncS05 } from "./index-reading";
 
 
 const bodyParser = require('body-parser');
@@ -41,10 +41,12 @@ try {
 try {
   AppDataSource.initialize().then(async () => {
   await readFile(principalDir);
-  const cncs = await getCnc();
-  await associateDatesS04(cncs);
-  await associateDatesS05(cncs);
-  await associateDatesS02(cncs);
+  const cncsS02 = await getCncS02();
+  const cncsS04 = await getCncS04();
+  const cncsS05 = await getCncS05();
+  await associateDatesS04(cncsS04);
+  await associateDatesS05(cncsS05);
+  await associateDatesS02(cncsS02);
 
 
   setInterval(() => {

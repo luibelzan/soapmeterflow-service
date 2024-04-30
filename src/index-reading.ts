@@ -6,18 +6,39 @@ import { T_S04_TEMP } from "./entities/T_S04_TEMP"
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
-import { PRUEBA } from "./entities/PRUEBA";
 
 
-export async function getCnc(): Promise<string[]> {
-    const s04Repository = AppDataSource.getRepository(T_S04_TEMP);
-    const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
+export async function getCncS02(): Promise<string[]> {
     const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
     try {
         //const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
-        const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
+        //const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
+        const s02s = (await s02Repository.createQueryBuilder('S02').select('DISTINCT S02.cnt_id').getRawMany()).map(item => item.cnt_id);
+        return s02s;
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+export async function getCncS04(): Promise<string[]> {
+    const s04Repository = AppDataSource.getRepository(T_S04_TEMP);
+    try {
+        const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
+        //const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
         //const s02s = (await s02Repository.createQueryBuilder('S02').select('DISTINCT S02.cnt_id').getRawMany()).map(item => item.cnt_id);
-        return s05;
+        return s04s;
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+export async function getCncS05(): Promise<string[]> {
+    const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
+    try {
+        //const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
+        const s05s = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
+        //const s02s = (await s02Repository.createQueryBuilder('S02').select('DISTINCT S02.cnt_id').getRawMany()).map(item => item.cnt_id);
+        return s05s;
     } catch(err) {
         console.error(err);
     }
@@ -88,15 +109,6 @@ export async function associateDatesS02(cnts: string[]): Promise<void> {
     const s02ReadingIndexRepository = AppDataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
     const s02s = (await s02Repository.find());
-    
-    const fhRepository = AppDataSource.getRepository(PRUEBA);
-    for(const date of dates) {
-        var fecha = new PRUEBA();
-        fecha.fh = date;
-        await fhRepository.save(fecha);
-    }
-    //console.log(dates);
-    
     try {
         for(const cnt of cnts) {
             for(let i=0; i<dates.length; i+=24) {
