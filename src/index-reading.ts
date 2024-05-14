@@ -9,8 +9,8 @@ import { T_S02_TEMP } from "./entities/T_S02_TEMP";
 import { DataSource } from "typeorm";
 
 
-export async function getCncS02(): Promise<string[]> {
-    const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
+export async function getCncS02(dataSource: DataSource): Promise<string[]> {
+    const s02Repository = dataSource.getRepository(T_S02_TEMP);
     try {
         //const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
         //const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
@@ -21,8 +21,8 @@ export async function getCncS02(): Promise<string[]> {
     }
 }
 
-export async function getCncS04(): Promise<string[]> {
-    const s04Repository = AppDataSource.getRepository(T_S04_TEMP);
+export async function getCncS04(dataSource: DataSource): Promise<string[]> {
+    const s04Repository = dataSource.getRepository(T_S04_TEMP);
     try {
         const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
         //const s05 = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);
@@ -33,8 +33,8 @@ export async function getCncS04(): Promise<string[]> {
     }
 }
 
-export async function getCncS05(): Promise<string[]> {
-    const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
+export async function getCncS05(dataSource: DataSource): Promise<string[]> {
+    const s05Repository = dataSource.getRepository(T_S05_TEMP);
     try {
         //const s04s = (await s04Repository.createQueryBuilder('S04').select('DISTINCT S04.cnt_id').getRawMany()).map(item => item.cnt_id);
         const s05s = (await s05Repository.createQueryBuilder('S05').select('DISTINCT S05.cnt_id').getRawMany()).map(item => item.cnt_id);

@@ -12,7 +12,9 @@ const app = express();
 const PORT = 8080;
 const interval = 5000;
 
-const principalDir = '../public/resources';
+const principalDir = '../public/resources/database1';
+const secondDir = '../public/resources/database2';
+const thirdDir = '../public/resources/database3';
 
 try {
   //Conexion con la base de datos
@@ -41,35 +43,40 @@ try {
 try {
   //DATABASE 1
   AppDataSource.initialize().then(async () => {
-    await readFile(principalDir);
-    const cncsS02 = await getCncS02();
-    const cncsS04 = await getCncS04();
-    const cncsS05 = await getCncS05();
-    await associateDates(cncsS02, cncsS04, cncsS05, AppDataSource);
 
-    const intervalHandler = async () => {
-      await readFile(principalDir); // Pasar el directorio como parámetro a readFile
-    };
+  await readFile(principalDir, AppDataSource);
+  const cncsS02 = await getCncS02(AppDataSource);
+  const cncsS04 = await getCncS04(AppDataSource);
+  const cncsS05 = await getCncS05(AppDataSource);
+  await associateDates(cncsS02, cncsS04, cncsS05, AppDataSource);
 
-    setInterval(async () => {
-      await intervalHandler();
-    }, interval);
+  setInterval(async () => {
+    await readFile(principalDir, AppDataSource); // Pasar el directorio como parámetro a readFile
+  }, interval);
+    
+  }).catch(error => console.log(error))
 
-    //DATABASE 2
-    await AppDataSource2.initialize();
-    const cncsS02_2 = await getCncS02();
-    const cncsS04_2 = await getCncS04();
-    const cncsS05_2 = await getCncS05();
-    await associateDates(cncsS02_2, cncsS04_2, cncsS05_2, AppDataSource2);
+  //DATABASE 2
+  AppDataSource2.initialize().then(async () => {
+    await readFile(secondDir, AppDataSource2);
+    const cncsS02 = await getCncS02(AppDataSource2);
+    const cncsS04 = await getCncS04(AppDataSource2);
+    const cncsS05 = await getCncS05(AppDataSource3);
 
-    //DATABASE 3  
-    await AppDataSource3.initialize();
-    const cncsS02_3 = await getCncS02();
-    const cncsS04_3 = await getCncS04();
-    const cncsS05_3 = await getCncS05();
-    await associateDates(cncsS02_3, cncsS04_3, cncsS05_3, AppDataSource3);
+    await associateDates(cncsS02, cncsS04, cncsS05, AppDataSource2);
 
-  }).catch(error => console.log(error));
+  }).catch(error => console.log(error))
+
+  //DATABASE 3  
+  AppDataSource3.initialize().then(async () => {
+    await readFile(thirdDir, AppDataSource3);
+    const cncsS02 = await getCncS02(AppDataSource3);
+    const cncsS04 = await getCncS04(AppDataSource3);
+    const cncsS05 = await getCncS05(AppDataSource3);
+
+    await associateDates(cncsS02, cncsS04, cncsS05, AppDataSource3);
+
+  }).catch(error => console.log(error))
 
 } catch(err) {
   console.error('Error al leer los archivos: ', err);

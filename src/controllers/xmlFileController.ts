@@ -1,7 +1,6 @@
 import { parseString } from 'xml2js';
 import fs from 'fs';
 import { T_S02_TEMP } from '../entities/T_S02_TEMP';
-import { AppDataSource } from '../data-source';
 import { parseDate, isValidDate } from '../utils';
 import { T_S04_TEMP } from '../entities/T_S04_TEMP';
 import { T_S09_TEMP } from '../entities/T_S09_TEMP';
@@ -25,9 +24,10 @@ import { T_S14 } from '../entities/T_S14';
 import { T_S17 } from '../entities/T_S17';
 import { T_S24 } from '../entities/T_S24';
 import { T_S12 } from '../entities/T_S12';
+import { DataSource } from 'typeorm';
 
 
-export async function parseFile(filePath: any): Promise<void> {
+export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
     try {
         const trozosDir = filePath.split('/');
         const file = trozosDir[trozosDir.length-1];
@@ -45,7 +45,7 @@ export async function parseFile(filePath: any): Promise<void> {
 
         const elements = result?.Report;
         if (elements !== undefined) {
-            await processReport(elements, idRpt, mag, reportDate);
+            await processReport(elements, idRpt, mag, reportDate, dataSource);
         }
         
     } catch (error) {
@@ -65,77 +65,77 @@ async function parseXml(data: string): Promise<any> {
     });
 }
 
-async function processReport(report: any, idRpt: string, mag: number, reportDate: string): Promise<void> {
+async function processReport(report: any, idRpt: string, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
 
     switch (idRpt) {
         case 'S04':
-            await processS04(report, mag, reportDate);
+            await processS04(report, mag, reportDate, dataSource);
             break;
         case 'S09':
-            await processS09(report, mag, reportDate);
+            await processS09(report, mag, reportDate, dataSource);
             break;
         case 'S05':
-            await processS05(report, mag, reportDate);
+            await processS05(report, mag, reportDate, dataSource);
             break;
         case 'S02':
-            await processS02(report, mag, reportDate);
+            await processS02(report, mag, reportDate, dataSource);
             break;
         case 'G01':
-            await processG01(report, mag, reportDate);
+            await processG01(report, mag, reportDate, dataSource);
             break;
         case 'G02':
-            await processG02(report, mag, reportDate);
+            await processG02(report, mag, reportDate, dataSource);
             break;
         case 'G03':
-            await processG03(report, mag, reportDate);
+            await processG03(report, mag, reportDate, dataSource);
             break;
         case 'G04':
-            await processG04(report, mag, reportDate);
+            await processG04(report, mag, reportDate, dataSource);
             break;
         case 'G05':
-            await processG05(report, mag, reportDate);
+            await processG05(report, mag, reportDate, dataSource);
             break;
         case 'G06':
-            await processG06(report, mag, reportDate);
+            await processG06(report, mag, reportDate, dataSource);
             break;
         case 'G07':
-            await processG07(report, mag, reportDate);
+            await processG07(report, mag, reportDate, dataSource);
             break;
         case 'G56':
-            await processG56(report, mag, reportDate);
+            await processG56(report, mag, reportDate, dataSource);
             break;
         case 'G57':
-            await processG57(report, mag, reportDate);
+            await processG57(report, mag, reportDate, dataSource);
             break;
         case 'G58':
-            await processG58(report, mag, reportDate);
+            await processG58(report, mag, reportDate, dataSource);
             break;
         case 'S93':
-            await processS93(report, mag, reportDate);
+            await processS93(report, mag, reportDate, dataSource);
             break;
         case 'S94':
-            await processS94(report, mag, reportDate);
+            await processS94(report, mag, reportDate, dataSource);
             break;
         case 'S96':
-            await processS96(report, mag, reportDate);
+            await processS96(report, mag, reportDate, dataSource);
             break;
         case 'S97':
-            await processS97(report, mag, reportDate);
+            await processS97(report, mag, reportDate, dataSource);
             break;
         case 'S06':
-            await processS06(report, mag, reportDate);
+            await processS06(report, mag, reportDate, dataSource);
             break;
         case 'S12':
-            await processS12(report, mag, reportDate);
+            await processS12(report, mag, reportDate, dataSource);
             break;
         case 'S14': 
-            await processS14(report, mag, reportDate);
+            await processS14(report, mag, reportDate, dataSource);
             break;
         case 'S17':
-            await processS17(report, mag, reportDate);
+            await processS17(report, mag, reportDate, dataSource);
             break;
         case 'S24':
-            await processS24(report, mag, reportDate);
+            await processS24(report, mag, reportDate, dataSource);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -143,8 +143,8 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
     }
 }
 
-async function processS04(report: any, mag: number, reportDate: string): Promise<void> {
-    const s04Repository = AppDataSource.getRepository(T_S04_TEMP);
+async function processS04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s04Repository = dataSource.getRepository(T_S04_TEMP);
     for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S04 != undefined) {
             for(let i=0; i<Object.keys(elem.S04).length; i++) {
@@ -197,8 +197,8 @@ async function processS04(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS09(report: any, mag: number, reportDate: string): Promise<void> {
-    const s09Repository = AppDataSource.getRepository(T_S09_TEMP);
+async function processS09(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s09Repository = dataSource.getRepository(T_S09_TEMP);
     for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S09 != undefined) {
             for(let i=0; i<Object.keys(elem.S09).length; i++) {
@@ -218,8 +218,8 @@ async function processS09(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS05(report: any, mag: number, reportDate: string): Promise<void> {
-    const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
+async function processS05(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s05Repository = dataSource.getRepository(T_S05_TEMP);
     for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S05 != undefined) {
             for(let i=0; i<Object.keys(elem.S05).length; i++) {
@@ -244,8 +244,8 @@ async function processS05(report: any, mag: number, reportDate: string): Promise
     };
 }
 
-async function processS02(report: any, mag: number, reportDate: string): Promise<void> {
-    const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
+async function processS02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s02Repository = dataSource.getRepository(T_S02_TEMP);
     const fechaHoraActual = new Date();
     for (const elem of report?.Cnc[0]?.Cnt) {
         if(elem.S02 != undefined) {
@@ -272,8 +272,8 @@ async function processS02(report: any, mag: number, reportDate: string): Promise
     };
 }
 
-async function processG01(report: any, mag: number, reportDate: string): Promise<void> {
-    const g01Repository = AppDataSource.getRepository(T_G01_TEMP);
+async function processG01(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g01Repository = dataSource.getRepository(T_G01_TEMP);
     for(const elem of report?.Cnc) {
         if(elem.G01 != undefined) {
             for(let i=0; i<Object.keys(elem.G01).length; i++) {
@@ -295,8 +295,8 @@ async function processG01(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG02(report: any, mag: number, reportDate: string): Promise<void> {
-    const g02Repository = AppDataSource.getRepository(T_G02_TEMP);
+async function processG02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g02Repository = dataSource.getRepository(T_G02_TEMP);
     for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G02).length; i++) {
@@ -318,8 +318,8 @@ async function processG02(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG03(report: any, mag: number, reportDate: string): Promise<void> {
-    const g03Repository = AppDataSource.getRepository(T_G03_TEMP);
+async function processG03(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g03Repository = dataSource.getRepository(T_G03_TEMP);
     for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G03).length; i++) {
@@ -356,8 +356,8 @@ async function processG03(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG04(report: any, mag: number, reportDate: string): Promise<void> {
-    const g04Repository = AppDataSource.getRepository(T_G04_TEMP);
+async function processG04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g04Repository = dataSource.getRepository(T_G04_TEMP);
     for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G04).length; i++) {
@@ -395,8 +395,8 @@ async function processG04(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG05(report: any, mag: number, reportDate: string): Promise<void> {
-    const g05Repository = AppDataSource.getRepository(T_G05_TEMP);
+async function processG05(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g05Repository = dataSource.getRepository(T_G05_TEMP);
     for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G05).length; i++) {
@@ -433,8 +433,8 @@ async function processG05(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG06(report: any, mag: number, reportDate: string): Promise<void> {
-    const g06Repository = AppDataSource.getRepository(T_G06_TEMP);
+async function processG06(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g06Repository = dataSource.getRepository(T_G06_TEMP);
     for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G06).length; i++) {
@@ -471,8 +471,8 @@ async function processG06(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG07(report: any, mag: number, reportDate: string): Promise<void> {
-    const g07Repository = AppDataSource.getRepository(T_G07_TEMP);
+async function processG07(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g07Repository = dataSource.getRepository(T_G07_TEMP);
     for(const elem of report?.Cnc[0].Cnt) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G07).length; i++) {
@@ -505,8 +505,8 @@ async function processG07(report: any, mag: number, reportDate: string): Promise
 }
 
 
-async function processG56(report: any, mag: number, reportDate: string): Promise<void> {
-    const g56Repository = AppDataSource.getRepository(T_G56);
+async function processG56(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g56Repository = dataSource.getRepository(T_G56);
     for(const elem of report?.Rtu[0].LVSLine) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G56).length; i++) {
@@ -549,8 +549,8 @@ async function processG56(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG57(report: any, mag: number, reportDate: string): Promise<void> {
-    const g57Repository = AppDataSource.getRepository(T_G57);
+async function processG57(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g57Repository = dataSource.getRepository(T_G57);
     for(const elem of report?.Rtu[0].LVSLine) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G57).length; i++) {
@@ -592,8 +592,8 @@ async function processG57(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processG58(report: any, mag: number, reportDate: string): Promise<void> {
-    const g58Repository = AppDataSource.getRepository(T_G58);
+async function processG58(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const g58Repository = dataSource.getRepository(T_G58);
     for(const elem of report?.Rtu[0].LVSLine) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.G58).length; i++) {
@@ -635,8 +635,8 @@ async function processG58(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS93(report: any, mag: number, reportDate: string): Promise<void> {
-    const s93Repository = AppDataSource.getRepository(T_S93);
+async function processS93(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s93Repository = dataSource.getRepository(T_S93);
     for(const elem of report?.Rtu) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.S93).length; i++) {
@@ -658,8 +658,8 @@ async function processS93(report: any, mag: number, reportDate: string): Promise
 }
 
 
-async function processS94(report: any, mag: number, reportDate: string): Promise<void> {
-    const s94Repository = AppDataSource.getRepository(T_S94);
+async function processS94(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s94Repository = dataSource.getRepository(T_S94);
     for(const elem of report?.Rtu) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.S94).length; i++) {
@@ -681,8 +681,8 @@ async function processS94(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS96(report: any, mag: number, reportDate: string): Promise<void> {
-    const s96Repository = AppDataSource.getRepository(T_S96);
+async function processS96(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s96Repository = dataSource.getRepository(T_S96);
     for(const elem of report?.Rtu) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.S96).length; i++) {
@@ -785,8 +785,8 @@ async function processS96(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS97(report: any, mag: number, reportDate: string): Promise<void> {
-    const s97Repository = AppDataSource.getRepository(T_S97);
+async function processS97(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s97Repository = dataSource.getRepository(T_S97);
     for(const elem of report?.Rtu) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem.S97).length; i++) {
@@ -807,8 +807,8 @@ async function processS97(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS06(report: any, mag: number, reportDate: string): Promise<void> {
-    const s06Repository = AppDataSource.getRepository(T_S06);
+async function processS06(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s06Repository = dataSource.getRepository(T_S06);
     for(const elem of report.Cnc[0].Cnt) {
         if(elem.S06 != undefined) {
             for(let i=0; i<Object.keys(elem.S06).length; i++) {
@@ -854,8 +854,8 @@ async function processS06(report: any, mag: number, reportDate: string): Promise
 }
 
 
-async function processS12(report: any, mag: number, reportDate: string): Promise<void> {
-    const s12Repository = AppDataSource.getRepository(T_S12);
+async function processS12(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s12Repository = dataSource.getRepository(T_S12);
     const elem = report.Cnc[0];
                 try {
                     var s12 = new T_S12();
@@ -922,8 +922,8 @@ async function processS12(report: any, mag: number, reportDate: string): Promise
             }
     
 
-async function processS14(report: any, mag: number, reportDate: string): Promise<void> {
-    const s14Repository = AppDataSource.getRepository(T_S14);
+async function processS14(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s14Repository = dataSource.getRepository(T_S14);
     for(const elem of report.Cnc[0].Cnt) {
         if(elem.S14 != undefined) {
             for(let i=0; i<Object.keys(elem.S14).length; i++) {
@@ -952,8 +952,8 @@ async function processS14(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS17(report: any, mag: number, reportDate: string): Promise<void> {
-    const s17Repository = AppDataSource.getRepository(T_S17);
+async function processS17(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const s17Repository = dataSource.getRepository(T_S17);
     for(const elem of report.Cnc) {
         if(elem.S17 != undefined) {
             for(let i=0; i<Object.keys(elem.S17).length; i++) {
@@ -975,9 +975,9 @@ async function processS17(report: any, mag: number, reportDate: string): Promise
     }
 }
 
-async function processS24(report: any, mag: number, reportDate: string): Promise<void> {
+async function processS24(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     //console.log(report.Cnc[0].S24[0].Meter);
-    const S24Repository = AppDataSource.getRepository(T_S24);
+    const S24Repository = dataSource.getRepository(T_S24);
     for(const elem of report.Cnc[0].S24[0].Meter) {
         if(elem != undefined) {
             for(let i=0; i<Object.keys(elem).length; i++) {

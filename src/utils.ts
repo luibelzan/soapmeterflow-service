@@ -1,9 +1,10 @@
+import { DataSource } from "typeorm";
 import { parseFile } from "./controllers/xmlFileController";
 const fs = require('fs');
 const path = require('path');
 var readFiles = [];
 
-export async function readFile(dir: string) {
+export async function readFile(dir: string, dataSource: DataSource) {
     try {
       const files = await fs.promises.readdir(dir);
       
@@ -11,11 +12,11 @@ export async function readFile(dir: string) {
         const fileDir = path.join(dir, file);
         const stats = await fs.promises.stat(fileDir);
         if(stats.isDirectory()) {
-          await readFile(fileDir);
+          await readFile(fileDir, dataSource);
         } else {
           if (!readFiles.includes(fileDir)) {
             console.log('Nuevo archivo detectado: ', fileDir);
-            await parseFile(fileDir);
+            await parseFile(fileDir, dataSource);
             readFiles.push(fileDir);
           }
         }
