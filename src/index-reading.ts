@@ -6,6 +6,7 @@ import { T_S04_TEMP } from "./entities/T_S04_TEMP"
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
+import { DataSource } from "typeorm";
 
 
 export async function getCncS02(): Promise<string[]> {
@@ -44,13 +45,13 @@ export async function getCncS05(): Promise<string[]> {
     }
 }
 
-export async function associateDatesS04(cnts: string[]): Promise<void> {
+export async function associateDatesS04(cnts: string[], dataSource: DataSource): Promise<void> {
 //Eejecutar esta funcion una vez al mes para que se inserten las nuevas fechas en la tabla de indices de lectura
     const f1 = new Date();
     const f2 = new Date();
     f2.setMonth(f1.getMonth()-1);
     const dates = getDatesBtwDates(f2, f1);
-    const s04ReadingIndexRepository = AppDataSource.getRepository(T_READING_INDEX_S04);
+    const s04ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S04);
     const s04Repository = AppDataSource.getRepository(T_S04_TEMP);
     const s04s = (await s04Repository.find());
     //console.log(s04Fh);
@@ -74,12 +75,12 @@ export async function associateDatesS04(cnts: string[]): Promise<void> {
     } 
 }
 
-export async function associateDatesS05(cnts: string[]): Promise<void> {
+export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
     f2.setMonth(f1.getMonth()-1);
     const dates = getDatesBtwDates(f2, f1);
-    const s05ReadingIndexRepository = AppDataSource.getRepository(T_READING_INDEX_S05);
+    const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
     const s05s = (await s05Repository.find());
     try {
@@ -101,12 +102,12 @@ export async function associateDatesS05(cnts: string[]): Promise<void> {
     }
 }
 
-export async function associateDatesS02(cnts: string[]): Promise<void> {
+export async function associateDatesS02(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
     f2.setMonth(f1.getMonth()-1);
     const dates = getDatesBtwDatesS02(f2, f1);
-    const s02ReadingIndexRepository = AppDataSource.getRepository(T_READING_INDEX_S02);
+    const s02ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = AppDataSource.getRepository(T_S02_TEMP);
     const s02s = (await s02Repository.find());
     try {
@@ -117,7 +118,7 @@ export async function associateDatesS02(cnts: string[]): Promise<void> {
                 s02ReadingIndex.fh = dates[i];
                 for(let j = 0; j<24; j++) {
                     if(includeFullDate(s02s, dates[i+j], cnt)) {
-                        console.log(includeFullDate(s02s, dates[i+j], cnt), 'Indices: ', i, j, ' Fecha: ', dates[i+j]);
+                        //console.log(includeFullDate(s02s, dates[i+j], cnt), 'Indices: ', i, j, ' Fecha: ', dates[i+j]);
                         s02ReadingIndex.read = 1;
                     } else {
                         s02ReadingIndex.read = 0;
@@ -191,4 +192,11 @@ function includeFullDate(reports: any, f2: Date, cnt: string): boolean {
         }
     }
     return res;
+}
+
+export async function associateDates(cncs02: string[], cncs04: string[], cncs05: string[], dataSource: DataSource) {
+    await associateDatesS02(cncs02, dataSource);
+    await associateDatesS04(cncs04, dataSource);
+    await associateDatesS05(cncs05, dataSource);
+    console.log('Read Index Calculated')
 }
