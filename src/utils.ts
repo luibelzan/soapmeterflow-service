@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { parseFile } from "./controllers/xmlFileController";
+import { associateDates, getCncS02, getCncS04, getCncS05 } from "./index-reading";
 const fs = require('fs');
 const path = require('path');
 var readFiles = [];
@@ -58,4 +59,21 @@ export function isValidDate(dateString: string): boolean {
 
     // Verificar si la fecha es válida
     return !isNaN(date.getTime());
+}
+
+
+export async function getReadIndex(dir: string, dataSource: DataSource) {
+  dataSource.initialize().then(async () => {
+    await readFile(dir, dataSource);
+    const cncsS02 = await getCncS02(dataSource);
+    const cncsS04 = await getCncS04(dataSource);
+    const cncsS05 = await getCncS05(dataSource);
+
+    await associateDates(cncsS02, cncsS04, cncsS05, dataSource);
+
+    setInterval(async () => {
+      await readFile(dir, dataSource); // Pasar el directorio como parámetro a readFile
+    }, 5000);
+    
+  }).catch(error => console.log(error))
 }
