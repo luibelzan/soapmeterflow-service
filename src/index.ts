@@ -1,7 +1,7 @@
 import { getData } from "./controllers/EventsController";
 import { getReadIndex } from "./utils";
 import express from 'express';
-import { AppDataSource, AppDataSource2, AppDataSource3 } from "./data-source"
+import { AppDataSource, dielec, mercedes, staClara } from "./data-source"
 
 const bodyParser = require('body-parser');
 const bodyParserXml = require('body-parser-xml');
@@ -11,8 +11,9 @@ const PORT = 8080;
 const interval = 5000;
 
 const principalDir = '../public/resources/database1';
-const secondDir = '../public/resources/database2';
-const thirdDir = '../public/resources/database3';
+const secondDir = '../public/resources/dielec';
+const thirdDir = '../public/resources/staclara';
+const fourthDir = '../public/resources/mercedes';
 
 try {
   //Conexion con la base de datos
@@ -40,13 +41,15 @@ try {
 
 try {
   //DATABASE 1
-  getReadIndex(principalDir, AppDataSource);
+  //getReadIndex(principalDir, AppDataSource);
 
   //DATABASE 2
-  getReadIndex(secondDir, AppDataSource2);
+  getReadIndex(secondDir, dielec);
 
   //DATABASE 3  
-  getReadIndex(thirdDir, AppDataSource3);
+  getReadIndex(thirdDir, staClara);
+
+  getReadIndex(fourthDir, mercedes);
 
 } catch(err) {
   console.error('Error al calcular los indices de lectura: ', err);
