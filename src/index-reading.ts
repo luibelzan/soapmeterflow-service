@@ -78,7 +78,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
 export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setMonth(f1.getMonth()-1);
+    f2.setMonth(f1.getMonth()-5);
     const dates = getDatesBtwDates(f2, f1);
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = AppDataSource.getRepository(T_S05_TEMP);
@@ -200,3 +200,25 @@ export async function associateDates(cncs02: string[], cncs04: string[], cncs05:
     await associateDatesS05(cncs05, dataSource);
     console.log('Read Index Calculated')
 }
+
+type MultiValueMap<K extends string | number | symbol, V> = {
+    [key in K]: V[];
+  };
+
+function addValueToMap<K extends string | number | symbol, V>(map: MultiValueMap<K, V>, key: K, value: V): void {
+    if (!map[key]) {
+      map[key] = [];
+    }
+    map[key].push(value);
+  }
+
+export async function getNonRead(dataSource: DataSource, entity: any): Promise<MultiValueMap<string, Date>> {
+    const res: MultiValueMap<string, Date> = {};
+    const indexRepository = dataSource.getRepository(entity);
+    const index = await indexRepository.createQueryBuilder('index').where('index.read = :read', { read: 0 }).getMany();
+    for(let i=0; i<index.length; i++) {
+        addValueToMap(res, index[i].cnt_id, index[i].fh);
+    }
+    return res;
+}
+

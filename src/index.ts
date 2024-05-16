@@ -2,6 +2,8 @@ import { getData } from "./controllers/EventsController";
 import { getReadIndex } from "./utils";
 import express from 'express';
 import { AppDataSource, dielec, mercedes, staClara } from "./data-source"
+import { getNonRead } from "./index-reading";
+import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 
 const bodyParser = require('body-parser');
 const bodyParserXml = require('body-parser-xml');
@@ -47,9 +49,15 @@ try {
   getReadIndex(secondDir, dielec);
 
   //DATABASE 3  
-  getReadIndex(thirdDir, staClara);
+  //getReadIndex(thirdDir, staClara);
 
-  getReadIndex(fourthDir, mercedes);
+  //getReadIndex(fourthDir, mercedes);
+
+  /*
+  dielec.initialize().then(async () => {
+    console.log(await getNonRead(dielec, T_READING_INDEX_S02));
+  })
+  */
 
 } catch(err) {
   console.error('Error al calcular los indices de lectura: ', err);
