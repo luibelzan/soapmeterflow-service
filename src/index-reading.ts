@@ -78,7 +78,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
 export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setMonth(f1.getMonth()-3);
+    f2.setMonth(f1.getMonth()-1);
     const dates = getDatesBtwDates(f2, f1);
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
@@ -166,21 +166,6 @@ export function getDatesBtwDates(fechaInicio: Date, fechaFin: Date): Date[] {
     return fechas;
 }
 
-/*
-export function getDatesBtwDatesS02(fechaInicio: Date, fechaFin: Date): Date[] {
-    const fechas: Date[] = [];
-    let fechaActual: Date = new Date(fechaInicio.getTime());
-    fechaActual.setHours(0, 0, 0, 0); // Set local time zone hours, minutes, seconds, and milliseconds to 0
-    fechaActual.setUTCHours(fechaActual.getUTCHours() + fechaActual.getTimezoneOffset() / 60); // Convert local time to UTC
-
-    while (fechaActual <= fechaFin) {
-        fechas.push(new Date(fechaActual.getTime()));
-        fechaActual.setUTCHours(fechaActual.getUTCHours() + 1);
-    }
-
-    return fechas;
-}
-*/
 
 export function getDatesBtwDatesS02(fechaInicio: Date, fechaFin: Date): Date[] {
     const fechas: Date[] = [];
@@ -228,51 +213,13 @@ function includeFullDate(reports: any, f2: Date, cnt: string): boolean {
     return res;
 }
 
-/*
-function includeFullDate(reports: any, f2: Date, cnt: string): boolean {
-    var res = false;
-    var f = new Date(Date.UTC(f2.getFullYear(), f2.getMonth(), f2.getDate(), f2.getHours(), f2.getMinutes(), f2.getSeconds(), f2.getMilliseconds()))
-    for(const s of reports) {
-        var cntId = s.cnt_id;
-        if(s.fh_i != undefined) {
-            var fh = new Date(Date.UTC(s.fh_i.getFullYear(), s.fh_i.getMonth(), s.fh_i.getDate(), s.fh_i.getHours(), s.fh_i.getMinutes(), s.fh_i.getSeconds(), s.fh_i.getMilliseconds()));
-        } else {
-            var fh = new Date(Date.UTC(s.fh.getFullYear(), s.fh.getMonth(), s.fh.getDate(), s.fh.getHours(), s.fh.getMinutes(), s.fh.getSeconds(), s.fh.getMilliseconds()));
-        }
-        if(fh.getDate()===f.getDate() && fh.getMonth()===f.getMonth() && fh.getFullYear()===f.getFullYear() && fh.getHours()===f.getHours() && fh.getMinutes===f.getMinutes && fh.getMilliseconds()===f.getMilliseconds() && cnt === cntId) {
-            res = true;
-            return res;
-        }
-    }
-    return res;
-}
-*/
 
 export async function associateDates(cncs02: string[], cncs04: string[], cncs05: string[], dataSource: DataSource) {
-    await associateDatesS02(cncs02, dataSource);
-    await associateDatesS04(cncs04, dataSource);
+    //await associateDatesS02(cncs02, dataSource);
+    //await associateDatesS04(cncs04, dataSource);
     await associateDatesS05(cncs05, dataSource);
     console.log('Read Index Calculated')
 }
 
-type MultiValueMap<K extends string | number | symbol, V> = {
-    [key in K]: V[];
-  };
 
-function addValueToMap<K extends string | number | symbol, V>(map: MultiValueMap<K, V>, key: K, value: V): void {
-    if (!map[key]) {
-      map[key] = [];
-    }
-    map[key].push(value);
-  }
-
-export async function getNonRead(dataSource: DataSource, entity: any): Promise<MultiValueMap<string, Date>> {
-    const res: MultiValueMap<string, Date> = {};
-    const indexRepository = dataSource.getRepository(entity);
-    const index = await indexRepository.createQueryBuilder('index').where('index.read = :read', { read: 0 }).getMany();
-    for(let i=0; i<index.length; i++) {
-        addValueToMap(res, index[i].cnt_id, index[i].fh);
-    }
-    return res;
-}
 

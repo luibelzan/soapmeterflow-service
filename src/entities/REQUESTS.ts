@@ -3,16 +3,19 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 @Entity()
 export class REQUESTS {
 
-    @Column()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column("text", { array: true })
     cnt_id: string[];
 
-    @Column()
-    fh_i: Date;
+    @Column({ nullable: true })
+    fh_i: string;
 
-    @Column()
-    fh_f: Date;
+    @Column({ nullable: true })
+    fh_f: string;
 
-    @Column()
+    @Column({ nullable: true })
     url: string; //tabla concecntardores
 
     @Column()
