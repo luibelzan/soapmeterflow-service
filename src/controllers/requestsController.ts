@@ -66,11 +66,11 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
             var cnc = await cncRepository.createQueryBuilder('cnc').where('cnc.id_ct = :id', { id: ctId}).getOne();
             request.url = cnc.ws_url;
             request.cnt_id = cntList;
-            request.fh_i = date;
+            request.fh_i = formatDate(date);
             request.url = cnc?.ws_url;
-            if(entity.name == 'T_S05_TEMP') {
+            if(entity.name.includes('S05')) {
                 request.report_type = 'S05';
-            } else if(entity.name == 'T_S04_TEMP') {
+            } else if(entity.name.includes('S04')) {
                 request.report_type = 'S04';
             } else {
                 request.report_type = 'S02';
@@ -84,9 +84,16 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
 
 }
 
-export async function buildXML(dataSource: DataSource) {
+export async function buildXML(dataSource: DataSource, entity: any) {
     const requestsRepository = dataSource.getRepository(REQUESTS);
-    const requests = await requestsRepository.find();
+    if(entity.name.includes('S05')) {
+        var type = 'S05';
+    } else if(entity.name.includes('S04')) {
+        var type = 'S04';
+    } else { 
+        var type = 'S02';
+    }
+    const requests = await requestsRepository.createQueryBuilder('req').where('req.report_type = :typ', { typ: type}).getMany();
     for(const req of requests) {
         if(req.cnt_id.length <= 10) {
             var xml = `<?xml version="1.0" encoding="utf-8"?>

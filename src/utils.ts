@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { parseFile } from "./controllers/xmlFileController";
 import { associateDates, getCncS02, getCncS04, getCncS05 } from "./index-reading";
+import { buildXML, getNonRead, loadRequests } from "./controllers/requestsController";
 const fs = require('fs');
 const path = require('path');
 var readFiles = [];
@@ -63,7 +64,7 @@ export function isValidDate(dateString: string): boolean {
 
 
 export async function getReadIndex(dir: string, dataSource: DataSource) {
-  dataSource.initialize().then(async () => {
+  //dataSource.initialize().then(async () => {
     await readFile(dir, dataSource);
     const cncsS02 = await getCncS02(dataSource);
     const cncsS04 = await getCncS04(dataSource);
@@ -75,5 +76,14 @@ export async function getReadIndex(dir: string, dataSource: DataSource) {
       await readFile(dir, dataSource); // Pasar el directorio como parámetro a readFile
     }, 5000);
     
-  }).catch(error => console.log(error))
+  //}).catch(error => console.log(error))
+}
+
+export async function getReadIndexAndSendRequests(dataSource: DataSource, dir: string, entity: any) {
+  dataSource.initialize().then(async () => {
+    await getReadIndex(dir, dataSource);
+    const nonRead = await getNonRead(dataSource, entity);
+    await loadRequests(nonRead, dataSource, entity);
+    await buildXML(dataSource, entity);
+  })
 }

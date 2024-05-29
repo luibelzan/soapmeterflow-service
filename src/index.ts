@@ -1,7 +1,7 @@
 import { getData } from "./controllers/EventsController";
-import { getReadIndex } from "./utils";
+import { getReadIndex, getReadIndexAndSendRequests } from "./utils";
 import express from 'express';
-import { AppDataSource, dielec, mercedes, staClara } from "./data-source"
+import { AppDataSource, chera, dielec, mercedes, staClara } from "./data-source"
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
@@ -21,6 +21,7 @@ const principalDir = '../public/resources/database1';
 const secondDir = '../public/resources/dielec';
 const thirdDir = '../public/resources/staclara';
 const fourthDir = '../public/resources/mercedes';
+const fiveDir = '../public/resources/chera';
 
 try {
   //Conexion con la base de datos
@@ -54,11 +55,15 @@ try {
   //getReadIndex(secondDir, dielec);
 
   
-  dielec.initialize().then(async () => {
-    //const nonRead = await getNonRead(dielec, T_READING_INDEX_S05);
+  //getReadIndex(fiveDir, chera);
+  /*
+  chera.initialize().then(async () => {
+    const nonRead = await getNonRead(dielec, T_READING_INDEX_S05);
     //await loadRequests(nonRead, dielec, T_S05_TEMP);
-    await buildXML(dielec);
+    await buildXML(chera);
   })
+  */
+ getReadIndexAndSendRequests(chera, fiveDir, T_READING_INDEX_S05);
   
   
 

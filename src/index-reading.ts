@@ -214,7 +214,7 @@ function includeFullDate(reports: any, f2: Date, cnt: string): boolean {
 }
 
 
-export async function associateDates(cncs02: string[], cncs04: string[], cncs05: string[], dataSource: DataSource) {
+export async function associateDates(cncs02: string[], cncs04: string[], cncs05: string[], dataSource: DataSource): Promise<void> {
     //await associateDatesS02(cncs02, dataSource);
     //await associateDatesS04(cncs04, dataSource);
     await associateDatesS05(cncs05, dataSource);
