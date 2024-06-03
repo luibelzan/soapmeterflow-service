@@ -2,6 +2,8 @@ import { DataSource } from "typeorm";
 import { T_CUPS } from "../entities/T_CUPS";
 import { T_CONCENTRADORES } from "../entities/T_CONCENTRADORES";
 import { REQUESTS } from "../entities/REQUESTS";
+import axios, { AxiosResponse } from 'axios';
+
 
 // Definir el tipo de la estructura
 type MultiValueMap = Map<string, string[]>;
@@ -95,6 +97,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
     }
     const requests = await requestsRepository.createQueryBuilder('req').where('req.report_type = :typ', { typ: type}).getMany();
     for(const req of requests) {
+        var url = req.url;
         if(req.cnt_id.length <= 10) {
             var xml = `<?xml version="1.0" encoding="utf-8"?>
             <s:Envelope 
@@ -109,7 +112,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             http://www.asais.fr/ns/Saturne/DC/ws">
             <IdPet>666</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
-            <tfStart>${formatDate(req.fh_i)}</tfStart>>
+            <tfStart>${req.fh_i}</tfStart>>
             <tfEnd>20170318000000000W</tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
@@ -117,6 +120,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </AsynchRequest>
             </s:Body>
             </s:Envelope>`
+            //sendWebService(xml, url);
+            console.log(url);
             console.log(xml);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
@@ -142,11 +147,24 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
+                console.log(url);
                 console.log(xml);
+                //sendWebService(xml, url);
             }
         }
         
     }
+}
+
+export async function sendWebService(xml: string, url: string): Promise<string> {
+    try {
+        const response: AxiosResponse<string> = await axios.post(url, xml);
+        return response.data;
+    } catch(err) { 
+        console.error('Error al enviar el WebService: ', err);
+        throw err;
+    } 
+
 }
 
 function formatDate(dateString: string): string {

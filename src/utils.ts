@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { parseFile } from "./controllers/xmlFileController";
 import { associateDates, getCncS02, getCncS04, getCncS05 } from "./index-reading";
 import { buildXML, getNonRead, loadRequests } from "./controllers/requestsController";
+import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 const fs = require('fs');
 const path = require('path');
 var readFiles = [];
@@ -79,11 +80,14 @@ export async function getReadIndex(dir: string, dataSource: DataSource) {
   //}).catch(error => console.log(error))
 }
 
-export async function getReadIndexAndSendRequests(dataSource: DataSource, dir: string, entity: any) {
+export async function getReadIndexAndSendRequests(dataSource: DataSource, dir: string) {
+  const entities = [T_READING_INDEX_S05]; //A'adir las entidades de s02 y s04 cuando este listo
   dataSource.initialize().then(async () => {
-    await getReadIndex(dir, dataSource);
-    const nonRead = await getNonRead(dataSource, entity);
-    await loadRequests(nonRead, dataSource, entity);
-    await buildXML(dataSource, entity);
+    //await getReadIndex(dir, dataSource);
+    for(const entity of entities) {
+      const nonRead = await getNonRead(dataSource, entity);
+      await loadRequests(nonRead, dataSource, entity);
+      await buildXML(dataSource, entity);
+    }
   })
 }

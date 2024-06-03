@@ -56,14 +56,7 @@ try {
 
   
   //getReadIndex(fiveDir, chera);
-  /*
-  chera.initialize().then(async () => {
-    const nonRead = await getNonRead(dielec, T_READING_INDEX_S05);
-    //await loadRequests(nonRead, dielec, T_S05_TEMP);
-    await buildXML(chera);
-  })
-  */
- getReadIndexAndSendRequests(chera, fiveDir, T_READING_INDEX_S05);
+  getReadIndexAndSendRequests(chera, fiveDir); //Funcion que calcula los indices y envia las peticiones
   
   
 
