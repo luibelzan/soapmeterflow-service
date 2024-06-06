@@ -66,7 +66,7 @@ export function isValidDate(dateString: string): boolean {
 
 export async function getReadIndex(dir: string, dataSource: DataSource) {
   //dataSource.initialize().then(async () => {
-    await readFile(dir, dataSource); //Podria situarse fuera de esta funcion para separar la funcionalidad
+    //await readFile(dir, dataSource); //Podria situarse fuera de esta funcion para separar la funcionalidad
     const cncsS02 = await getCncS02(dataSource);
     const cncsS04 = await getCncS04(dataSource);
     const cncsS05 = await getCncS05(dataSource);
@@ -91,4 +91,52 @@ export async function getReadIndexAndSendRequests(dataSource: DataSource, dir: s
       await buildXML(dataSource, entity);
     }
   })
+}
+
+export function stopFunction(intervalId: NodeJS.Timeout, dataSource: DataSource, dir: string) {
+  console.log('La funcion ha sido detenida');
+  clearInterval(intervalId);
+  getReadIndexAndSendRequests(dataSource, dir)
+}
+
+function calculateTimeUntil(horas: number, minutos: number): number {
+  const ahora = new Date();
+  const proximaEjecucion = new Date();
+  proximaEjecucion.setHours(horas, minutos, 0, 0);
+
+  // Si la hora de inicio ya pasó hoy, programa para mañana
+  if (proximaEjecucion.getTime() <= ahora.getTime()) {
+      proximaEjecucion.setDate(proximaEjecucion.getDate() + 1);
+  }
+
+  return proximaEjecucion.getTime() - ahora.getTime();
+}
+
+export function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, endHour: number) {
+  dataSource.initialize().then(async () => {
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    if (currentHours >= startHour && currentHours < endHour) {
+        // Estamos dentro del intervalo de ejecución
+        const param = "My parameter"; // Define el parámetro de entrada para myFunction
+        const intervalId = setInterval(() => readFile(dir, dataSource), 1000); // Ejecuta myFunction con el parámetro cada segundo
+
+        // Calcula el tiempo restante hasta el final del período de ejecución
+        const timeUntilEnd = calculateTimeUntil(endHour, 0);
+        setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd);
+    }
+
+    // Programa el inicio de la función para el próximo día a las 9:00 a.m.
+    const timeUntilStart = calculateTimeUntil(startHour, 0);
+    setTimeout(() => {
+        const param = "My parameter"; // Define el parámetro de entrada para myFunction
+        const intervalId = setInterval(() => readFile(dir, dataSource), 1000); // Ejecuta myFunction con el parámetro cada segundo
+
+        // Programa la detención de la función pasando intervalId como parámetro
+        const timeUntilEnd = calculateTimeUntil(endHour, 0);
+        setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd - timeUntilStart);
+    }, timeUntilStart);
+  }).catch((err) => console.error(err)); 
 }

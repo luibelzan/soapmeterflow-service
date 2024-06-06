@@ -1,5 +1,5 @@
 import { getData } from "./controllers/EventsController";
-import { getReadIndex, getReadIndexAndSendRequests } from "./utils";
+import { getReadIndex, getReadIndexAndSendRequests, scheduleDailyExecution } from "./utils";
 import express from 'express';
 import { AppDataSource, cela, chera, dielec, mercedes, staClara } from "./data-source"
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
@@ -59,7 +59,9 @@ try {
   //getReadIndex(fiveDir, chera);
   //getReadIndexAndSendRequests(chera, fiveDir); //Funcion que calcula los indices y envia las peticiones
 
-  getReadIndexAndSendRequests(cela, sixDir);
+  //getReadIndexAndSendRequests(cela, sixDir);
+  scheduleDailyExecution(cela, sixDir, 11, 13);
+  setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   
   
 
