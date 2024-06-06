@@ -78,7 +78,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
 export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setMonth(f1.getMonth()-1);
+    f2.setDate(f1.getDate()-6);
     const dates = getDatesBtwDates(f2, f1);
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
@@ -215,8 +215,8 @@ function includeFullDate(reports: any, f2: Date, cnt: string): boolean {
 
 
 export async function associateDates(cncs02: string[], cncs04: string[], cncs05: string[], dataSource: DataSource): Promise<void> {
-    //await associateDatesS02(cncs02, dataSource);
-    //await associateDatesS04(cncs04, dataSource);
+    await associateDatesS02(cncs02, dataSource);
+    await associateDatesS04(cncs04, dataSource);
     await associateDatesS05(cncs05, dataSource);
     console.log('Read Index Calculated')
 }

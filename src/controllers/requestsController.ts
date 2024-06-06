@@ -101,19 +101,15 @@ export async function buildXML(dataSource: DataSource, entity: any) {
         if(req.cnt_id.length <= 10) {
             var xml = `<?xml version="1.0" encoding="utf-8"?>
             <s:Envelope 
-            xmlns:s="
-            http://schemas.xmlsoap.org/soap/envelope/">
-            
+            xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
             <s:Body>
             <AsynchRequest
-                xmlns:i="
-            http://www.w3.org/2001/XMLSchema-instance"
-                xmlns="
-            http://www.asais.fr/ns/Saturne/DC/ws">
+                xmlns:i="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
             <IdPet>666</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
             <tfStart>${req.fh_i}</tfStart>>
-            <tfEnd>20170318000000000W</tfEnd>
+            <tfEnd>${req.fh_i}</tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
             <Source>${req.source}</Source>
@@ -128,19 +124,15 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 var cntAux = req.cnt_id.slice(i, i+10);
                 var xml = `<?xml version="1.0" encoding="utf-8"?>
                 <s:Envelope 
-                xmlns:s="
-                http://schemas.xmlsoap.org/soap/envelope/">
-                
+                xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
                 <s:Body>
                 <AsynchRequest
-                    xmlns:i="
-                http://www.w3.org/2001/XMLSchema-instance"
-                    xmlns="
-                http://www.asais.fr/ns/Saturne/DC/ws">
+                    xmlns:i="http://www.w3.org/2001/XMLSchema-instance"
+                    xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
                 <IdPet>666</IdPet>
                 <IdRpt>${req.report_type}</IdRpt>
-                <tfStart>${formatDate(req.fh_i)}</tfStart>>
-                <tfEnd>20170318000000000W</tfEnd>
+                <tfStart>${req.fh_i}</tfStart>>
+                <tfEnd>${req.fh_i}</tfEnd>
                 <IdMeters>${cntAux}</IdMeters>
                 <Priority>${req.priority}</Priority>
                 <Source>${req.source}</Source>

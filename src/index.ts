@@ -1,7 +1,7 @@
 import { getData } from "./controllers/EventsController";
 import { getReadIndex, getReadIndexAndSendRequests } from "./utils";
 import express from 'express';
-import { AppDataSource, chera, dielec, mercedes, staClara } from "./data-source"
+import { AppDataSource, cela, chera, dielec, mercedes, staClara } from "./data-source"
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
@@ -22,6 +22,7 @@ const secondDir = '../public/resources/dielec';
 const thirdDir = '../public/resources/staclara';
 const fourthDir = '../public/resources/mercedes';
 const fiveDir = '../public/resources/chera';
+const sixDir = '../public/resources/cela';
 
 try {
   //Conexion con la base de datos
@@ -56,7 +57,9 @@ try {
 
   
   //getReadIndex(fiveDir, chera);
-  getReadIndexAndSendRequests(chera, fiveDir); //Funcion que calcula los indices y envia las peticiones
+  //getReadIndexAndSendRequests(chera, fiveDir); //Funcion que calcula los indices y envia las peticiones
+
+  getReadIndexAndSendRequests(cela, sixDir);
   
   
 

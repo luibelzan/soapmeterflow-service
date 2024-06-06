@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import { parseFile } from "./controllers/xmlFileController";
 import { associateDates, getCncS02, getCncS04, getCncS05 } from "./index-reading";
-import { buildXML, getNonRead, loadRequests } from "./controllers/requestsController";
+import { buildXML, getNonRead, loadRequests, sendWebService } from "./controllers/requestsController";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 const fs = require('fs');
 const path = require('path');
@@ -66,16 +66,17 @@ export function isValidDate(dateString: string): boolean {
 
 export async function getReadIndex(dir: string, dataSource: DataSource) {
   //dataSource.initialize().then(async () => {
-    await readFile(dir, dataSource);
+    await readFile(dir, dataSource); //Podria situarse fuera de esta funcion para separar la funcionalidad
     const cncsS02 = await getCncS02(dataSource);
     const cncsS04 = await getCncS04(dataSource);
     const cncsS05 = await getCncS05(dataSource);
 
     await associateDates(cncsS02, cncsS04, cncsS05, dataSource);
-
+/*
     setInterval(async () => {
       await readFile(dir, dataSource); // Pasar el directorio como parámetro a readFile
     }, 5000);
+    */
     
   //}).catch(error => console.log(error))
 }
@@ -83,7 +84,7 @@ export async function getReadIndex(dir: string, dataSource: DataSource) {
 export async function getReadIndexAndSendRequests(dataSource: DataSource, dir: string) {
   const entities = [T_READING_INDEX_S05]; //A'adir las entidades de s02 y s04 cuando este listo
   dataSource.initialize().then(async () => {
-    //await getReadIndex(dir, dataSource);
+    await getReadIndex(dir, dataSource);
     for(const entity of entities) {
       const nonRead = await getNonRead(dataSource, entity);
       await loadRequests(nonRead, dataSource, entity);
