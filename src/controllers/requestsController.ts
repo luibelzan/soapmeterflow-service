@@ -77,7 +77,7 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
             } else {
                 request.report_type = 'S02';
             }
-            request.priority = 3;
+            request.priority = 1;
             request.source = 'MET';
             await requestRepository.save(request);
         }
@@ -99,6 +99,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
     for(const req of requests) {
         var url = req.url;
         if(req.cnt_id.length <= 10) {
+            var idPet = Math.floor(Math.random() * 900) + 100;
             var xml = `<?xml version="1.0" encoding="utf-8"?>
             <s:Envelope 
             xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
@@ -106,21 +107,22 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             <AsynchRequest
                 xmlns:i="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
-            <IdPet>666</IdPet>
+            <IdPet>${idPet}</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
             <tfStart>${req.fh_i}</tfStart>>
-            <tfEnd>${req.fh_i}</tfEnd>
+            <tfEnd></tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
             <Source>${req.source}</Source>
             </AsynchRequest>
             </s:Body>
             </s:Envelope>`
-            //sendWebService(xml, url);
             console.log(url);
-            console.log(xml);
+            sendWebService(xml, url);
+            //console.log(xml);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
+                var idPet = Math.floor(Math.random() * 900) + 100;
                 var cntAux = req.cnt_id.slice(i, i+10);
                 var xml = `<?xml version="1.0" encoding="utf-8"?>
                 <s:Envelope 
@@ -129,10 +131,10 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 <AsynchRequest
                     xmlns:i="http://www.w3.org/2001/XMLSchema-instance"
                     xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
-                <IdPet>666</IdPet>
+                <IdPet>${idPet}</IdPet>
                 <IdRpt>${req.report_type}</IdRpt>
                 <tfStart>${req.fh_i}</tfStart>>
-                <tfEnd>${req.fh_i}</tfEnd>
+                <tfEnd></tfEnd>
                 <IdMeters>${cntAux}</IdMeters>
                 <Priority>${req.priority}</Priority>
                 <Source>${req.source}</Source>
@@ -140,8 +142,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </s:Body>
                 </s:Envelope>`
                 console.log(url);
-                console.log(xml);
-                //sendWebService(xml, url);
+                //console.log(xml);
+                sendWebService(xml, url);
             }
         }
         
@@ -150,13 +152,17 @@ export async function buildXML(dataSource: DataSource, entity: any) {
 
 export async function sendWebService(xml: string, url: string): Promise<string> {
     try {
-        const response: AxiosResponse<string> = await axios.post(url, xml);
+        const response: AxiosResponse<string> = await axios.post(url, xml, {
+            headers: {
+                'Content-Type': 'application/xml',
+                'Accept': 'application/xml'
+            }
+        });
         return response.data;
-    } catch(err) { 
+    } catch (err) {
         console.error('Error al enviar el WebService: ', err);
-        throw err;
-    } 
-
+        //throw err; // Vuelve a lanzar el error para que pueda ser manejado por el llamador de esta función
+    }
 }
 
 function formatDate(dateString: string): string {

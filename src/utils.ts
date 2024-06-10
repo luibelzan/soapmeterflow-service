@@ -64,7 +64,7 @@ export function isValidDate(dateString: string): boolean {
 }
 
 
-export async function getReadIndex(dir: string, dataSource: DataSource) {
+export async function getReadIndex(dataSource: DataSource) {
   //dataSource.initialize().then(async () => {
     //await readFile(dir, dataSource); //Podria situarse fuera de esta funcion para separar la funcionalidad
     const cncsS02 = await getCncS02(dataSource);
@@ -81,22 +81,22 @@ export async function getReadIndex(dir: string, dataSource: DataSource) {
   //}).catch(error => console.log(error))
 }
 
-export async function getReadIndexAndSendRequests(dataSource: DataSource, dir: string) {
+export async function getReadIndexAndSendRequests(dataSource: DataSource) {
   const entities = [T_READING_INDEX_S05]; //A'adir las entidades de s02 y s04 cuando este listo
-  dataSource.initialize().then(async () => {
-    await getReadIndex(dir, dataSource);
+  //dataSource.initialize().then(async () => {
+    await getReadIndex(dataSource);
     for(const entity of entities) {
       const nonRead = await getNonRead(dataSource, entity);
       await loadRequests(nonRead, dataSource, entity);
       await buildXML(dataSource, entity);
     }
-  })
+  //})
 }
 
 export function stopFunction(intervalId: NodeJS.Timeout, dataSource: DataSource, dir: string) {
   console.log('La funcion ha sido detenida');
   clearInterval(intervalId);
-  getReadIndexAndSendRequests(dataSource, dir)
+  getReadIndexAndSendRequests(dataSource)
 }
 
 function calculateTimeUntil(horas: number, minutos: number): number {
@@ -112,7 +112,7 @@ function calculateTimeUntil(horas: number, minutos: number): number {
   return proximaEjecucion.getTime() - ahora.getTime();
 }
 
-export function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, endHour: number) {
+export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, endHour: number) {
   dataSource.initialize().then(async () => {
     const now = new Date();
     const currentHours = now.getHours();
@@ -120,23 +120,30 @@ export function scheduleDailyExecution(dataSource: DataSource, dir: string, star
 
     if (currentHours >= startHour && currentHours < endHour) {
         // Estamos dentro del intervalo de ejecución
-        const param = "My parameter"; // Define el parámetro de entrada para myFunction
-        const intervalId = setInterval(() => readFile(dir, dataSource), 1000); // Ejecuta myFunction con el parámetro cada segundo
+        await readFile(dir, dataSource);
+        const intervalId = setInterval(async () => 
+          await readFile(dir, dataSource), 5000); // Ejecuta myFunction con el parámetro cada segundo
 
         // Calcula el tiempo restante hasta el final del período de ejecución
         const timeUntilEnd = calculateTimeUntil(endHour, 0);
         setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd);
-    }
+    } 
+      // Programa el inicio de la función para el próximo día a las 9:00 a.m.
+      const timeUntilStart = calculateTimeUntil(startHour, 0);
+      setTimeout(() => {
+          const intervalId = setInterval(async () => await readFile(dir, dataSource), 5000); // Ejecuta myFunction con el parámetro cada segundo
 
-    // Programa el inicio de la función para el próximo día a las 9:00 a.m.
-    const timeUntilStart = calculateTimeUntil(startHour, 0);
-    setTimeout(() => {
-        const param = "My parameter"; // Define el parámetro de entrada para myFunction
-        const intervalId = setInterval(() => readFile(dir, dataSource), 1000); // Ejecuta myFunction con el parámetro cada segundo
-
-        // Programa la detención de la función pasando intervalId como parámetro
-        const timeUntilEnd = calculateTimeUntil(endHour, 0);
-        setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd - timeUntilStart);
-    }, timeUntilStart);
+          // Programa la detención de la función pasando intervalId como parámetro
+          const timeUntilEnd = calculateTimeUntil(endHour, 0);
+          setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd - timeUntilStart);
+      }, timeUntilStart);
   }).catch((err) => console.error(err)); 
+}
+
+export async function prueba(dir: string, dataSource: DataSource) {
+  dataSource.initialize().then(async () => {
+    //await readFile(dir, dataSource);
+    getReadIndexAndSendRequests(dataSource);
+  }).catch((err) => console.error(err));
+  
 }
