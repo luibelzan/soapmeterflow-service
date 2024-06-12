@@ -3,6 +3,7 @@ import { T_CUPS } from "../entities/T_CUPS";
 import { T_CONCENTRADORES } from "../entities/T_CONCENTRADORES";
 import { REQUESTS } from "../entities/REQUESTS";
 import axios, { AxiosResponse } from 'axios';
+import { REQUESTS2 } from "../entities/REQUESTS2";
 
 
 // Definir el tipo de la estructura
@@ -79,6 +80,7 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
             }
             request.priority = 1;
             request.source = 'MET';
+            request.ct_id = ctId;
             await requestRepository.save(request);
         }
     }
@@ -86,8 +88,58 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
 
 }
 
+
+export async function setDateInterval(dataSource: DataSource, entity: any) {
+    const requestRepository = dataSource.getRepository(REQUESTS);
+    const request2Repository = dataSource.getRepository(REQUESTS2);
+    const cncRepository = dataSource.getRepository(T_CONCENTRADORES);
+    const cts = await cncRepository.createQueryBuilder('cnc').select('cnc.id_ct').getMany(); 
+    if(entity.name.includes('S05')) {
+        var type = 'S05';
+    } else if(entity.name.includes('S04')) {
+        var type = 'S04';
+    } else {
+        var type = 'S02';
+    }
+
+    for(const ct of cts) {
+        const requests = await requestRepository.createQueryBuilder('req').where('req.ct_id = :id', { id: ct.id_ct}).andWhere('req.report_type LIKE :typ', { typ: type}).getMany();
+        var cnts = [];
+        var dates = [];
+        for(const req of requests) {
+            cnts.push(...req.cnt_id);
+            dates.push(req.fh_i);
+        }
+        const dateObjects = dates.map(date => {
+            const year = parseInt(date.slice(0, 4));
+            const month = parseInt(date.slice(4, 6)) - 1; // Restamos 1 porque los meses en JavaScript son 0-indexados
+            const day = parseInt(date.slice(6, 8));
+            const hour = parseInt(date.slice(8, 10));
+            const minute = parseInt(date.slice(10, 12));
+            const second = parseInt(date.slice(12, 14));
+            // Opcional: Si tienes milisegundos, se pueden extraer de la cadena también
+        
+            return new Date(year, month, day, hour, minute, second);
+        });
+        const minDate = new Date(Math.min(...dateObjects.map(date => date.getTime())));
+        const maxDate = new Date(Math.max(...dateObjects.map(date => date.getTime())));
+        //onsole.log(dates);
+        var request = new REQUESTS2();
+        request.cnt_id = cnts;
+        request.ct_id = ct.id_ct;
+        request.url = requests[0].url;
+        request.fh_i = formatDate(minDate.toISOString());
+        request.fh_f = formatDate(maxDate.toISOString());
+        request.source = 'MET';
+        request.priority = 3;
+        request.report_type = type;
+        await request2Repository.save(request);
+
+    }
+}
+
 export async function buildXML(dataSource: DataSource, entity: any) {
-    const requestsRepository = dataSource.getRepository(REQUESTS);
+    const requestsRepository = dataSource.getRepository(REQUESTS2);
     if(entity.name.includes('S05')) {
         var type = 'S05';
     } else if(entity.name.includes('S04')) {
@@ -110,7 +162,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             <IdPet>${idPet}</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
             <tfStart>${req.fh_i}</tfStart>>
-            <tfEnd></tfEnd>
+            <tfEnd>${req.fh_f}</tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
             <Source>${req.source}</Source>
@@ -134,7 +186,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 <IdPet>${idPet}</IdPet>
                 <IdRpt>${req.report_type}</IdRpt>
                 <tfStart>${req.fh_i}</tfStart>>
-                <tfEnd></tfEnd>
+                <tfEnd>${req.fh_f}</tfEnd>
                 <IdMeters>${cntAux}</IdMeters>
                 <Priority>${req.priority}</Priority>
                 <Source>${req.source}</Source>

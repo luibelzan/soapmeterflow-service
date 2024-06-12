@@ -5,7 +5,7 @@ import { AppDataSource, cela, chera, dielec, mercedes, pastor, staClara } from "
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
-import { loadRequests, getNonRead, groupByCT, buildXML, sendWebService } from "./controllers/requestsController";
+import { loadRequests, getNonRead, groupByCT, buildXML, sendWebService, setDateInterval } from "./controllers/requestsController";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 import { T_CUPS } from "./entities/T_CUPS";
 import { REQUESTS } from "./entities/REQUESTS";
@@ -66,7 +66,12 @@ try {
   scheduleDailyExecution(pastor, sevenDir, 10, 11);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   */
-  prueba(sevenDir, pastor);
+  //prueba(sevenDir, pastor);
+  
+  pastor.initialize().then(async () => {
+    await setDateInterval(pastor, T_S05_TEMP);
+  })
+  
   
 
   //DATABASE 3  
