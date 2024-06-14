@@ -24,7 +24,9 @@ const fourthDir = '../public/resources/mercedes';
 const fiveDir = '../public/resources/chera';
 const sixDir = '../public/resources/cela';
 const sevenDir = '../public/resources/pastor';
+const pruebaDir = '../public/resources/prueba';
 
+/*
 try {
   //Conexion con la base de datos
   AppDataSource.initialize().then(async () => {
@@ -48,7 +50,7 @@ try {
 } catch(error) {
   console.error('Error al conectar con la base de datos:' , error);
 }
-
+*/
 try {
   //DATABASE 1
   //getReadIndex(principalDir, AppDataSource);
@@ -66,11 +68,7 @@ try {
   scheduleDailyExecution(pastor, sevenDir, 10, 11);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   */
-  //prueba(sevenDir, pastor);
-  
-  pastor.initialize().then(async () => {
-    await setDateInterval(pastor, T_S05_TEMP);
-  })
+  prueba(pruebaDir, AppDataSource);
   
   
 
