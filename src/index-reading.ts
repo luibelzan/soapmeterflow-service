@@ -47,6 +47,7 @@ export async function getCncS05(dataSource: DataSource): Promise<string[]> {
 
 export async function associateDatesS04(cnts: string[], dataSource: DataSource): Promise<void> {
 //Eejecutar esta funcion una vez al mes para que se inserten las nuevas fechas en la tabla de indices de lectura
+//Posible modificadcion: eliminar de la lista de fechas todas las que no pertenezcan al dia 1 ya que los s04 son reportes mensuales
     const f1 = new Date();
     const f2 = new Date();
     f2.setMonth(f1.getMonth()-1);

@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import { parseFile } from "./controllers/xmlFileController";
 import { associateDates, getCncS02, getCncS04, getCncS05 } from "./index-reading";
-import { buildXML, getNonRead, loadRequests, sendWebService } from "./controllers/requestsController";
+import { buildXML, getNonRead, loadRequests, sendWebService, setDateInterval } from "./controllers/requestsController";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 const fs = require('fs');
 const path = require('path');
@@ -88,6 +88,7 @@ export async function getReadIndexAndSendRequests(dataSource: DataSource) {
     for(const entity of entities) {
       const nonRead = await getNonRead(dataSource, entity);
       await loadRequests(nonRead, dataSource, entity);
+      await setDateInterval(dataSource, entity);
       await buildXML(dataSource, entity);
     }
   //})

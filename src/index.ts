@@ -5,7 +5,7 @@ import { AppDataSource, cela, chera, dielec, mercedes, pastor, staClara } from "
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
-import { loadRequests, getNonRead, groupByCT, buildXML, sendWebService } from "./controllers/requestsController";
+import { loadRequests, getNonRead, groupByCT, buildXML, sendWebService, setDateInterval } from "./controllers/requestsController";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 import { T_CUPS } from "./entities/T_CUPS";
 import { REQUESTS } from "./entities/REQUESTS";
@@ -24,7 +24,9 @@ const fourthDir = '../public/resources/mercedes';
 const fiveDir = '../public/resources/chera';
 const sixDir = '../public/resources/cela';
 const sevenDir = '../public/resources/pastor';
+const pruebaDir = '../public/resources/prueba';
 
+/*
 try {
   //Conexion con la base de datos
   AppDataSource.initialize().then(async () => {
@@ -48,7 +50,7 @@ try {
 } catch(error) {
   console.error('Error al conectar con la base de datos:' , error);
 }
-
+*/
 try {
   //DATABASE 1
   //getReadIndex(principalDir, AppDataSource);
@@ -66,7 +68,8 @@ try {
   scheduleDailyExecution(pastor, sevenDir, 10, 11);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   */
-  prueba(sevenDir, pastor);
+  prueba(pruebaDir, AppDataSource);
+  
   
 
   //DATABASE 3  
