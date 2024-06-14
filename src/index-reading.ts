@@ -47,11 +47,12 @@ export async function getCncS05(dataSource: DataSource): Promise<string[]> {
 
 export async function associateDatesS04(cnts: string[], dataSource: DataSource): Promise<void> {
 //Eejecutar esta funcion una vez al mes para que se inserten las nuevas fechas en la tabla de indices de lectura
-//Posible modificadcion: eliminar de la lista de fechas todas las que no pertenezcan al dia 1 ya que los s04 son reportes mensuales
+//Posible modificadcion: eliminar de la lista de fechas todas las que no pertenezcan al dia 1 ya que los s04 son reportes mensuales (Hecho)
     const f1 = new Date();
     const f2 = new Date();
     f2.setMonth(f1.getMonth()-1);
-    const dates = getDatesBtwDates(f2, f1);
+    const fullDates = getDatesBtwDates(f2, f1);
+    const dates = fullDates.filter(date => date.getDate() === 1);
     const s04ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S04);
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
     const s04s = (await s04Repository.find());
@@ -221,6 +222,8 @@ export async function associateDates(cncs02: string[], cncs04: string[], cncs05:
     await associateDatesS05(cncs05, dataSource);
     console.log('Read Index Calculated')
 }
+
+
 
 
 
