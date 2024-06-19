@@ -69,7 +69,8 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
             var cnc = await cncRepository.createQueryBuilder('cnc').where('cnc.id_ct = :id', { id: ctId}).getOne();
             request.url = cnc.ws_url;
             request.cnt_id = cntList;
-            request.fh_i = formatDate(date);
+            //console.log(date, '========', formatDate(date));
+            request.fh_i = new Date(date);
             request.url = cnc?.ws_url;
             if(entity.name.includes('S05')) {
                 request.report_type = 'S05';
@@ -104,32 +105,29 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
 
     for(const ct of cts) {
         const requests = await requestRepository.createQueryBuilder('req').where('req.ct_id = :id', { id: ct.id_ct}).andWhere('req.report_type LIKE :typ', { typ: type}).getMany();
-        if(requests != undefined) {
+        if(requests.length > 0) {
             var cnts = [];
             var dates = [];
             for(const req of requests) {
                 cnts.push(...req.cnt_id);
                 dates.push(req.fh_i);
             }
-            const dateObjects = dates.map(date => {
-                const year = parseInt(date.slice(0, 4));
-                const month = parseInt(date.slice(4, 6)) - 1; 
-                const day = parseInt(date.slice(6, 8));
-                const hour = parseInt(date.slice(8, 10));
-                const minute = parseInt(date.slice(10, 12));
-                const second = parseInt(date.slice(12, 14));
             
-                return new Date(year, month, day, hour, minute, second);
-            });
-            const minDate = new Date(Math.min(...dateObjects.map(date => date.getTime())));
-            const maxDate = new Date(Math.max(...dateObjects.map(date => date.getTime())));
-            //onsole.log(dates);
+            const minDate = new Date(Math.min(...dates.map(date => date.getTime())));
+            const maxDate = new Date(Math.max(...dates.map(date => date.getTime())));
             var request = new REQUESTS2();
+            if(maxDate.getTime() == minDate.getTime() && type == 'S04') {
+                var fecha = new Date(minDate);
+                fecha.setMonth(minDate.getMonth()+1);
+                request.fh_i = minDate;
+                request.fh_f = fecha;
+            } else {
+                request.fh_i = minDate;
+                request.fh_f = maxDate;
+            }
             request.cnt_id = cnts;
             request.ct_id = ct.id_ct;
             request.url = requests[0].url;
-            request.fh_i = formatDate(minDate.toISOString());
-            request.fh_f = formatDate(maxDate.toISOString());
             request.source = 'MET';
             request.priority = 3;
             request.report_type = type;
@@ -169,8 +167,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </AsynchRequest>
             </s:Body>
             </s:Envelope>`
-            console.log(url);
-            sendWebService(xml, url);
+            //console.log(url);
+            //sendWebService(xml, url);
             //console.log(xml);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
@@ -193,9 +191,9 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
-                console.log(url);
+                //console.log(url);
                 //console.log(xml);
-                sendWebService(xml, url);
+                //sendWebService(xml, url);
             }
         }
         

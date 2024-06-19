@@ -68,7 +68,7 @@ try {
   scheduleDailyExecution(pastor, sevenDir, 10, 11);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   */
-  prueba(pruebaDir, AppDataSource);
+  prueba(sevenDir, pastor);
   
   
 

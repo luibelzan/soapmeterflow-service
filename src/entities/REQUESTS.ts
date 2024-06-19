@@ -10,10 +10,10 @@ export class REQUESTS {
     cnt_id: string[];
 
     @Column({ nullable: true })
-    fh_i: string;
+    fh_i: Date;
 
     @Column({ nullable: true })
-    fh_f: string;
+    fh_f: Date;
 
     @Column({ nullable: true })
     url: string; //tabla concecntardores
