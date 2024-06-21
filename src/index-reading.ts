@@ -50,9 +50,13 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
 //Posible modificadcion: eliminar de la lista de fechas todas las que no pertenezcan al dia 1 ya que los s04 son reportes mensuales (Hecho)
     const f1 = new Date();
     const f2 = new Date();
-    f2.setMonth(f1.getMonth()-1);
+    if(f1.getDate() == 1) {
+        f2.setMonth(f1.getMonth()-1);
+    } else {
+        f2.setMonth(f1.getMonth()-2);
+    }
     const fullDates = getDatesBtwDates(f2, f1);
-    const dates = fullDates.filter(date => date.getDate() === 1);
+    const dates = fullDates.filter(date => date.getDate() === 1 && date.getMonth() < new Date().getMonth());
     const s04ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S04);
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
     const s04s = (await s04Repository.find());

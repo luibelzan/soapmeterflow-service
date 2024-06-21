@@ -144,7 +144,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 
 export async function prueba(dir: string, dataSource: DataSource) {
   dataSource.initialize().then(async () => {
-    await readFile(dir, dataSource);
+    //await readFile(dir, dataSource);
     getReadIndexAndSendRequests(dataSource);
   }).catch((err) => console.error(err));
   

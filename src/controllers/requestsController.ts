@@ -204,8 +204,10 @@ export async function sendWebService(xml: string, url: string): Promise<string> 
     try {
         const response: AxiosResponse<string> = await axios.post(url, xml, {
             headers: {
-                'Content-Type': 'application/xml',
-                'Accept': 'application/xml'
+                'Accept-Encoding': 'gzip,deflate',
+                'Content-Type': 'text/xml;charset=UTF-8',
+                'SOAPAction': 'http://www.asais.fr/ns/Saturne/DC/ws/Request',
+                'Connection': 'Keep-Alive',
             }
         });
         return response.data;
@@ -215,20 +217,15 @@ export async function sendWebService(xml: string, url: string): Promise<string> 
     }
 }
 
-function formatDate(dateString: string): string {
-    const date = new Date(dateString);
-
-    // Ajustar la fecha a la medianoche UTC
-    const year = date.getUTCFullYear().toString();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    
-    // Las horas, minutos, segundos y milisegundos en UTC se establecen a cero
-    const hours = '00';
-    const minutes = '00';
-    const seconds = '00';
-    const milliseconds = '000';
+function formatDate(date: Date): string {
+    const year = date.getFullYear().toString().padStart(4, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
     
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}W`;
-}
+  }
 
