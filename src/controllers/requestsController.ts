@@ -121,6 +121,11 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                 fecha.setMonth(minDate.getMonth()+1);
                 request.fh_i = minDate;
                 request.fh_f = fecha;
+            } else if(type == 'S02') {
+                var fecha = new Date(maxDate);
+                fecha.setHours(23, 0, 0, 0);
+                request.fh_i = minDate;
+                request.fh_f = fecha;
             } else {
                 request.fh_i = minDate;
                 request.fh_f = maxDate;

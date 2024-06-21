@@ -84,7 +84,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
 export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setDate(f1.getDate()-6);
+    f2.setMonth(f1.getMonth()-1);
     const dates = getDatesBtwDates(f2, f1);
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
@@ -112,7 +112,7 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
 export async function associateDatesS02(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setMonth(f1.getMonth()-3);
+    f2.setDate(f1.getDate()-6);
     const dates = getDatesBtwDatesS02(f2, f1);
     const s02ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = dataSource.getRepository(T_S02_TEMP);

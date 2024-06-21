@@ -4,6 +4,7 @@ import { associateDates, getCncS02, getCncS04, getCncS05 } from "./index-reading
 import { buildXML, getNonRead, loadRequests, sendWebService, setDateInterval } from "./controllers/requestsController";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04";
+import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 const fs = require('fs');
 const path = require('path');
 var readFiles = [];
@@ -83,7 +84,7 @@ export async function getReadIndex(dataSource: DataSource) {
 }
 
 export async function getReadIndexAndSendRequests(dataSource: DataSource) {
-  const entities = [T_READING_INDEX_S05, T_READING_INDEX_S04]; //A'adir las entidades de s02 y s04 cuando este listo
+  const entities = [T_READING_INDEX_S05, T_READING_INDEX_S04, T_READING_INDEX_S02]; //A'adir las entidades de s02 y s04 cuando este listo
   //dataSource.initialize().then(async () => {
     await getReadIndex(dataSource);
     for(const entity of entities) {
