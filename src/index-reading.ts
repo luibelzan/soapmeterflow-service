@@ -46,65 +46,97 @@ export async function getCncS05(dataSource: DataSource): Promise<string[]> {
 }
 
 export async function associateDatesS04(cnts: string[], dataSource: DataSource): Promise<void> {
-//Eejecutar esta funcion una vez al mes para que se inserten las nuevas fechas en la tabla de indices de lectura
-//Posible modificadcion: eliminar de la lista de fechas todas las que no pertenezcan al dia 1 ya que los s04 son reportes mensuales (Hecho)
     const f1 = new Date();
     const f2 = new Date();
-    if(f1.getDate() == 1) {
-        f2.setMonth(f1.getMonth()-1);
+    if (f1.getDate() == 1) {
+        f2.setMonth(f1.getMonth() - 1);
     } else {
-        f2.setMonth(f1.getMonth()-2);
+        f2.setMonth(f1.getMonth() - 2);
     }
     const fullDates = getDatesBtwDates(f2, f1);
     const dates = fullDates.filter(date => date.getDate() === 1 && date.getMonth() < new Date().getMonth());
     const s04ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S04);
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
-    const s04s = (await s04Repository.find());
-    //console.log(s04Fh);
+
+    const s04s = await s04Repository.find();
+    const s04Map = new Map<string, Set<number>>();
+
+    // Crear un mapa de cnts a fechas para una búsqueda más rápida
+    for (const s04 of s04s) {
+        if (!s04Map.has(s04.cnt_id)) {
+            s04Map.set(s04.cnt_id, new Set<number>());
+        }
+        s04Map.get(s04.cnt_id)!.add(s04.fh_i.getTime());
+    }
+
+    const s04ReadingIndices: T_READING_INDEX_S04[] = [];
+
     try {
-        for(const cnt of cnts) {
-            for(let i=0; i<dates.length; i++) {
-                var s04ReadingIndex = new T_READING_INDEX_S04();
+        for (const cnt of cnts) {
+            for (const date of dates) {
+                const s04ReadingIndex = new T_READING_INDEX_S04();
                 s04ReadingIndex.cnt_id = cnt;
-                s04ReadingIndex.fh = dates[i];
-                if(includeDate(s04s, dates[i], cnt)) {
+                s04ReadingIndex.fh = date;
+
+                if (includeDate(s04Map, cnt, date)) {
                     s04ReadingIndex.read = 1;
                 } else {
                     s04ReadingIndex.read = 0;
                 }
-                await s04ReadingIndexRepository.save(s04ReadingIndex);
-                //console.log(cnt, ' - ', dates[i]);
+
+                s04ReadingIndices.push(s04ReadingIndex);
             }
         }
-    } catch(err) {
+
+        // Guardar todos los índices de lectura de una vez
+        await s04ReadingIndexRepository.save(s04ReadingIndices);
+    } catch (err) {
         console.error(err);
-    } 
+    }
 }
 
 export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setMonth(f1.getMonth()-1);
+    f2.setDate(f1.getDate() - 6);
     const dates = getDatesBtwDates(f2, f1);
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
-    const s05s = (await s05Repository.find());
+
+    const s05s = await s05Repository.find();
+    const s05Map = new Map<string, Set<number>>();
+
+    // Crear un mapa de cnts a fechas para una búsqueda más rápida
+    for (const s05 of s05s) {
+        if (!s05Map.has(s05.cnt_id)) {
+            s05Map.set(s05.cnt_id, new Set<number>());
+        }
+        s05Map.get(s05.cnt_id)!.add(s05.fh.getTime());
+    }
+
+    const s05ReadingIndices: T_READING_INDEX_S05[] = [];
+
     try {
-          for(const cnt of cnts) {
-            for(let i=0; i<dates.length; i++) {
-                var s05ReadingIndex = new T_READING_INDEX_S05();
+        for (const cnt of cnts) {
+            for (const date of dates) {
+                const s05ReadingIndex = new T_READING_INDEX_S05();
                 s05ReadingIndex.cnt_id = cnt;
-                s05ReadingIndex.fh = dates[i];
-                //console.log(dates[i], cnt, includeDate(s05s, dates[i], cnt))
-                if(includeDate(s05s, dates[i], cnt)) {
+                s05ReadingIndex.fh = date;
+
+                // Verificar si la fecha está incluida en el mapa
+                if (includeDate(s05Map, cnt, date)) {
                     s05ReadingIndex.read = 1;
                 } else {
                     s05ReadingIndex.read = 0;
                 }
-                await s05ReadingIndexRepository.save(s05ReadingIndex);
+
+                s05ReadingIndices.push(s05ReadingIndex);
             }
-          }
-    } catch(err) {
+        }
+
+        // Guardar todos los índices de lectura de una vez
+        await s05ReadingIndexRepository.save(s05ReadingIndices);
+    } catch (err) {
         console.error(err);
     }
 }
@@ -112,54 +144,75 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
 export async function associateDatesS02(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setDate(f1.getDate()-6);
+    f2.setDate(f1.getDate() - 6);
     const dates = getDatesBtwDatesS02(f2, f1);
     const s02ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
-    const s02s = (await s02Repository.find());
+
+    const s02s = await s02Repository.find();
+    const s02Map = new Map<string, Set<number>>();
+
+    // Crear un mapa de cnts a fechas para una búsqueda más rápida
+    for (const s02 of s02s) {
+        if (!s02Map.has(s02.cnt_id)) {
+            s02Map.set(s02.cnt_id, new Set<number>());
+        }
+        s02Map.get(s02.cnt_id)!.add(s02.fh.getTime());
+    }
+
+    const s02ReadingIndices: T_READING_INDEX_S02[] = [];
+
     try {
-        for(const cnt of cnts) {
-            for(let i=0; i<dates.length; i+=24) {
-                var s02ReadingIndex = new T_READING_INDEX_S02();
+        for (const cnt of cnts) {
+            for (let i = 0; i < dates.length; i += 24) {
+                const s02ReadingIndex = new T_READING_INDEX_S02();
                 s02ReadingIndex.cnt_id = cnt;
                 s02ReadingIndex.fh = dates[i];
-                if(dates[i].getMonth()==2 && dates[i].getDate()===31) {
-                    for(let j = 0; j<23; j++) {
-                        //console.log(includeFullDate(s02s, dates[i+j], cnt), 'Indices: ', i, j, ' Fecha: ', dates[i+j]);
-                        if(includeFullDate(s02s, dates[i+j], cnt)) {
-                            s02ReadingIndex.read = 1;
-                        } else {
-                            s02ReadingIndex.read = 0;
-                            break;
-                        }
-                    }
-                } else if(dates[i].getMonth()===9 && dates[i].getDate()===27) {
-                    for(let j = 0; j<25; j++) {
-                        if(includeFullDate(s02s, dates[i+j], cnt)) {
-                            s02ReadingIndex.read = 1;
-                        } else {
-                            s02ReadingIndex.read = 0;
-                            break;
-                        }
-                    }
+
+                let read = true;
+                const dateRange = getDateRange(dates[i], 24);
+
+                if (dates[i].getMonth() === 2 && dates[i].getDate() === 31) {
+                    read = checkDateRange(s02Map, cnt, dateRange.slice(0, 23));
+                } else if (dates[i].getMonth() === 9 && dates[i].getDate() === 27) {
+                    read = checkDateRange(s02Map, cnt, dateRange.slice(0, 25));
                 } else {
-                    for(let j = 0; j<24; j++) {
-                        if(includeFullDate(s02s, dates[i+j], cnt)) {
-                            s02ReadingIndex.read = 1;
-                        } else {
-                            s02ReadingIndex.read = 0;
-                            break;
-                        }
-                    }
+                    read = checkDateRange(s02Map, cnt, dateRange);
                 }
-                await s02ReadingIndexRepository.save(s02ReadingIndex);
+
+                s02ReadingIndex.read = read ? 1 : 0;
+                s02ReadingIndices.push(s02ReadingIndex);
             }
         }
-    } catch(err) {
+
+        // Guardar todos los índices de lectura de una vez
+        await s02ReadingIndexRepository.save(s02ReadingIndices);
+    } catch (err) {
         console.error(err);
     }
 }
 
+function getDateRange(startDate: Date, hours: number): Date[] {
+    const dates = [];
+    for (let i = 0; i < hours; i++) {
+        const date = new Date(startDate);
+        date.setHours(startDate.getHours() + i);
+        dates.push(date);
+    }
+    return dates;
+}
+
+function checkDateRange(s02Map: Map<string, Set<number>>, cnt: string, dateRange: Date[]): boolean {
+    const dateSet = s02Map.get(cnt);
+    if (!dateSet) return false;
+
+    for (const date of dateRange) {
+        if (!dateSet.has(date.getTime())) {
+            return false;
+        }
+    }
+    return true;
+}
 
 export function getDatesBtwDates(fechaInicio: Date, fechaFin: Date): Date[] {
     const fechas: Date[] = [];
@@ -185,38 +238,10 @@ export function getDatesBtwDatesS02(fechaInicio: Date, fechaFin: Date): Date[] {
 }
 
 
-function includeDate(reports: any, f2: Date, cnt: string): boolean {
-    var res = false;
-    for(const s of reports) {
-        var cntId = s.cnt_id;
-        if(s.fh_i != undefined) {
-            var fh = s.fh_i;
-        } else {
-            var fh = s.fh;
-        }
-        if(fh.getDate()===f2.getDate() && fh.getMonth()===f2.getMonth() && fh.getFullYear()===f2.getFullYear()  && cnt === cntId) {
-            res = true;
-            return res;
-        }
-    }
-    return res;
-}
-
-function includeFullDate(reports: any, f2: Date, cnt: string): boolean {
-    var res = false;
-    for(const s of reports) {
-        var cntId = s.cnt_id;
-        if(s.fh_i != undefined) {
-            var fh = s.fh_i;
-        } else {
-            var fh = s.fh;
-        }
-        if(fh.getUTCDate()===f2.getUTCDate() && fh.getUTCMonth()===f2.getUTCMonth() && fh.getUTCFullYear()===f2.getUTCFullYear() && fh.getUTCHours()===f2.getUTCHours() && fh.getUTCMinutes()===f2.getUTCMinutes() && cnt === cntId) {
-            res = true;
-            return res;
-        }
-    }
-    return res;
+function includeDate(s05Map: Map<string, Set<number>>, cnt: string, date: Date): boolean {
+    const dateSet = s05Map.get(cnt);
+    if (!dateSet) return false;
+    return dateSet.has(date.getTime());
 }
 
 
