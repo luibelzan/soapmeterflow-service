@@ -112,32 +112,61 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                 cnts.push(...req.cnt_id);
                 dates.push(req.fh_i);
             }
-            
             const minDate = new Date(Math.min(...dates.map(date => date.getTime())));
             const maxDate = new Date(Math.max(...dates.map(date => date.getTime())));
-            var request = new REQUESTS2();
-            if(maxDate.getTime() == minDate.getTime() && type == 'S04') {
-                var fecha = new Date(minDate);
-                fecha.setMonth(minDate.getMonth()+1);
+            if (type === 'S04' && maxDate.getTime() === minDate.getTime()) {
+                const fecha = new Date(minDate);
+                fecha.setMonth(minDate.getMonth() + 1);
+                const request = new REQUESTS2();
                 request.fh_i = minDate;
                 request.fh_f = fecha;
-            } else if(type == 'S02') {
-                var fecha = new Date(maxDate);
-                fecha.setHours(23, 0, 0, 0);
-                request.fh_i = minDate;
-                request.fh_f = fecha;
+                request.cnt_id = cnts;
+                request.ct_id = ct.id_ct;
+                request.url = requests[0].url;
+                request.source = 'MET';
+                request.priority = 3;
+                request.report_type = type;
+                await request2Repository.save(request);
+            } else if (type === 'S02') {
+                let startDate = new Date(minDate);
+                let endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 10);
+
+                while (startDate < maxDate) {
+                    if (endDate > maxDate) {
+                        endDate = new Date(maxDate);
+                    }
+
+                    const request = new REQUESTS2();
+                    request.fh_i = new Date(startDate);
+                    request.fh_f = new Date(endDate);
+                    request.cnt_id = cnts;
+                    request.ct_id = ct.id_ct;
+                    request.url = requests[0].url;
+                    request.source = 'MET';
+                    request.priority = 3;
+                    request.report_type = type;
+                    await request2Repository.save(request);
+
+                    // Avanzar al siguiente rango de 10 días
+                    startDate = new Date(endDate);
+                    startDate.setDate(startDate.getDate() + 1);
+                    endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + 10);
+                }
             } else {
+                const request = new REQUESTS2();
                 request.fh_i = minDate;
                 request.fh_f = maxDate;
+                request.cnt_id = cnts;
+                request.ct_id = ct.id_ct;
+                request.url = requests[0].url;
+                request.source = 'MET';
+                request.priority = 3;
+                request.report_type = type;
+                await request2Repository.save(request);
             }
-            request.cnt_id = cnts;
-            request.ct_id = ct.id_ct;
-            request.url = requests[0].url;
-            request.source = 'MET';
-            request.priority = 3;
-            request.report_type = type;
-            await request2Repository.save(request);
-            } 
+        }
     }
 }
 

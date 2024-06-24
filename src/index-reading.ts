@@ -150,7 +150,14 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
     const f1 = new Date();
     const f2 = new Date();
     f2.setDate(f1.getDate() - 21);
-    const dates = getDatesBtwDatesS02(f2, f1);
+    const fullDates = getDatesBtwDatesS02(f2, f1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dates = fullDates.filter(date => {
+        const dateCopy = new Date(date); // Crear una copia de la fecha
+        dateCopy.setHours(0, 0, 0, 0); // Ajustar la hora de la copia a las 00:00
+        return dateCopy.getTime() !== today.getTime(); // Comparar las fechas en milisegundos
+    });
     const s02ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
 
