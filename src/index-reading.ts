@@ -87,9 +87,11 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
                 s04ReadingIndices.push(s04ReadingIndex);
             }
         }
-
-        // Guardar todos los índices de lectura de una vez
-        await s04ReadingIndexRepository.save(s04ReadingIndices);
+        const batchSize = 10000;
+        for (let i = 0; i < s04ReadingIndices.length; i += batchSize) {
+            const batch = s04ReadingIndices.slice(i, i + batchSize);
+            await s04ReadingIndexRepository.save(batch);
+        }
     } catch (err) {
         console.error(err);
     }
@@ -134,8 +136,11 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
             }
         }
 
-        // Guardar todos los índices de lectura de una vez
-        await s05ReadingIndexRepository.save(s05ReadingIndices);
+        const batchSize = 10000;
+        for (let i = 0; i < s05ReadingIndices.length; i += batchSize) {
+            const batch = s05ReadingIndices.slice(i, i + batchSize);
+            await s05ReadingIndexRepository.save(batch);
+        }
     } catch (err) {
         console.error(err);
     }
@@ -144,7 +149,7 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
 export async function associateDatesS02(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setDate(f1.getDate() - 6);
+    f2.setDate(f1.getDate() - 21);
     const dates = getDatesBtwDatesS02(f2, f1);
     const s02ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
@@ -184,9 +189,11 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
                 s02ReadingIndices.push(s02ReadingIndex);
             }
         }
-
-        // Guardar todos los índices de lectura de una vez
-        await s02ReadingIndexRepository.save(s02ReadingIndices);
+        const batchSize = 10000;
+        for (let i = 0; i < s02ReadingIndices.length; i += batchSize) {
+            const batch = s02ReadingIndices.slice(i, i + batchSize);
+            await s02ReadingIndexRepository.save(batch);
+        }
     } catch (err) {
         console.error(err);
     }
