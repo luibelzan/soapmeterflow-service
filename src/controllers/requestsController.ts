@@ -193,8 +193,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
             <IdPet>${idPet}</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
-            <tfStart>${req.fh_i}</tfStart>>
-            <tfEnd>${req.fh_f}</tfEnd>
+            <tfStart>${formatDate(req.fh_i)}</tfStart>>
+            <tfEnd>${formatDate(req.fh_f)}</tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
             <Source>${req.source}</Source>
@@ -218,8 +218,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                     xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
                 <IdPet>${idPet}</IdPet>
                 <IdRpt>${req.report_type}</IdRpt>
-                <tfStart>${req.fh_i}</tfStart>>
-                <tfEnd>${req.fh_f}</tfEnd>
+                <tfStart>${formatDate(req.fh_i)}</tfStart>>
+                <tfEnd>${formatDate(req.fh_f)}</tfEnd>
                 <IdMeters>${cntAux}</IdMeters>
                 <Priority>${req.priority}</Priority>
                 <Source>${req.source}</Source>
