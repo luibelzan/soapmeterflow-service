@@ -202,8 +202,9 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </s:Body>
             </s:Envelope>`
             //console.log(url);
-            //sendWebService(xml, url);
+            sendWebService(xml, url);
             //console.log(xml);
+            await sleep(3000);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
                 var idPet = Math.floor(Math.random() * 900) + 100;
@@ -227,7 +228,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </s:Envelope>`
                 //console.log(url);
                 //console.log(xml);
-                //sendWebService(xml, url);
+                sendWebService(xml, url);
+                await sleep(3000);
             }
         }
         
@@ -262,4 +264,8 @@ function formatDate(date: Date): string {
     
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}W`;
   }
+
+function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 

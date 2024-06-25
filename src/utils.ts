@@ -11,6 +11,8 @@ var readFiles = [];
 
 export async function readFile(dir: string, dataSource: DataSource) {
     try {
+      const startDate = new Date();
+      console.log('Parseo comenzado a ', startDate);
       const files = await fs.promises.readdir(dir);
       
       for (const file of files) {
@@ -26,6 +28,10 @@ export async function readFile(dir: string, dataSource: DataSource) {
           }
         }
       }
+      var finishDate = new Date();
+      const diff = finishDate.getTime()-startDate.getTime();
+      console.log('Parseo terminado a ', finishDate);
+      console.log('Tiempo empleado: ', diff/(1000*60));
     } catch (err) {
       console.error('Error al leer la carpeta: ', err);
     }
@@ -69,11 +75,17 @@ export function isValidDate(dateString: string): boolean {
 export async function getReadIndex(dataSource: DataSource) {
   //dataSource.initialize().then(async () => {
     //await readFile(dir, dataSource); //Podria situarse fuera de esta funcion para separar la funcionalidad
+    const startDate = new Date();
+    console.log('Calculo indices de lectura comenzado a ', startDate);
     const cncsS02 = await getCncS02(dataSource);
     const cncsS04 = await getCncS04(dataSource);
     const cncsS05 = await getCncS05(dataSource);
 
     await associateDates(cncsS02, cncsS04, cncsS05, dataSource);
+    const finishDate = new Date();
+    const diff = finishDate.getTime()-startDate.getTime() / (1000*60);
+    console.log('Calculo indices de lectura terminado a ', finishDate);
+    console.log('Tiempo empleado ', diff);
 /*
     setInterval(async () => {
       await readFile(dir, dataSource); // Pasar el directorio como parámetro a readFile
@@ -86,13 +98,13 @@ export async function getReadIndex(dataSource: DataSource) {
 export async function getReadIndexAndSendRequests(dataSource: DataSource) {
   const entities = [T_READING_INDEX_S05, T_READING_INDEX_S04, T_READING_INDEX_S02]; //A'adir las entidades de s02 y s04 cuando este listo
   //dataSource.initialize().then(async () => {
-    await getReadIndex(dataSource);
-    for(const entity of entities) {
-      const nonRead = await getNonRead(dataSource, entity);
-      await loadRequests(nonRead, dataSource, entity);
-      await setDateInterval(dataSource, entity);
-      await buildXML(dataSource, entity);
-    }
+  await getReadIndex(dataSource);
+  for(const entity of entities) {
+    const nonRead = await getNonRead(dataSource, entity);
+    await loadRequests(nonRead, dataSource, entity);
+    await setDateInterval(dataSource, entity);
+    await buildXML(dataSource, entity);
+  }
   //})
 }
 
@@ -145,7 +157,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 
 export async function prueba(dir: string, dataSource: DataSource) {
   dataSource.initialize().then(async () => {
-    //await readFile(dir, dataSource);
+    await readFile(dir, dataSource);
     getReadIndexAndSendRequests(dataSource);
   }).catch((err) => console.error(err));
   
