@@ -83,7 +83,7 @@ export async function getReadIndex(dataSource: DataSource) {
 
     await associateDates(cncsS02, cncsS04, cncsS05, dataSource);
     const finishDate = new Date();
-    const diff = finishDate.getTime()-startDate.getTime() / (1000*60);
+    const diff = (finishDate.getTime()-startDate.getTime()) / (1000*60);
     console.log('Calculo indices de lectura terminado a ', finishDate);
     console.log('Tiempo empleado ', diff);
 /*
