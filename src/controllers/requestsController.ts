@@ -136,10 +136,11 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                     if (endDate > maxDate) {
                         endDate = new Date(maxDate);
                     }
-
+                    const finishDate = new Date(endDate);
+                    finishDate.setHours(23, 0, 0, 0);
                     const request = new REQUESTS2();
                     request.fh_i = new Date(startDate);
-                    request.fh_f = new Date(endDate);
+                    request.fh_f = new Date(finishDate);
                     request.cnt_id = cnts;
                     request.ct_id = ct.id_ct;
                     request.url = requests[0].url;

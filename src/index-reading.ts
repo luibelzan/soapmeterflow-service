@@ -53,7 +53,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
     } else {
         f2.setMonth(f1.getMonth() - 2);
     }
-    const fullDates = getDatesBtwDates(f2, f1);
+    const fullDates = getDatesBtwDates(f2, f1); 
     const dates = fullDates.filter(date => date.getDate() === 1 && date.getMonth() < new Date().getMonth());
     const s04ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S04);
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
