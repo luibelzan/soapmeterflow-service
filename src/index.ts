@@ -65,7 +65,7 @@ try {
   //getReadIndexAndSendRequests(cela, sixDir);
 
   
-  scheduleDailyExecution(pastor, sevenDir, 10, 11, 15000);
+  scheduleDailyExecution(pastor, sevenDir, 13, 14, 15000);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   
   //prueba(sevenDir, pastor);

@@ -67,22 +67,23 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
         for (const [ctId, cntList] of dateGroup.entries()) {
             var request = new REQUESTS();
             var cnc = await cncRepository.createQueryBuilder('cnc').where('cnc.id_ct = :id', { id: ctId}).getOne();
-            request.url = cnc.ws_url;
-            request.cnt_id = cntList;
-            //console.log(date, '========', formatDate(date));
-            request.fh_i = new Date(date);
-            request.url = cnc?.ws_url;
-            if(entity.name.includes('S05')) {
-                request.report_type = 'S05';
-            } else if(entity.name.includes('S04')) {
-                request.report_type = 'S04';
-            } else {
-                request.report_type = 'S02';
+            if(cnc != undefined) {
+                request.url = cnc.ws_url;
+                request.cnt_id = cntList;
+                request.fh_i = new Date(date);
+                request.url = cnc?.ws_url;
+                if(entity.name.includes('S05')) {
+                    request.report_type = 'S05';
+                } else if(entity.name.includes('S04')) {
+                    request.report_type = 'S04';
+                } else {
+                    request.report_type = 'S02';
+                }
+                request.priority = 1;
+                request.source = 'MET';
+                request.ct_id = ctId;
+                await requestRepository.save(request);
             }
-            request.priority = 1;
-            request.source = 'MET';
-            request.ct_id = ctId;
-            await requestRepository.save(request);
         }
     }
     console.log('Requests done')

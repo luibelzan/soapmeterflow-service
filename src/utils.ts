@@ -9,6 +9,29 @@ const fs = require('fs');
 const path = require('path');
 var readFiles = [];
 
+async function moveFile(sourceFile: string, targetDir: string) {
+  try {
+    // Obtener el nombre base del archivo
+    const fileName = path.basename(sourceFile);
+    
+    // Crear el directorio de destino si no existe
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    // Construir la ruta completa del archivo de destino
+    const targetFile = path.join(targetDir, fileName);
+
+    // Mover el archivo utilizando fs.promises.rename
+    await fs.promises.rename(sourceFile, targetFile);
+
+    //console.log(`Archivo movido correctamente: ${sourceFile} -> ${targetFile}`);
+  } catch (error) {
+    console.error(`Error al mover el archivo: ${error.message}`);
+  }
+}
+
+
 export async function readFile(dir: string, dataSource: DataSource) {
     try {
       const startDate = new Date();
@@ -18,14 +41,12 @@ export async function readFile(dir: string, dataSource: DataSource) {
       for (const file of files) {
         const fileDir = path.join(dir, file);
         const stats = await fs.promises.stat(fileDir);
-        if(stats.isDirectory()) {
+        if(stats.isDirectory() && !fileDir.includes('Procesados')) {
           await readFile(fileDir, dataSource);
-        } else {
-          if (!readFiles.includes(fileDir)) {
-            console.log('Nuevo archivo detectado: ', fileDir);
-            await parseFile(fileDir, dataSource);
-            readFiles.push(fileDir);
-          }
+        } else if(!fileDir.includes('Procesados')){
+          console.log('Nuevo archivo detectado: ', fileDir);
+          await parseFile(fileDir, dataSource);
+          moveFile(fileDir, dir.concat('/Procesados/'));
         }
       }
       var finishDate = new Date();
