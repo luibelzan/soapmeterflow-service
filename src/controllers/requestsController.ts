@@ -112,32 +112,62 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                 cnts.push(...req.cnt_id);
                 dates.push(req.fh_i);
             }
-            
             const minDate = new Date(Math.min(...dates.map(date => date.getTime())));
             const maxDate = new Date(Math.max(...dates.map(date => date.getTime())));
-            var request = new REQUESTS2();
-            if(maxDate.getTime() == minDate.getTime() && type == 'S04') {
-                var fecha = new Date(minDate);
-                fecha.setMonth(minDate.getMonth()+1);
+            if (type === 'S04' && maxDate.getTime() === minDate.getTime()) {
+                const fecha = new Date(minDate);
+                fecha.setMonth(minDate.getMonth() + 1);
+                const request = new REQUESTS2();
                 request.fh_i = minDate;
                 request.fh_f = fecha;
-            } else if(type == 'S02') {
-                var fecha = new Date(maxDate);
-                fecha.setHours(23, 0, 0, 0);
-                request.fh_i = minDate;
-                request.fh_f = fecha;
+                request.cnt_id = cnts;
+                request.ct_id = ct.id_ct;
+                request.url = requests[0].url;
+                request.source = 'MET';
+                request.priority = 3;
+                request.report_type = type;
+                await request2Repository.save(request);
+            } else if (type === 'S02') {
+                let startDate = new Date(minDate);
+                let endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 10);
+
+                while (startDate < maxDate) {
+                    if (endDate > maxDate) {
+                        endDate = new Date(maxDate);
+                    }
+                    const finishDate = new Date(endDate);
+                    finishDate.setHours(23, 0, 0, 0);
+                    const request = new REQUESTS2();
+                    request.fh_i = new Date(startDate);
+                    request.fh_f = new Date(finishDate);
+                    request.cnt_id = cnts;
+                    request.ct_id = ct.id_ct;
+                    request.url = requests[0].url;
+                    request.source = 'MET';
+                    request.priority = 3;
+                    request.report_type = type;
+                    await request2Repository.save(request);
+
+                    // Avanzar al siguiente rango de 10 días
+                    startDate = new Date(endDate);
+                    startDate.setDate(startDate.getDate() + 1);
+                    endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + 10);
+                }
             } else {
+                const request = new REQUESTS2();
                 request.fh_i = minDate;
                 request.fh_f = maxDate;
+                request.cnt_id = cnts;
+                request.ct_id = ct.id_ct;
+                request.url = requests[0].url;
+                request.source = 'MET';
+                request.priority = 3;
+                request.report_type = type;
+                await request2Repository.save(request);
             }
-            request.cnt_id = cnts;
-            request.ct_id = ct.id_ct;
-            request.url = requests[0].url;
-            request.source = 'MET';
-            request.priority = 3;
-            request.report_type = type;
-            await request2Repository.save(request);
-            } 
+        }
     }
 }
 
@@ -164,8 +194,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
             <IdPet>${idPet}</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
-            <tfStart>${req.fh_i}</tfStart>>
-            <tfEnd>${req.fh_f}</tfEnd>
+            <tfStart>${formatDate(req.fh_i)}</tfStart>>
+            <tfEnd>${formatDate(req.fh_f)}</tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
             <Source>${req.source}</Source>
@@ -173,8 +203,9 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </s:Body>
             </s:Envelope>`
             //console.log(url);
-            //sendWebService(xml, url);
+            sendWebService(xml, url);
             //console.log(xml);
+            await sleep(3000);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
                 var idPet = Math.floor(Math.random() * 900) + 100;
@@ -188,8 +219,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                     xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
                 <IdPet>${idPet}</IdPet>
                 <IdRpt>${req.report_type}</IdRpt>
-                <tfStart>${req.fh_i}</tfStart>>
-                <tfEnd>${req.fh_f}</tfEnd>
+                <tfStart>${formatDate(req.fh_i)}</tfStart>>
+                <tfEnd>${formatDate(req.fh_f)}</tfEnd>
                 <IdMeters>${cntAux}</IdMeters>
                 <Priority>${req.priority}</Priority>
                 <Source>${req.source}</Source>
@@ -198,7 +229,8 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </s:Envelope>`
                 //console.log(url);
                 //console.log(xml);
-                //sendWebService(xml, url);
+                sendWebService(xml, url);
+                await sleep(3000);
             }
         }
         
@@ -233,4 +265,8 @@ function formatDate(date: Date): string {
     
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}W`;
   }
+
+function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
