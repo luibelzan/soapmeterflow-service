@@ -1,5 +1,5 @@
 import { getData } from "./controllers/EventsController";
-import { getReadIndex, getReadIndexAndSendRequests, prueba, readFile, scheduleDailyExecution } from "./utils";
+import { getReadIndex, getReadIndexAndSendRequests, run, readFile, scheduleDailyExecution } from "./utils";
 import express from 'express';
 import { AppDataSource, cela, chera, dielec, mercedes, pastor, staClara } from "./data-source"
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
@@ -64,11 +64,11 @@ try {
 
   //getReadIndexAndSendRequests(cela, sixDir);
 
-  /*
-  scheduleDailyExecution(pastor, sevenDir, 10, 11);
+  
+  scheduleDailyExecution(pastor, sevenDir, 10, 11, 15000);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
-  */
-  prueba(sevenDir, pastor);
+  
+  //prueba(sevenDir, pastor);
   
   
 

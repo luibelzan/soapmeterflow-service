@@ -127,7 +127,7 @@ function calculateTimeUntil(horas: number, minutos: number): number {
   return proximaEjecucion.getTime() - ahora.getTime();
 }
 
-export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, endHour: number) {
+export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, endHour: number, interval: number) {
   dataSource.initialize().then(async () => {
     const now = new Date();
     const currentHours = now.getHours();
@@ -135,9 +135,9 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 
     if (currentHours >= startHour && currentHours < endHour) {
         // Estamos dentro del intervalo de ejecución
-        await readFile(dir, dataSource);
+        await run(dir, dataSource);
         const intervalId = setInterval(async () => 
-          await readFile(dir, dataSource), 5000); // Ejecuta myFunction con el parámetro cada segundo
+          await run(dir, dataSource), interval); // Ejecuta myFunction con el parámetro cada segundo
 
         // Calcula el tiempo restante hasta el final del período de ejecución
         const timeUntilEnd = calculateTimeUntil(endHour, 0);
@@ -146,7 +146,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
       // Programa el inicio de la función para el próximo día a las 9:00 a.m.
       const timeUntilStart = calculateTimeUntil(startHour, 0);
       setTimeout(() => {
-          const intervalId = setInterval(async () => await readFile(dir, dataSource), 5000); // Ejecuta myFunction con el parámetro cada segundo
+          const intervalId = setInterval(async () => await run(dir, dataSource), interval); // Ejecuta myFunction con el parámetro cada segundo
 
           // Programa la detención de la función pasando intervalId como parámetro
           const timeUntilEnd = calculateTimeUntil(endHour, 0);
@@ -155,10 +155,10 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
   }).catch((err) => console.error(err)); 
 }
 
-export async function prueba(dir: string, dataSource: DataSource) {
-  dataSource.initialize().then(async () => {
+export async function run(dir: string, dataSource: DataSource) {
+  //dataSource.initialize().then(async () => {
     await readFile(dir, dataSource);
     getReadIndexAndSendRequests(dataSource);
-  }).catch((err) => console.error(err));
+  //}).catch((err) => console.error(err));
   
 }
