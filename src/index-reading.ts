@@ -74,17 +74,25 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
     try {
         for (const cnt of cnts) {
             for (const date of dates) {
-                const s04ReadingIndex = new T_READING_INDEX_S04();
-                s04ReadingIndex.cnt_id = cnt;
-                s04ReadingIndex.fh = date;
-
-                if (includeDate(s04Map, cnt, date)) {
-                    s04ReadingIndex.read = 1;
+                let existingRecord = await s04ReadingIndexRepository.findOne({ where: { cnt_id: cnt, fh: date } });
+                if(existingRecord) {
+                    if (includeDate(s04Map, cnt, date)) {
+                        existingRecord.read = 1;
+                    } else {
+                        existingRecord.read = 0;
+                    }
+                    await s04ReadingIndexRepository.save(existingRecord);
                 } else {
-                    s04ReadingIndex.read = 0;
-                }
-
-                s04ReadingIndices.push(s04ReadingIndex);
+                    const s04ReadingIndex = new T_READING_INDEX_S04();
+                    s04ReadingIndex.cnt_id = cnt;
+                    s04ReadingIndex.fh = date;
+                    if (includeDate(s04Map, cnt, date)) {
+                        s04ReadingIndex.read = 1;
+                    } else {
+                        s04ReadingIndex.read = 0;
+                    }
+                    await s04ReadingIndices.push(s04ReadingIndex);
+                 }
             }
         }
         const batchSize = 10000;
@@ -188,6 +196,7 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
                     } else {
                         read = checkDateRange(s02Map, cnt, dateRange);
                     }
+                    existingRecord.read = read ? 1 : 0;
                     await s02ReadingIndexRepository.save(existingRecord);
                 } else {
                     const s02ReadingIndex = new T_READING_INDEX_S02();
