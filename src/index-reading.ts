@@ -123,27 +123,33 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
         }
         s05Map.get(s05.cnt_id)!.add(s05.fh.getTime());
     }
-
     const s05ReadingIndices: T_READING_INDEX_S05[] = [];
-
     try {
         for (const cnt of cnts) {
             for (const date of dates) {
-                const s05ReadingIndex = new T_READING_INDEX_S05();
-                s05ReadingIndex.cnt_id = cnt;
-                s05ReadingIndex.fh = date;
-
-                // Verificar si la fecha está incluida en el mapa
-                if (includeDate(s05Map, cnt, date)) {
-                    s05ReadingIndex.read = 1;
+                let existingRecord = await s05ReadingIndexRepository.findOne({ where: { cnt_id: cnt, fh: date } });
+                if(existingRecord) {
+                    if (includeDate(s05Map, cnt, date)) {
+                        existingRecord.read = 1;
+                    } else {
+                        existingRecord.read = 0;
+                    }
+                    await s05ReadingIndexRepository.save(existingRecord);
                 } else {
-                    s05ReadingIndex.read = 0;
-                }
+                    const s05ReadingIndex = new T_READING_INDEX_S05();
+                    s05ReadingIndex.cnt_id = cnt;
+                    s05ReadingIndex.fh = date;
 
-                s05ReadingIndices.push(s05ReadingIndex);
+                    // Verificar si la fecha está incluida en el mapa
+                    if (includeDate(s05Map, cnt, date)) {
+                        s05ReadingIndex.read = 1;
+                    } else {
+                        s05ReadingIndex.read = 0;
+                    }
+                    s05ReadingIndices.push(s05ReadingIndex);
+                }
             }
         }
-
         const batchSize = 10000;
         for (let i = 0; i < s05ReadingIndices.length; i += batchSize) {
             const batch = s05ReadingIndices.slice(i, i + batchSize);
