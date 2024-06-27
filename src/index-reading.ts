@@ -177,23 +177,34 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
     try {
         for (const cnt of cnts) {
             for (let i = 0; i < dates.length; i += 24) {
-                const s02ReadingIndex = new T_READING_INDEX_S02();
-                s02ReadingIndex.cnt_id = cnt;
-                s02ReadingIndex.fh = dates[i];
-
+                let existingRecord = await s02ReadingIndexRepository.findOne({ where: { cnt_id: cnt, fh: dates[i] } });
                 let read = true;
                 const dateRange = getDateRange(dates[i], 24);
-
-                if (dates[i].getMonth() === 2 && dates[i].getDate() === 31) {
-                    read = checkDateRange(s02Map, cnt, dateRange.slice(0, 23));
-                } else if (dates[i].getMonth() === 9 && dates[i].getDate() === 27) {
-                    read = checkDateRange(s02Map, cnt, dateRange.slice(0, 25));
+                if(existingRecord) {
+                    if (dates[i].getMonth() === 2 && dates[i].getDate() === 31) {
+                        read = checkDateRange(s02Map, cnt, dateRange.slice(0, 23));
+                    } else if (dates[i].getMonth() === 9 && dates[i].getDate() === 27) {
+                        read = checkDateRange(s02Map, cnt, dateRange.slice(0, 25));
+                    } else {
+                        read = checkDateRange(s02Map, cnt, dateRange);
+                    }
+                    await s02ReadingIndexRepository.save(existingRecord);
                 } else {
-                    read = checkDateRange(s02Map, cnt, dateRange);
-                }
+                    const s02ReadingIndex = new T_READING_INDEX_S02();
+                    s02ReadingIndex.cnt_id = cnt;
+                    s02ReadingIndex.fh = dates[i];
 
-                s02ReadingIndex.read = read ? 1 : 0;
-                s02ReadingIndices.push(s02ReadingIndex);
+                    if (dates[i].getMonth() === 2 && dates[i].getDate() === 31) {
+                        read = checkDateRange(s02Map, cnt, dateRange.slice(0, 23));
+                    } else if (dates[i].getMonth() === 9 && dates[i].getDate() === 27) {
+                        read = checkDateRange(s02Map, cnt, dateRange.slice(0, 25));
+                    } else {
+                        read = checkDateRange(s02Map, cnt, dateRange);
+                    }
+
+                    s02ReadingIndex.read = read ? 1 : 0;
+                    s02ReadingIndices.push(s02ReadingIndex);   
+                }
             }
         }
         const batchSize = 10000;

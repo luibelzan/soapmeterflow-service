@@ -7,7 +7,6 @@ import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04";
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 const fs = require('fs');
 const path = require('path');
-var readFiles = [];
 
 async function moveFile(sourceFile: string, targetDir: string) {
   try {
