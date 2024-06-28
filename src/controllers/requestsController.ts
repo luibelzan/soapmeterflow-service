@@ -182,6 +182,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
         var type = 'S02';
     }
     const requests = await requestsRepository.createQueryBuilder('req').where('req.report_type = :typ', { typ: type}).getMany();
+    const sentRequests = [];
     for(const req of requests) {
         var url = req.url;
         if(req.cnt_id.length <= 10) {
@@ -204,9 +205,9 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </s:Body>
             </s:Envelope>`
             //console.log(url);
-            //sendWebService(xml, url);
-            //console.log(xml);
-            //await sleep(3000);
+            sendWebService(xml, url);
+            sentRequests.push(req);
+            await sleep(3000);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
                 var idPet = Math.floor(Math.random() * 900) + 100;
@@ -230,12 +231,19 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </s:Envelope>`
                 //console.log(url);
                 //console.log(xml);
-                //sendWebService(xml, url);
-                //await sleep(3000);
+                sendWebService(xml, url);
+                sentRequests.push(req);
+                await sleep(3000);
             }
         }
-        
     }
+    const batchSize = 1000;
+    const request1Repository = dataSource.getRepository(REQUESTS);
+    for(let i = 0; i < sentRequests.length; i =+ batchSize) {
+        const batch = sentRequests.slice(i, i+batchSize);
+        await requestsRepository.delete(batch);
+    }
+    await request1Repository.clear();
 }
 
 export async function sendWebService(xml: string, url: string): Promise<string> {
@@ -248,6 +256,7 @@ export async function sendWebService(xml: string, url: string): Promise<string> 
                 'Connection': 'Keep-Alive',
             }
         });
+        console.log('Peticion enviada correctamente ', url);
         return response.data;
     } catch (err) {
         console.error('Error al enviar el WebService: ', err);
