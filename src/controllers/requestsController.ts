@@ -68,7 +68,7 @@ export async function loadRequests(map: MultiValueMap, dataSource: DataSource, e
             var request = new REQUESTS();
             var cnc = await cncRepository.createQueryBuilder('cnc').where('cnc.id_ct = :id', { id: ctId}).getOne();
             if(cnc != undefined) {
-                request.url = cnc.ws_url;
+                //request.url = cnc.ws_url;
                 request.cnt_id = cntList;
                 request.fh_i = new Date(date);
                 request.url = cnc?.ws_url;
