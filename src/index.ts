@@ -1,32 +1,25 @@
 import { getData } from "./controllers/EventsController";
-import { getReadIndex, getReadIndexAndSendRequests, run, readFile, scheduleDailyExecution } from "./utils";
+import config from "../configLoader";
+import { scheduleDailyExecution } from "./utils";
 import express from 'express';
 import { AppDataSource, cela, chera, dielec, mercedes, pastor, staClara } from "./data-source"
-import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
-import { T_S05_TEMP } from "./entities/T_S05_TEMP";
-import { T_S02_TEMP } from "./entities/T_S02_TEMP";
-import { loadRequests, getNonRead, groupByCT, buildXML, sendWebService, setDateInterval } from "./controllers/requestsController";
-import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
-import { T_CUPS } from "./entities/T_CUPS";
-import { REQUESTS } from "./entities/REQUESTS";
+
 
 const bodyParser = require('body-parser');
 const bodyParserXml = require('body-parser-xml');
 
 const app = express();
-const PORT = 8080;
-const interval = 5000;
+const PORT = config.port;
+const startDate = config.startDate;
+const finishDate = config.finishDate;
+const executionInterval = config.executionInterval;
 
-const principalDir = '../public/resources/database1';
-const secondDir = '../public/resources/dielec';
-const thirdDir = '../public/resources/staclara';
-const fourthDir = '../public/resources/mercedes';
-const fiveDir = '../public/resources/chera';
-const sixDir = '../public/resources/cela';
-const sevenDir = '../public/resources/pastor';
-const pruebaDir = '../public/resources/prueba';
+const cheraDir = config.cheraDir;
+const sotDecheraDir = config.sotDecheraDir
+const alvaroBenitoDir = config.alvaroBenitoDir
+const pastorDir = config.pastorDir;
 
-/*
+
 try {
   //Conexion con la base de datos
   AppDataSource.initialize().then(async () => {
@@ -50,7 +43,7 @@ try {
 } catch(error) {
   console.error('Error al conectar con la base de datos:' , error);
 }
-*/
+
 try {
   //DATABASE 1
   //getReadIndex(principalDir, AppDataSource);
@@ -65,7 +58,7 @@ try {
   //getReadIndexAndSendRequests(cela, sixDir);
 
   
-  scheduleDailyExecution(pastor, sevenDir, 10, 15, 30000);
+  scheduleDailyExecution(pastor, pastorDir, startDate, finishDate, executionInterval);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   
   //prueba(sevenDir, pastor);

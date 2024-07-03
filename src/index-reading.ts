@@ -1,5 +1,6 @@
 import e from "express";
 import { AppDataSource } from "./data-source";
+import config from "../configLoader";
 import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
 import { T_S04_TEMP } from "./entities/T_S04_TEMP"
@@ -7,6 +8,9 @@ import { T_S05_TEMP } from "./entities/T_S05_TEMP";
 import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 import { T_S02_TEMP } from "./entities/T_S02_TEMP";
 import { DataSource } from "typeorm";
+
+const s05Days = config.numberDaysS05;
+const s02Days = config.numberDaysS02;
 
 
 export async function getCncS02(dataSource: DataSource): Promise<string[]> {
@@ -108,7 +112,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
 export async function associateDatesS05(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setDate(f1.getDate() - 6);
+    f2.setDate(f1.getDate() - s05Days);
     const dates = getDatesBtwDates(f2, f1);
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
@@ -163,7 +167,7 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
 export async function associateDatesS02(cnts: string[], dataSource: DataSource): Promise<void> {
     const f1 = new Date();
     const f2 = new Date();
-    f2.setDate(f1.getDate() - 21);
+    f2.setDate(f1.getDate() - s02Days);
     const fullDates = getDatesBtwDatesS02(f2, f1);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
