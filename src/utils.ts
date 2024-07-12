@@ -34,7 +34,7 @@ async function moveFile(sourceFile: string, targetDir: string) {
 export async function readFile(dir: string, dataSource: DataSource) {
     try {
       const startDate = new Date();
-      console.log('Parseo comenzado a ', startDate);
+      console.log('Parseo comenzado a ', startDate, `${dataSource.options.database}`);
       const files = await fs.promises.readdir(dir);
       
       for (const file of files) {
@@ -50,8 +50,8 @@ export async function readFile(dir: string, dataSource: DataSource) {
       }
       var finishDate = new Date();
       const diff = finishDate.getTime()-startDate.getTime();
-      console.log('Parseo terminado a ', finishDate);
-      console.log('Tiempo empleado: ', diff/(1000*60));
+      console.log('Parseo terminado a ', finishDate, `(${dataSource.options.database})`);
+      console.log('Tiempo empleado: ', diff/(1000*60), `${dataSource.options.database}`);
     } catch (err) {
       console.error('Error al leer la carpeta: ', err);
     }
@@ -96,7 +96,7 @@ export async function getReadIndex(dataSource: DataSource) {
   //dataSource.initialize().then(async () => {
     //await readFile(dir, dataSource); //Podria situarse fuera de esta funcion para separar la funcionalidad
     const startDate = new Date();
-    console.log('Calculo indices de lectura comenzado a ', startDate);
+    console.log('Calculo indices de lectura comenzado a ', startDate, `${dataSource.options.database}`);
     const cncsS02 = await getCncS02(dataSource);
     const cncsS04 = await getCncS04(dataSource);
     const cncsS05 = await getCncS05(dataSource);
@@ -104,8 +104,8 @@ export async function getReadIndex(dataSource: DataSource) {
     await associateDates(cncsS02, cncsS04, cncsS05, dataSource);
     const finishDate = new Date();
     const diff = (finishDate.getTime()-startDate.getTime()) / (1000*60);
-    console.log('Calculo indices de lectura terminado a ', finishDate);
-    console.log('Tiempo empleado ', diff);
+    console.log('Calculo indices de lectura terminado a ', finishDate, `${dataSource.options.database}`);
+    console.log('Tiempo empleado ', diff, `${dataSource.options.database}`);
 /*
     setInterval(async () => {
       await readFile(dir, dataSource); // Pasar el directorio como parámetro a readFile
@@ -147,31 +147,35 @@ function calculateTimeUntil(horas: number, minutos: number): number {
   return proximaEjecucion.getTime() - ahora.getTime();
 }
 
-export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, endHour: number, interval: number) {
+export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, startMinute: number, endHour: number, endMinute: number, interval: number) {
   dataSource.initialize().then(async () => {
     const now = new Date();
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
 
-    if (currentHours >= startHour && currentHours < endHour) {
+    if ((currentHours > startHour || (currentHours === startHour && currentMinutes >= startMinute)) &&
+        (currentHours < endHour || (currentHours === endHour && currentMinutes < endMinute))) {
         // Estamos dentro del intervalo de ejecución
         await run(dir, dataSource);
         const intervalId = setInterval(async () => 
           await run(dir, dataSource), interval); // Ejecuta myFunction con el parámetro cada segundo
 
         // Calcula el tiempo restante hasta el final del período de ejecución
-        const timeUntilEnd = calculateTimeUntil(endHour, 0);
+        const timeUntilEnd = calculateTimeUntil(endHour, endMinute);
         setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd);
-    } 
-      // Programa el inicio de la función para el próximo día a las 9:00 a.m.
-      const timeUntilStart = calculateTimeUntil(startHour, 0);
-      setTimeout(() => {
+    } else {
+      // Programa el inicio de la función para el próximo día a la hora y minuto especificados
+      const timeUntilStart = calculateTimeUntil(startHour, startMinute);
+      console.log(timeUntilStart);
+      setTimeout(async () => {
+          await run(dir, dataSource);
           const intervalId = setInterval(async () => await run(dir, dataSource), interval); // Ejecuta myFunction con el parámetro cada segundo
 
           // Programa la detención de la función pasando intervalId como parámetro
-          const timeUntilEnd = calculateTimeUntil(endHour, 0);
+          const timeUntilEnd = calculateTimeUntil(endHour, endMinute);
           setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd - timeUntilStart);
       }, timeUntilStart);
+    }
   }).catch((err) => console.error(err)); 
 }
 

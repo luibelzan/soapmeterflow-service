@@ -2,7 +2,7 @@ import { getData } from "./controllers/EventsController";
 import config from "../configLoader";
 import { scheduleDailyExecution } from "./utils";
 import express from 'express';
-import { AppDataSource, cela, chera, dielec, mercedes, pastor, staClara } from "./data-source"
+import { AppDataSource, chera, pastor } from "./data-source"
 
 
 const bodyParser = require('body-parser');
@@ -10,8 +10,10 @@ const bodyParserXml = require('body-parser-xml');
 
 const app = express();
 const PORT = config.port;
-const startDate = config.startDate;
-const finishDate = config.finishDate;
+const startHour = config.startHour;
+const startMinute = config.startMinute;
+const finishHour = config.finishHour;
+const finishMinute = config.finishMinute;
 const executionInterval = config.executionInterval;
 
 const cheraDir = config.cheraDir;
@@ -58,7 +60,10 @@ try {
   //getReadIndexAndSendRequests(cela, sixDir);
 
   
-  scheduleDailyExecution(pastor, pastorDir, startDate, finishDate, executionInterval);
+  scheduleDailyExecution(pastor, pastorDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
+
+  scheduleDailyExecution(chera, cheraDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
   setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
   
   //prueba(sevenDir, pastor);

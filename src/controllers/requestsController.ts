@@ -186,7 +186,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
     for(const req of requests) {
         var url = req.url;
         if(req.cnt_id.length <= 10) {
-            var idPet = Math.floor(Math.random() * 900) + 100;
+            var idPet = generateIdentifier();
             var xml = `<?xml version="1.0" encoding="utf-8"?>
             <s:Envelope 
             xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
@@ -205,12 +205,12 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </s:Body>
             </s:Envelope>`
             //console.log(url);
-            sendWebService(xml, url);
+            sendWebService(xml, url, dataSource);
             sentRequests.push(req);
             await sleep(3000);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
-                var idPet = Math.floor(Math.random() * 900) + 100;
+                var idPet = generateIdentifier();
                 var cntAux = req.cnt_id.slice(i, i+10);
                 var xml = `<?xml version="1.0" encoding="utf-8"?>
                 <s:Envelope 
@@ -231,7 +231,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </s:Envelope>`
                 //console.log(url);
                 //console.log(xml);
-                sendWebService(xml, url);
+                sendWebService(xml, url, dataSource);
                 sentRequests.push(req);
                 await sleep(3000);
             }
@@ -246,7 +246,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
     await request1Repository.clear();
 }
 
-export async function sendWebService(xml: string, url: string): Promise<string> {
+export async function sendWebService(xml: string, url: string, dataSource: DataSource): Promise<string> {
     try {
         const response: AxiosResponse<string> = await axios.post(url, xml, {
             headers: {
@@ -256,7 +256,7 @@ export async function sendWebService(xml: string, url: string): Promise<string> 
                 'Connection': 'Keep-Alive',
             }
         });
-        console.log('Peticion enviada correctamente ', url);
+        console.log('Peticion enviada correctamente ', url, `${dataSource.options.database}`);
         return response.data;
     } catch (err) {
         console.error('Error al enviar el WebService: ', err);
@@ -279,4 +279,11 @@ function formatDate(date: Date): string {
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+function generateIdentifier() {
+    const prefix = "CE";
+    const randomNumbers = Math.floor(Math.random() * 1000); // Genera un número entre 0 y 999
+    const paddedNumbers = String(randomNumbers).padStart(3, '0'); // Asegura que siempre tenga 3 dígitos
+    return prefix + paddedNumbers;
+  }
 
