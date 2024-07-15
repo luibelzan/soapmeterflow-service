@@ -153,7 +153,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
 
-    if ((currentHours > startHour || (currentHours === startHour && currentMinutes >= startMinute)) &&
+    if ((currentHours >= startHour || (currentHours === startHour && currentMinutes >= startMinute)) &&
         (currentHours < endHour || (currentHours === endHour && currentMinutes < endMinute))) {
         // Estamos dentro del intervalo de ejecución
         await run(dir, dataSource);
@@ -166,7 +166,6 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
     } else {
       // Programa el inicio de la función para el próximo día a la hora y minuto especificados
       const timeUntilStart = calculateTimeUntil(startHour, startMinute);
-      console.log(timeUntilStart);
       setTimeout(async () => {
           await run(dir, dataSource);
           const intervalId = setInterval(async () => await run(dir, dataSource), interval); // Ejecuta myFunction con el parámetro cada segundo

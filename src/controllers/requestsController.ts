@@ -4,10 +4,13 @@ import { T_CONCENTRADORES } from "../entities/T_CONCENTRADORES";
 import { REQUESTS } from "../entities/REQUESTS";
 import axios, { AxiosResponse } from 'axios';
 import { REQUESTS2 } from "../entities/REQUESTS2";
+import config from "../../configLoader";
 
 
 // Definir el tipo de la estructura
 type MultiValueMap = Map<string, string[]>;
+const daysS05 = config.numberDaysS05;
+const daysS02 = config.numberDaysS02;
 
 // Función para agregar valores a una clave
 function addValueToMap(map: MultiValueMap, key: string, value: string): void {
@@ -20,13 +23,29 @@ function addValueToMap(map: MultiValueMap, key: string, value: string): void {
 export async function getNonRead(dataSource: DataSource , entity: any): Promise<MultiValueMap> {
     const res: MultiValueMap = new Map<string, string[]>();
     const indexRepository = dataSource.getRepository(entity);
-    const index = await indexRepository.createQueryBuilder('index').where('index.read = :read', { read: 0 }).getMany();
+	const today = new Date();
+	let limitDate = new Date(today);
+	if(entity.name.includes('S02')) {
+		limitDate.setDate(today.getDate()-daysS02);
+	} else if(entity.name.includes('S05')) {
+		limitDate.setDate(today.getDate()-daysS05);
+	} else {
+		if (today.getDate() == 1) {
+			limitDate.setMonth(today.getMonth() - 1);
+		} else {
+			limitDate.setMonth(today.getMonth() - 2);
+			limitDate.setDate(1);
+		}
+	}
+    console.log(limitDate);
+    const index = await indexRepository.createQueryBuilder('index').where('index.read = :read', { read: 0 }).andWhere('index.fh >= :date', { date: limitDate }).getMany();
     for(let i=0; i<index.length; i++) {
         const dateKey = index[i].fh.toISOString();
         addValueToMap(res, dateKey, index[i].cnt_id);
     }
     return res;
 }
+
 
 export async function groupByCT(map: MultiValueMap, dataSource: DataSource): Promise<Map<string, string[]>> {
     let res: Map<string, string[]> = new Map(); 
@@ -204,10 +223,10 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </AsynchRequest>
             </s:Body>
             </s:Envelope>`
-            //console.log(url);
-            sendWebService(xml, url, dataSource);
-            sentRequests.push(req);
-            await sleep(3000);
+            console.log(url);
+            //sendWebService(xml, url, dataSource);
+            //sentRequests.push(req);
+            //await sleep(3000);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
                 var idPet = generateIdentifier();
@@ -229,14 +248,15 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
-                //console.log(url);
+                console.log(url);
                 //console.log(xml);
-                sendWebService(xml, url, dataSource);
-                sentRequests.push(req);
-                await sleep(3000);
+                //sendWebService(xml, url, dataSource);
+                //sentRequests.push(req);
+                //await sleep(3000);
             }
         }
     }
+    /*
     const batchSize = 1000;
     const request1Repository = dataSource.getRepository(REQUESTS);
     for(let i = 0; i < sentRequests.length; i =+ batchSize) {
@@ -244,6 +264,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
         await requestsRepository.delete(batch);
     }
     await request1Repository.clear();
+    */
 }
 
 export async function sendWebService(xml: string, url: string, dataSource: DataSource): Promise<string> {
@@ -281,9 +302,8 @@ function sleep(ms: number): Promise<void> {
 }
 
 function generateIdentifier() {
-    const prefix = "CE";
     const randomNumbers = Math.floor(Math.random() * 1000); // Genera un número entre 0 y 999
     const paddedNumbers = String(randomNumbers).padStart(3, '0'); // Asegura que siempre tenga 3 dígitos
-    return prefix + paddedNumbers;
+    return paddedNumbers;
   }
 
