@@ -144,8 +144,9 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
 }
 
 async function processS04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
-    const res = [];
+    let res = [];
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
+    const batchSize = 5000;
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
             if(elem.S04 != undefined) {
@@ -190,13 +191,15 @@ async function processS04(report: any, mag: number, reportDate: string, dataSour
                         s04.r4i = elem.S04[i].Value[0].$.R4i;
                     }
                     res.push(s04);
+                    if (res.length >= batchSize) {
+                        await s04Repository.save(res);
+                        res = []; // Limpiar el array para el próximo lote
+                    }
                 } 
             }
         }
-        const batchSize = 10000;
-        for (let i = 0; i < res.length; i += batchSize) {
-            const batch = res.slice(i, i + batchSize);
-            await s04Repository.save(batch);
+        if(res.length > 0) {
+            await s04Repository.save(res);
         }
     } catch(err) {
         console.error(err);
@@ -228,7 +231,8 @@ async function processS09(report: any, mag: number, reportDate: string, dataSour
 
 async function processS05(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
-    const res = [];
+    let res = [];
+    const batchSize = 5000;
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
             if(elem.S05 != undefined) {
@@ -245,13 +249,15 @@ async function processS05(report: any, mag: number, reportDate: string, dataSour
                     s05.r3a = elem.S05[i].Value[0].$.R3a;
                     s05.r4a = elem.S05[i].Value[0].$.R4a;
                     res.push(s05);
+                    if (res.length >= batchSize) {
+                        await s05Repository.save(res);
+                        res = []; // Limpiar el array para el próximo lote
+                    }
                 } 
             }
         }
-        const batchSize = 10000;
-        for (let i = 0; i < res.length; i += batchSize) {
-            const batch = res.slice(i, i + batchSize);
-            await s05Repository.save(batch);
+        if(res.length > 0) {
+            await s05Repository.save(res);
         }
     } catch(err) {
         console.error(err);
@@ -261,7 +267,8 @@ async function processS05(report: any, mag: number, reportDate: string, dataSour
 
 async function processS02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
-    const res = [];
+    let res = [];
+    const batchSize = 5000;
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
             if(elem.S02 != undefined) {
@@ -279,13 +286,15 @@ async function processS02(report: any, mag: number, reportDate: string, dataSour
                     s02.r4 = parseInt(elem.S02[i].$.R4);
                     s02.origen = 'STG';
                     res.push(s02);
+                    if (res.length >= batchSize) {
+                        await s02Repository.save(res);
+                        res = []; // Limpiar el array para el próximo lote
+                    }
                 } 
             }
         } 
-        const batchSize = 10000;
-        for (let i = 0; i < res.length; i += batchSize) {
-            const batch = res.slice(i, i + batchSize);
-            await s02Repository.save(batch);
+        if(res.length > 0) {
+            await s02Repository.save(res);
         }
     } catch(err) {
         console.error(err);

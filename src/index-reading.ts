@@ -59,13 +59,15 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
     }
     const fullDates = getDatesBtwDates(f2, f1); 
     const dates = fullDates.filter(date => date.getDate() === 1 && date.getMonth() < new Date().getMonth());
+
     const s04ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S04);
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
 
+    const batchSize = 1000; // Ajusta el tamaño del lote según sea necesario
+    let s04ReadingIndices: T_READING_INDEX_S04[] = [];
+    
     const s04s = await s04Repository.find();
     const s04Map = new Map<string, Set<number>>();
-
-    // Crear un mapa de cnts a fechas para una búsqueda más rápida
     for (const s04 of s04s) {
         if (!s04Map.has(s04.cnt_id)) {
             s04Map.set(s04.cnt_id, new Set<number>());
@@ -73,36 +75,31 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
         s04Map.get(s04.cnt_id)!.add(s04.fh_i.getTime());
     }
 
-    const s04ReadingIndices: T_READING_INDEX_S04[] = [];
-
     try {
         for (const cnt of cnts) {
             for (const date of dates) {
                 let existingRecord = await s04ReadingIndexRepository.findOne({ where: { cnt_id: cnt, fh: date } });
-                if(existingRecord) {
-                    if (includeDate(s04Map, cnt, date)) {
-                        existingRecord.read = 1;
-                    } else {
-                        existingRecord.read = 0;
-                    }
+                if (existingRecord) {
+                    existingRecord.read = includeDate(s04Map, cnt, date) ? 1 : 0;
                     await s04ReadingIndexRepository.save(existingRecord);
                 } else {
                     const s04ReadingIndex = new T_READING_INDEX_S04();
                     s04ReadingIndex.cnt_id = cnt;
                     s04ReadingIndex.fh = date;
-                    if (includeDate(s04Map, cnt, date)) {
-                        s04ReadingIndex.read = 1;
-                    } else {
-                        s04ReadingIndex.read = 0;
+                    s04ReadingIndex.read = includeDate(s04Map, cnt, date) ? 1 : 0;
+                    s04ReadingIndices.push(s04ReadingIndex);
+                    
+                    if (s04ReadingIndices.length >= batchSize) {
+                        await s04ReadingIndexRepository.save(s04ReadingIndices);
+                        s04ReadingIndices = []; // Limpiar el array para el próximo lote
                     }
-                    await s04ReadingIndices.push(s04ReadingIndex);
-                 }
+                }
             }
         }
-        const batchSize = 10000;
-        for (let i = 0; i < s04ReadingIndices.length; i += batchSize) {
-            const batch = s04ReadingIndices.slice(i, i + batchSize);
-            await s04ReadingIndexRepository.save(batch);
+
+        // Guardar cualquier lote restante
+        if (s04ReadingIndices.length > 0) {
+            await s04ReadingIndexRepository.save(s04ReadingIndices);
         }
     } catch (err) {
         console.error(err);
@@ -114,50 +111,47 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
     const f2 = new Date();
     f2.setDate(f1.getDate() - s05Days);
     const dates = getDatesBtwDates(f2, f1);
+
     const s05ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S05);
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
 
+    const batchSize = 1000; // Ajusta el tamaño del lote según sea necesario
+    let s05ReadingIndices: T_READING_INDEX_S05[] = [];
+
     const s05s = await s05Repository.find();
     const s05Map = new Map<string, Set<number>>();
-
-    // Crear un mapa de cnts a fechas para una búsqueda más rápida
     for (const s05 of s05s) {
         if (!s05Map.has(s05.cnt_id)) {
             s05Map.set(s05.cnt_id, new Set<number>());
         }
         s05Map.get(s05.cnt_id)!.add(s05.fh.getTime());
     }
-    const s05ReadingIndices: T_READING_INDEX_S05[] = [];
+
     try {
         for (const cnt of cnts) {
             for (const date of dates) {
                 let existingRecord = await s05ReadingIndexRepository.findOne({ where: { cnt_id: cnt, fh: date } });
-                if(existingRecord) {
-                    if (includeDate(s05Map, cnt, date)) {
-                        existingRecord.read = 1;
-                    } else {
-                        existingRecord.read = 0;
-                    }
+                if (existingRecord) {
+                    existingRecord.read = includeDate(s05Map, cnt, date) ? 1 : 0;
                     await s05ReadingIndexRepository.save(existingRecord);
                 } else {
                     const s05ReadingIndex = new T_READING_INDEX_S05();
                     s05ReadingIndex.cnt_id = cnt;
                     s05ReadingIndex.fh = date;
-
-                    // Verificar si la fecha está incluida en el mapa
-                    if (includeDate(s05Map, cnt, date)) {
-                        s05ReadingIndex.read = 1;
-                    } else {
-                        s05ReadingIndex.read = 0;
-                    }
+                    s05ReadingIndex.read = includeDate(s05Map, cnt, date) ? 1 : 0;
                     s05ReadingIndices.push(s05ReadingIndex);
+
+                    if (s05ReadingIndices.length >= batchSize) {
+                        await s05ReadingIndexRepository.save(s05ReadingIndices);
+                        s05ReadingIndices = []; // Limpiar el array para el próximo lote
+                    }
                 }
             }
         }
-        const batchSize = 10000;
-        for (let i = 0; i < s05ReadingIndices.length; i += batchSize) {
-            const batch = s05ReadingIndices.slice(i, i + batchSize);
-            await s05ReadingIndexRepository.save(batch);
+
+        // Guardar cualquier lote restante
+        if (s05ReadingIndices.length > 0) {
+            await s05ReadingIndexRepository.save(s05ReadingIndices);
         }
     } catch (err) {
         console.error(err);
@@ -172,17 +166,19 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dates = fullDates.filter(date => {
-        const dateCopy = new Date(date); // Crear una copia de la fecha
-        dateCopy.setHours(0, 0, 0, 0); // Ajustar la hora de la copia a las 00:00
-        return dateCopy.getTime() !== today.getTime(); // Comparar las fechas en milisegundos
+        const dateCopy = new Date(date);
+        dateCopy.setHours(0, 0, 0, 0);
+        return dateCopy.getTime() !== today.getTime();
     });
+
     const s02ReadingIndexRepository = dataSource.getRepository(T_READING_INDEX_S02);
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
 
+    const batchSize = 1000; // Ajusta el tamaño del lote según sea necesario
+    let s02ReadingIndices: T_READING_INDEX_S02[] = [];
+
     const s02s = await s02Repository.find();
     const s02Map = new Map<string, Set<number>>();
-
-    // Crear un mapa de cnts a fechas para una búsqueda más rápida
     for (const s02 of s02s) {
         if (!s02Map.has(s02.cnt_id)) {
             s02Map.set(s02.cnt_id, new Set<number>());
@@ -190,15 +186,13 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
         s02Map.get(s02.cnt_id)!.add(s02.fh.getTime());
     }
 
-    const s02ReadingIndices: T_READING_INDEX_S02[] = [];
-
     try {
         for (const cnt of cnts) {
             for (let i = 0; i < dates.length; i += 24) {
                 let existingRecord = await s02ReadingIndexRepository.findOne({ where: { cnt_id: cnt, fh: dates[i] } });
                 let read = true;
                 const dateRange = getDateRange(dates[i], 24);
-                if(existingRecord) {
+                if (existingRecord) {
                     if (dates[i].getMonth() === 2 && dates[i].getDate() === 31) {
                         read = checkDateRange(s02Map, cnt, dateRange.slice(0, 23));
                     } else if (dates[i].getMonth() === 9 && dates[i].getDate() === 27) {
@@ -222,14 +216,19 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
                     }
 
                     s02ReadingIndex.read = read ? 1 : 0;
-                    s02ReadingIndices.push(s02ReadingIndex);   
+                    s02ReadingIndices.push(s02ReadingIndex);
+
+                    if (s02ReadingIndices.length >= batchSize) {
+                        await s02ReadingIndexRepository.save(s02ReadingIndices);
+                        s02ReadingIndices = []; // Limpiar el array para el próximo lote
+                    }
                 }
             }
         }
-        const batchSize = 10000;
-        for (let i = 0; i < s02ReadingIndices.length; i += batchSize) {
-            const batch = s02ReadingIndices.slice(i, i + batchSize);
-            await s02ReadingIndexRepository.save(batch);
+
+        // Guardar cualquier lote restante
+        if (s02ReadingIndices.length > 0) {
+            await s02ReadingIndexRepository.save(s02ReadingIndices);
         }
     } catch (err) {
         console.error(err);
