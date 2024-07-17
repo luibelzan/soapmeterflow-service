@@ -9,6 +9,9 @@ export class REQUESTS2 {
     @Column("text", { array: true })
     cnt_id: string[];
 
+    @Column()
+    number_cnt: number;
+
     @Column({ nullable: true })
     fh_i: Date;
 

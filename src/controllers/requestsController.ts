@@ -140,6 +140,7 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                 request.fh_i = minDate;
                 request.fh_f = fecha;
                 request.cnt_id = cnts;
+                request.number_cnt = cnts.length;
                 request.ct_id = ct.id_ct;
                 request.url = requests[0].url;
                 request.source = 'MET';
@@ -161,6 +162,7 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                     request.fh_i = new Date(startDate);
                     request.fh_f = new Date(finishDate);
                     request.cnt_id = cnts;
+                    request.number_cnt = cnts.length;
                     request.ct_id = ct.id_ct;
                     request.url = requests[0].url;
                     request.source = 'MET';
@@ -179,6 +181,7 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                 request.fh_i = minDate;
                 request.fh_f = maxDate;
                 request.cnt_id = cnts;
+                request.number_cnt = cnts.length;
                 request.ct_id = ct.id_ct;
                 request.url = requests[0].url;
                 request.source = 'MET';
