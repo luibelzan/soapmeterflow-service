@@ -37,7 +37,6 @@ export async function getNonRead(dataSource: DataSource , entity: any): Promise<
 			limitDate.setDate(1);
 		}
 	}
-    console.log(limitDate);
     const index = await indexRepository.createQueryBuilder('index').where('index.read = :read', { read: 0 }).andWhere('index.fh >= :date', { date: limitDate }).getMany();
     for(let i=0; i<index.length; i++) {
         const dateKey = index[i].fh.toISOString();
@@ -215,7 +214,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
             <IdPet>${idPet}</IdPet>
             <IdRpt>${req.report_type}</IdRpt>
-            <tfStart>${formatDate(req.fh_i)}</tfStart>>
+            <tfStart>${formatDate(req.fh_i)}</tfStart>
             <tfEnd>${formatDate(req.fh_f)}</tfEnd>
             <IdMeters>${req.cnt_id}</IdMeters>
             <Priority>${req.priority}</Priority>
@@ -223,7 +222,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </AsynchRequest>
             </s:Body>
             </s:Envelope>`
-            console.log(url);
+            console.log(xml);
             //sendWebService(xml, url, dataSource);
             //sentRequests.push(req);
             //await sleep(3000);
@@ -240,7 +239,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                     xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
                 <IdPet>${idPet}</IdPet>
                 <IdRpt>${req.report_type}</IdRpt>
-                <tfStart>${formatDate(req.fh_i)}</tfStart>>
+                <tfStart>${formatDate(req.fh_i)}</tfStart>
                 <tfEnd>${formatDate(req.fh_f)}</tfEnd>
                 <IdMeters>${cntAux}</IdMeters>
                 <Priority>${req.priority}</Priority>
@@ -248,7 +247,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
-                console.log(url);
+                console.log(xml);
                 //console.log(xml);
                 //sendWebService(xml, url, dataSource);
                 //sentRequests.push(req);

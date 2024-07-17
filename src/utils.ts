@@ -153,7 +153,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
 
-    if ((currentHours >= startHour || (currentHours === startHour && currentMinutes >= startMinute)) &&
+    if ((currentHours > startHour || (currentHours === startHour && currentMinutes >= startMinute)) &&
         (currentHours < endHour || (currentHours === endHour && currentMinutes < endMinute))) {
         // Estamos dentro del intervalo de ejecución
         await run(dir, dataSource);
