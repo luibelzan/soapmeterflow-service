@@ -128,10 +128,10 @@ export async function getReadIndexAndSendRequests(dataSource: DataSource) {
   //})
 }
 
-export function stopFunction(intervalId: NodeJS.Timeout, dataSource: DataSource, dir: string) {
+export function stopFunction(intervalId: NodeJS.Timeout) {
   console.log('La funcion ha sido detenida');
   clearInterval(intervalId);
-  getReadIndexAndSendRequests(dataSource)
+  //getReadIndexAndSendRequests(dataSource)
 }
 
 function calculateTimeUntil(horas: number, minutos: number): number {
@@ -152,9 +152,8 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
     const now = new Date();
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
-
-    if ((currentHours > startHour || (currentHours === startHour && currentMinutes >= startMinute)) &&
-        (currentHours < endHour || (currentHours === endHour && currentMinutes < endMinute))) {
+    if ((currentHours > startHour || (currentHours == startHour && currentMinutes >= startMinute)) &&
+        (currentHours < endHour || (currentHours == endHour && currentMinutes < endMinute))) {
         // Estamos dentro del intervalo de ejecución
         await run(dir, dataSource);
         const intervalId = setInterval(async () => 
@@ -162,7 +161,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 
         // Calcula el tiempo restante hasta el final del período de ejecución
         const timeUntilEnd = calculateTimeUntil(endHour, endMinute);
-        setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd);
+        setTimeout(() => stopFunction(intervalId), timeUntilEnd);
     } else {
       // Programa el inicio de la función para el próximo día a la hora y minuto especificados
       const timeUntilStart = calculateTimeUntil(startHour, startMinute);
@@ -172,7 +171,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 
           // Programa la detención de la función pasando intervalId como parámetro
           const timeUntilEnd = calculateTimeUntil(endHour, endMinute);
-          setTimeout(() => stopFunction(intervalId, dataSource, dir), timeUntilEnd - timeUntilStart);
+          setTimeout(() => stopFunction(intervalId), timeUntilEnd - timeUntilStart);
       }, timeUntilStart);
     }
   }).catch((err) => console.error(err)); 
