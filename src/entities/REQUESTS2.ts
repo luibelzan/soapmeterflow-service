@@ -1,13 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
 @Entity()
-export class REQUESTS {
+export class REQUESTS2 {
 
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column("text", { array: true })
     cnt_id: string[];
+
+    @Column()
+    number_cnt: number;
 
     @Column({ nullable: true })
     fh_i: Date;

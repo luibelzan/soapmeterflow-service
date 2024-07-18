@@ -144,11 +144,13 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
 }
 
 async function processS04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    let res = [];
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
-    for (const elem of report?.Cnc[0]?.Cnt) {
-        if(elem.S04 != undefined) {
-            for(let i=0; i<Object.keys(elem.S04).length; i++) {
-                try {
+    const batchSize = 5000;
+    try {
+        for (const elem of report?.Cnc[0]?.Cnt) {
+            if(elem.S04 != undefined) {
+                for(let i=0; i<Object.keys(elem.S04).length; i++) {
                     var s04 = new T_S04_TEMP();
                     s04.cnt_id = elem.$.Id;
                     s04.fh_i = parseDate(elem.S04[i].$.Fhi);
@@ -188,14 +190,23 @@ async function processS04(report: any, mag: number, reportDate: string, dataSour
                         s04.r3i = elem.S04[i].Value[0].$.R3i;
                         s04.r4i = elem.S04[i].Value[0].$.R4i;
                     }
-                    await s04Repository.save(s04);
-                } catch(err) {
-                    console.error(err);
-                }
+                    res.push(s04);
+                    if (res.length >= batchSize) {
+                        await s04Repository.save(res);
+                        res = []; // Limpiar el array para el próximo lote
+                    }
+                } 
             }
         }
+        if(res.length > 0) {
+            await s04Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
+    
 }
+
 
 async function processS09(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s09Repository = dataSource.getRepository(T_S09_TEMP);
@@ -220,10 +231,12 @@ async function processS09(report: any, mag: number, reportDate: string, dataSour
 
 async function processS05(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
-    for (const elem of report?.Cnc[0]?.Cnt) {
-        if(elem.S05 != undefined) {
-            for(let i=0; i<Object.keys(elem.S05).length; i++) {
-                try {
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for (const elem of report?.Cnc[0]?.Cnt) {
+            if(elem.S05 != undefined) {
+                for(let i=0; i<Object.keys(elem.S05).length; i++) {
                     var s05 = new T_S05_TEMP();
                     s05.cnt_id = elem.$.Id;
                     s05.fh = parseDate(elem.S05[i].$.Fh);
@@ -235,22 +248,31 @@ async function processS05(report: any, mag: number, reportDate: string, dataSour
                     s05.r2a = elem.S05[i].Value[0].$.R2a;
                     s05.r3a = elem.S05[i].Value[0].$.R3a;
                     s05.r4a = elem.S05[i].Value[0].$.R4a;
-                    await s05Repository.save(s05);
-                } catch(err) {
-                    console.error(err);
-                }
+                    res.push(s05);
+                    if (res.length >= batchSize) {
+                        await s05Repository.save(res);
+                        res = []; // Limpiar el array para el próximo lote
+                    }
+                } 
             }
         }
-    };
+        if(res.length > 0) {
+            await s05Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
+    }
 }
+
 
 async function processS02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
-    const fechaHoraActual = new Date();
-    for (const elem of report?.Cnc[0]?.Cnt) {
-        if(elem.S02 != undefined) {
-            for(let i=0; i<Object.keys(elem.S02).length; i++) {
-                try{
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for (const elem of report?.Cnc[0]?.Cnt) {
+            if(elem.S02 != undefined) {
+                for(let i=0; i<Object.keys(elem.S02).length; i++) {
                     var s02 = new T_S02_TEMP();
                     s02.cnt_id = elem.$.Id;
                     s02.magn = parseInt(elem.$.Magn);
@@ -263,14 +285,22 @@ async function processS02(report: any, mag: number, reportDate: string, dataSour
                     s02.r3 = parseInt(elem.S02[i].$.R3);
                     s02.r4 = parseInt(elem.S02[i].$.R4);
                     s02.origen = 'STG';
-                    await s02Repository.save(s02);
-                } catch(err) {
-                    console.error(err);
-                }
+                    res.push(s02);
+                    if (res.length >= batchSize) {
+                        await s02Repository.save(res);
+                        res = []; // Limpiar el array para el próximo lote
+                    }
+                } 
             }
         } 
-    };
+        if(res.length > 0) {
+            await s02Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
+    }
 }
+
 
 async function processG01(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g01Repository = dataSource.getRepository(T_G01_TEMP);

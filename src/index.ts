@@ -1,27 +1,26 @@
 import { getData } from "./controllers/EventsController";
-import { getReadIndex, getReadIndexAndSendRequests } from "./utils";
+import config from "../configLoader";
+import { scheduleDailyExecution } from "./utils";
 import express from 'express';
-import { AppDataSource, chera, dielec, mercedes, staClara } from "./data-source"
-import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
-import { T_S05_TEMP } from "./entities/T_S05_TEMP";
-import { T_S02_TEMP } from "./entities/T_S02_TEMP";
-import { loadRequests, getNonRead, groupByCT, buildXML } from "./controllers/requestsController";
-import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
-import { T_CUPS } from "./entities/T_CUPS";
-import { REQUESTS } from "./entities/REQUESTS";
+import { AppDataSource, chera, pastor } from "./data-source"
+
 
 const bodyParser = require('body-parser');
 const bodyParserXml = require('body-parser-xml');
 
 const app = express();
-const PORT = 8080;
-const interval = 5000;
+const PORT = config.port;
+const startHour = config.startHour;
+const startMinute = config.startMinute;
+const finishHour = config.finishHour;
+const finishMinute = config.finishMinute;
+const executionInterval = config.executionInterval;
 
-const principalDir = '../public/resources/database1';
-const secondDir = '../public/resources/dielec';
-const thirdDir = '../public/resources/staclara';
-const fourthDir = '../public/resources/mercedes';
-const fiveDir = '../public/resources/chera';
+const cheraDir = config.cheraDir;
+const sotDecheraDir = config.sotDecheraDir
+const alvaroBenitoDir = config.alvaroBenitoDir
+const pastorDir = config.pastorDir;
+
 
 try {
   //Conexion con la base de datos
@@ -56,14 +55,18 @@ try {
 
   
   //getReadIndex(fiveDir, chera);
-  /*
-  chera.initialize().then(async () => {
-    const nonRead = await getNonRead(dielec, T_READING_INDEX_S05);
-    //await loadRequests(nonRead, dielec, T_S05_TEMP);
-    await buildXML(chera);
-  })
-  */
- getReadIndexAndSendRequests(chera, fiveDir, T_READING_INDEX_S05);
+  //getReadIndexAndSendRequests(chera, fiveDir); //Funcion que calcula los indices y envia las peticiones
+
+  //getReadIndexAndSendRequests(cela, sixDir);
+
+  
+  scheduleDailyExecution(pastor, pastorDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
+
+  scheduleDailyExecution(chera, cheraDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
+  
+  //prueba(sevenDir, pastor);
   
   
 
