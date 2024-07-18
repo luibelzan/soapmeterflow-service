@@ -180,7 +180,12 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 export async function run(dir: string, dataSource: DataSource) {
   //dataSource.initialize().then(async () => {
     await readFile(dir, dataSource);
-    getReadIndexAndSendRequests(dataSource);
+    await getReadIndexAndSendRequests(dataSource);
   //}).catch((err) => console.error(err));
   
+}
+
+export async function initializeApplication(dataSource: DataSource, dir: string, startHour: number, startMinute: number, finishHour: number, finishMinute: number, executionInterval: number) {
+  scheduleDailyExecution(dataSource, dir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  setInterval(scheduleDailyExecution, 24 * 60 * 60 * 1000);
 }

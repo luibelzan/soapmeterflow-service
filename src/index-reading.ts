@@ -1,5 +1,3 @@
-import e from "express";
-import { AppDataSource } from "./data-source";
 import config from "../configLoader";
 import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
