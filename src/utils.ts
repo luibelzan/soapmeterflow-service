@@ -148,16 +148,6 @@ function calculateTimeUntil(horas: number, minutos: number): number {
 }
 
 export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, startMinute: number, endHour: number, endMinute: number, interval: number) {
-  if(!dataSource.isInitialized) {
-    dataSource.initialize().then(async () => {
-      scheduleTask(dataSource, dir, startHour, startMinute, endHour, endMinute, interval);
-    }).catch((err) => console.error(err)); 
-  } else {
-    scheduleTask(dataSource, dir, startHour, startMinute, endHour, endMinute, interval);
-  }
-}
-
-export async function scheduleTask(dataSource: DataSource, dir: string, startHour: number, startMinute: number, endHour: number, endMinute: number, interval: number) {
     const now = new Date();
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
@@ -186,11 +176,11 @@ export async function scheduleTask(dataSource: DataSource, dir: string, startHou
 }
 
 export async function run(dir: string, dataSource: DataSource) {
-  //dataSource.initialize().then(async () => {
+  dataSource.initialize().then(async () => {
     await readFile(dir, dataSource);
     await getReadIndexAndSendRequests(dataSource);
-  //}).catch((err) => console.error(err));
-  
+    closeConnection(dataSource);
+  }).catch((err) => console.error(err));
 }
 
 export async function initializeApplication(dataSource: DataSource, dir: string, startHour: number, startMinute: number, finishHour: number, finishMinute: number, executionInterval: number) {
@@ -198,4 +188,8 @@ export async function initializeApplication(dataSource: DataSource, dir: string,
   setInterval(() => {
     scheduleDailyExecution(dataSource, dir, startHour, startMinute, finishHour, finishMinute, executionInterval)
   }, 24 * 60 * 60 * 1000);
+}
+
+async function closeConnection(dataSource: DataSource) {
+  await dataSource.destroy();
 }
