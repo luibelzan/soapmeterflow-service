@@ -1,5 +1,3 @@
-import e from "express";
-import { AppDataSource } from "./data-source";
 import config from "../configLoader";
 import { T_READING_INDEX_S04 } from "./entities/T_READING_INDEX_S04";
 import { T_READING_INDEX_S05 } from "./entities/T_READING_INDEX_S05";
@@ -66,7 +64,7 @@ export async function associateDatesS04(cnts: string[], dataSource: DataSource):
     const batchSize = 1000; // Ajusta el tamaño del lote según sea necesario
     let s04ReadingIndices: T_READING_INDEX_S04[] = [];
     
-    const s04s = await s04Repository.find();
+    const s04s = await s04Repository.createQueryBuilder('s04').where('s04.fh_i >= :fecha', { fecha: f2}).getMany();
     const s04Map = new Map<string, Set<number>>();
     for (const s04 of s04s) {
         if (!s04Map.has(s04.cnt_id)) {
@@ -118,7 +116,7 @@ export async function associateDatesS05(cnts: string[], dataSource: DataSource):
     const batchSize = 1000; // Ajusta el tamaño del lote según sea necesario
     let s05ReadingIndices: T_READING_INDEX_S05[] = [];
 
-    const s05s = await s05Repository.find();
+    const s05s = await s05Repository.createQueryBuilder('s05').where('s05.fh >= :fecha', { fecha: f2}).getMany();
     const s05Map = new Map<string, Set<number>>();
     for (const s05 of s05s) {
         if (!s05Map.has(s05.cnt_id)) {
@@ -177,7 +175,7 @@ export async function associateDatesS02(cnts: string[], dataSource: DataSource):
     const batchSize = 1000; // Ajusta el tamaño del lote según sea necesario
     let s02ReadingIndices: T_READING_INDEX_S02[] = [];
 
-    const s02s = await s02Repository.find();
+    const s02s = await s02Repository.createQueryBuilder('s02').where('s02.fh >= :fecha', { fecha: f2}).getMany();
     const s02Map = new Map<string, Set<number>>();
     for (const s02 of s02s) {
         if (!s02Map.has(s02.cnt_id)) {

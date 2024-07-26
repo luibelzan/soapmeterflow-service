@@ -125,12 +125,13 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
     for(const ct of cts) {
         const requests = await requestRepository.createQueryBuilder('req').where('req.ct_id = :id', { id: ct.id_ct}).andWhere('req.report_type LIKE :typ', { typ: type}).getMany();
         if(requests.length > 0) {
-            var cnts = [];
+            var allCnts = [];
             var dates = [];
             for(const req of requests) {
-                cnts.push(...req.cnt_id);
+                allCnts.push(...req.cnt_id);
                 dates.push(req.fh_i);
             }
+            var cnts = removeDuplicates(allCnts);
             const minDate = new Date(Math.min(...dates.map(date => date.getTime())));
             const maxDate = new Date(Math.max(...dates.map(date => date.getTime())));
             if (type === 'S04' && maxDate.getTime() === minDate.getTime()) {
@@ -176,6 +177,18 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
                     endDate = new Date(startDate);
                     endDate.setDate(startDate.getDate() + 10);
                 }
+            } else if(type == 'S05' && minDate.getTime() == maxDate.getTime()) {
+                const request = new REQUESTS2();
+                request.fh_i = minDate;
+                //request.fh_f = '';
+                request.cnt_id = cnts;
+                request.number_cnt = cnts.length;
+                request.ct_id = ct.id_ct;
+                request.url = requests[0].url;
+                request.source = 'MET';
+                request.priority = 3;
+                request.report_type = type;
+                await request2Repository.save(request);
             } else {
                 const request = new REQUESTS2();
                 request.fh_i = minDate;
@@ -225,10 +238,10 @@ export async function buildXML(dataSource: DataSource, entity: any) {
             </AsynchRequest>
             </s:Body>
             </s:Envelope>`
-            console.log(xml);
-            //sendWebService(xml, url, dataSource);
-            //sentRequests.push(req);
-            //await sleep(3000);
+            //console.log(xml);
+            sendWebService(xml, url, dataSource);
+            sentRequests.push(req);
+            await sleep(3000);
         } else {
             for(let i=0; i<req.cnt_id.length; i+=10) {
                 var idPet = generateIdentifier();
@@ -250,15 +263,15 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
-                console.log(xml);
                 //console.log(xml);
-                //sendWebService(xml, url, dataSource);
-                //sentRequests.push(req);
-                //await sleep(3000);
+                //console.log(xml);
+                sendWebService(xml, url, dataSource);
+                sentRequests.push(req);
+                await sleep(3000);
             }
         }
     }
-    /*
+    console.log('Finito peticiones');
     const batchSize = 1000;
     const request1Repository = dataSource.getRepository(REQUESTS);
     for(let i = 0; i < sentRequests.length; i =+ batchSize) {
@@ -266,7 +279,6 @@ export async function buildXML(dataSource: DataSource, entity: any) {
         await requestsRepository.delete(batch);
     }
     await request1Repository.clear();
-    */
 }
 
 export async function sendWebService(xml: string, url: string, dataSource: DataSource): Promise<string> {
@@ -288,15 +300,19 @@ export async function sendWebService(xml: string, url: string, dataSource: DataS
 }
 
 function formatDate(date: Date): string {
-    const year = date.getFullYear().toString().padStart(4, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-    
-    return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}W`;
+	if(date != undefined) {
+		const year = date.getFullYear().toString().padStart(4, '0');
+		const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+		const day = date.getDate().toString().padStart(2, '0');
+		const hours = date.getHours().toString().padStart(2, '0');
+		const minutes = date.getMinutes().toString().padStart(2, '0');
+		const seconds = date.getSeconds().toString().padStart(2, '0');
+		const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+		
+		return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}W`;
+	} else {
+		return '';
+	}
   }
 
 function sleep(ms: number): Promise<void> {
@@ -308,4 +324,13 @@ function generateIdentifier() {
     const paddedNumbers = String(randomNumbers).padStart(3, '0'); // Asegura que siempre tenga 3 dígitos
     return paddedNumbers;
   }
+
+function removeDuplicates<T>(arr: T[]): T[] {
+    return arr.reduce((uniqueArray, item) => {
+        if (!uniqueArray.includes(item)) {
+            uniqueArray.push(item);
+        }
+        return uniqueArray;
+    }, [] as T[]);
+}
 

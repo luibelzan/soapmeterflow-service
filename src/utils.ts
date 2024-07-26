@@ -148,7 +148,6 @@ function calculateTimeUntil(horas: number, minutos: number): number {
 }
 
 export async function scheduleDailyExecution(dataSource: DataSource, dir: string, startHour: number, startMinute: number, endHour: number, endMinute: number, interval: number) {
-  dataSource.initialize().then(async () => {
     const now = new Date();
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
@@ -174,13 +173,23 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
           setTimeout(() => stopFunction(intervalId), timeUntilEnd - timeUntilStart);
       }, timeUntilStart);
     }
-  }).catch((err) => console.error(err)); 
 }
 
 export async function run(dir: string, dataSource: DataSource) {
-  //dataSource.initialize().then(async () => {
+  dataSource.initialize().then(async () => {
     await readFile(dir, dataSource);
-    getReadIndexAndSendRequests(dataSource);
-  //}).catch((err) => console.error(err));
-  
+    await getReadIndexAndSendRequests(dataSource);
+    closeConnection(dataSource);
+  }).catch((err) => console.error(err));
+}
+
+export async function initializeApplication(dataSource: DataSource, dir: string, startHour: number, startMinute: number, finishHour: number, finishMinute: number, executionInterval: number) {
+  scheduleDailyExecution(dataSource, dir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  setInterval(() => {
+    scheduleDailyExecution(dataSource, dir, startHour, startMinute, finishHour, finishMinute, executionInterval)
+  }, 24 * 60 * 60 * 1000);
+}
+
+async function closeConnection(dataSource: DataSource) {
+  await dataSource.destroy();
 }
