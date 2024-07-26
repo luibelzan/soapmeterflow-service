@@ -164,6 +164,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
     } else {
       // Programa el inicio de la función para el próximo día a la hora y minuto especificados
       const timeUntilStart = calculateTimeUntil(startHour, startMinute);
+      console.log('Faltan ', timeUntilStart, ' milisegundos para la siguiente ejecucion');
       setTimeout(async () => {
           await run(dir, dataSource);
           const intervalId = setInterval(async () => await run(dir, dataSource), interval); // Ejecuta myFunction con el parámetro cada segundo

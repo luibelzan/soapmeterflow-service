@@ -11,6 +11,7 @@ import config from "../../configLoader";
 type MultiValueMap = Map<string, string[]>;
 const daysS05 = config.numberDaysS05;
 const daysS02 = config.numberDaysS02;
+const toleranceIndex = config.toleranceIndex;
 
 // Función para agregar valores a una clave
 function addValueToMap(map: MultiValueMap, key: string, value: string): void {
@@ -208,6 +209,7 @@ export async function setDateInterval(dataSource: DataSource, entity: any) {
 
 export async function buildXML(dataSource: DataSource, entity: any) {
     const requestsRepository = dataSource.getRepository(REQUESTS2);
+    const cupsRepository = dataSource.getRepository(T_CUPS);
     if(entity.name.includes('S05')) {
         var type = 'S05';
     } else if(entity.name.includes('S04')) {
@@ -217,35 +219,14 @@ export async function buildXML(dataSource: DataSource, entity: any) {
     }
     const requests = await requestsRepository.createQueryBuilder('req').where('req.report_type = :typ', { typ: type}).getMany();
     const sentRequests = [];
+
     for(const req of requests) {
+        var ct = req.ct_id;
         var url = req.url;
-        if(req.cnt_id.length <= 10) {
-            var idPet = generateIdentifier();
-            var xml = `<?xml version="1.0" encoding="utf-8"?>
-            <s:Envelope 
-            xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-            <s:Body>
-            <AsynchRequest
-                xmlns:i="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
-            <IdPet>${idPet}</IdPet>
-            <IdRpt>${req.report_type}</IdRpt>
-            <tfStart>${formatDate(req.fh_i)}</tfStart>
-            <tfEnd>${formatDate(req.fh_f)}</tfEnd>
-            <IdMeters>${req.cnt_id}</IdMeters>
-            <Priority>${req.priority}</Priority>
-            <Source>${req.source}</Source>
-            </AsynchRequest>
-            </s:Body>
-            </s:Envelope>`
-            //console.log(xml);
-            sendWebService(xml, url, dataSource);
-            sentRequests.push(req);
-            await sleep(3000);
-        } else {
-            for(let i=0; i<req.cnt_id.length; i+=10) {
+        const numCnt = (await cupsRepository.createQueryBuilder('cnt').where('cnt.id_ct = :ct', { ct: ct}).getMany()).length;
+        if(req.cnt_id.length < numCnt*(toleranceIndex/100)) {
+            if(req.cnt_id.length <= 10) {
                 var idPet = generateIdentifier();
-                var cntAux = req.cnt_id.slice(i, i+10);
                 var xml = `<?xml version="1.0" encoding="utf-8"?>
                 <s:Envelope 
                 xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
@@ -257,21 +238,46 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 <IdRpt>${req.report_type}</IdRpt>
                 <tfStart>${formatDate(req.fh_i)}</tfStart>
                 <tfEnd>${formatDate(req.fh_f)}</tfEnd>
-                <IdMeters>${cntAux}</IdMeters>
+                <IdMeters>${req.cnt_id}</IdMeters>
                 <Priority>${req.priority}</Priority>
                 <Source>${req.source}</Source>
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
-                //console.log(xml);
-                //console.log(xml);
+                //console.log(url);
                 sendWebService(xml, url, dataSource);
                 sentRequests.push(req);
                 await sleep(3000);
+            } else {
+                for(let i=0; i<req.cnt_id.length; i+=10) {
+                    var idPet = generateIdentifier();
+                    var cntAux = req.cnt_id.slice(i, i+10);
+                    var xml = `<?xml version="1.0" encoding="utf-8"?>
+                    <s:Envelope 
+                    xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+                    <s:Body>
+                    <AsynchRequest
+                        xmlns:i="http://www.w3.org/2001/XMLSchema-instance"
+                        xmlns="http://www.asais.fr/ns/Saturne/DC/ws">
+                    <IdPet>${idPet}</IdPet>
+                    <IdRpt>${req.report_type}</IdRpt>
+                    <tfStart>${formatDate(req.fh_i)}</tfStart>
+                    <tfEnd>${formatDate(req.fh_f)}</tfEnd>
+                    <IdMeters>${cntAux}</IdMeters>
+                    <Priority>${req.priority}</Priority>
+                    <Source>${req.source}</Source>
+                    </AsynchRequest>
+                    </s:Body>
+                    </s:Envelope>`
+                    //console.log(url);
+                    //console.log(xml);
+                    sendWebService(xml, url, dataSource);
+                    sentRequests.push(req);
+                    await sleep(3000);
+                }
             }
         }
     }
-    console.log('Finito peticiones');
     const batchSize = 1000;
     const request1Repository = dataSource.getRepository(REQUESTS);
     for(let i = 0; i < sentRequests.length; i =+ batchSize) {
