@@ -244,7 +244,7 @@ export async function buildXML(dataSource: DataSource, entity: any) {
                 </AsynchRequest>
                 </s:Body>
                 </s:Envelope>`
-                //console.log(url);
+                //console.log(url);           
                 sendWebService(xml, url, dataSource);
                 sentRequests.push(req);
                 await sleep(3000);
@@ -300,7 +300,7 @@ export async function sendWebService(xml: string, url: string, dataSource: DataS
         console.log('Peticion enviada correctamente ', url, `${dataSource.options.database}`);
         return response.data;
     } catch (err) {
-        console.error('Error al enviar el WebService: ', err);
+        console.error('Error al enviar el WebService: ', err.cause, `${dataSource.options.database}`);
         //throw err; // Vuelve a lanzar el error para que pueda ser manejado por el llamador de esta función
     }
 }
