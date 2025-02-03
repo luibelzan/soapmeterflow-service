@@ -85,5 +85,5 @@ export class T_G58 {
     mimcn: number;
 
     @Column()
-    bc: number;
+    bc: string;
 }
