@@ -61,7 +61,7 @@ export class T_G59 {
     momPF2: number;
 
     @Column({ type: 'float' })
-    momChph3: number;
+    momCph3: number;
 
     @Column({ type: 'float' })
     momVph3: number;
@@ -85,6 +85,6 @@ export class T_G59 {
     momCn: number;
 
     @Column()
-    bc: number;
+    bc: string;
 
 }

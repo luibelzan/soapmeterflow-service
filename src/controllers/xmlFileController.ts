@@ -25,6 +25,7 @@ import { T_S17 } from '../entities/T_S17';
 import { T_S24 } from '../entities/T_S24';
 import { T_S12 } from '../entities/T_S12';
 import { DataSource } from 'typeorm';
+import { T_G59 } from '../entities/T_G59';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -66,8 +67,8 @@ async function parseXml(data: string): Promise<any> {
 }
 
 async function processReport(report: any, idRpt: string, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
-
-    switch (idRpt) {
+    
+    switch (idRpt.trim()) {
         case 'S04':
             await processS04(report, mag, reportDate, dataSource);
             break;
@@ -137,6 +138,21 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
         case 'S24':
             await processS24(report, mag, reportDate, dataSource);
             break;
+        case 'G59':
+            await processG59(report, mag, reportDate, dataSource);
+            break;
+        /*
+            case 'S52':
+            //await processS52(report, mag, reportDate, dataSource);
+        case 'S53':
+            //await processS53(report, mag, reportDate, dataSource);
+        case 'S59':
+            //await processS59(report, mag, reportDate, dataSource);
+        case 'S64':
+            //await processS64(report, mag, reportDate, dataSource);
+        case 'S82':
+            //await processS82(report, mag, reportDate, dataSource);
+            */
         default:
             console.error(`Unknown report type: ${idRpt}`);
             break;
@@ -1021,6 +1037,49 @@ async function processS24(report: any, mag: number, reportDate: string, dataSour
 					S24.active = elem.$.Active;										
                     await S24Repository.save(S24);
                     //console.log('S24 insertado')
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processG59(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const G59Repository = dataSource.getRepository(T_G59);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.G59).length; i++) {
+                try {
+                    var G59 = new T_G59();
+                    G59.rtu_id = report.Rtu[0].$.Id;
+                    G59.lvs_id = elem.$.Id;
+                    G59.lvs_pos = elem.$.Pos;
+                    G59.fh = parseDate(elem.G59[i].$.Fh);
+                    G59.momCph1 = elem.G59[i].$.MomCph1;
+                    G59.momVph1 = elem.G59[i].$.MomVph1;
+                    G59.momPimph1 = elem.G59[i].$.MomPimph1;
+                    G59.MomPexph1 = elem.G59[i].$.MomPexph1;
+                    G59.momQimph1 = elem.G59[i].$.MomQimph1;
+                    G59.momQexph1 = elem.G59[i].$.MomQexph1;
+                    G59.momPF1 = elem.G59[i].$.MomPF1;
+                    G59.momCph2 = elem.G59[i].$.MomCph2;
+                    G59.momVph2 = elem.G59[i].$.MomVph2;
+                    G59.momPimph2 = elem.G59[i].$.MomPimph2;
+                    G59.momPexph2 = elem.G59[i].$.MomPexph2;
+                    G59.momQimph2 = elem.G59[i].$.MomQimph2;
+                    G59.momQexph2 = elem.G59[i].$.MomQexph2;
+                    G59.momPF2 = elem.G59[i].$.MomPF2;
+                    G59.momCph3 = elem.G59[i].$.MomCph3;
+                    G59.momVph3 = elem.G59[i].$.MomVph3;
+                    G59.momPimph3 = elem.G59[i].$.MomPimph3;
+                    G59.momPexph3 = elem.G59[i].$.MomPexph3;
+                    G59.momQimph3 = elem.G59[i].$.MomQimph3;
+                    G59.momQexph3 = elem.G59[i].$.MomQexph3;
+                    G59.momPF3 = elem.G59[i].$.MomPF3;
+                    G59.momCn = elem.G59[i].$.MomCn;
+                    G59.bc = elem.G59[i].$.Bc;
+                    await G59Repository.save(G59);
                 } catch(err) {
                     console.error(err);
                 }

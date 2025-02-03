@@ -13,10 +13,11 @@ const cheraDir = config.cheraDir;
 const sotDecheraDir = config.sotDecheraDir
 const alvaroBenitoDir = config.alvaroBenitoDir
 const pastorDir = config.pastorDir;
+const pruebasDir = '../Distribuidoras/pruebas';
 
 try {  
   
-  initializeApplication(pastor, pastorDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  initializeApplication(AppDataSource, pruebasDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
 
 } catch(err) {
   console.error('Error al calcular los indices de lectura: ', err);
