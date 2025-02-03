@@ -27,6 +27,7 @@ import { T_S12 } from '../entities/T_S12';
 import { DataSource } from 'typeorm';
 import { T_G59 } from '../entities/T_G59';
 import { T_S52 } from '../entities/T_S52';
+import { T_S53 } from '../entities/T_S53';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -146,7 +147,8 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processS52(report, mag, reportDate, dataSource);
             break;
         case 'S53':
-            //await processS53(report, mag, reportDate, dataSource);
+            await processS53(report, mag, reportDate, dataSource);
+            break;
         case 'S59':
             //await processS59(report, mag, reportDate, dataSource);
         case 'S64':
@@ -1108,6 +1110,46 @@ async function processS52(report:any, mag: number, reportDate: string, dataSourc
                     S52.r4 = elem.S52[i].$.R4;
                     S52.bc = elem.S52[i].$.Bc;
                     await S52Repository.save(S52);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS53(report: any, mag: number, reportDate: string, dataSoure: DataSource): Promise<void> {
+    const S53Repository = dataSoure.getRepository(T_S53);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S53).length; i++) {
+                try {
+                    var S53 = new T_S53();
+                    S53.rtu_id = report.Rtu[0].$.Id;
+                    S53.lvs_id = elem.$.Id;
+                    S53.lvs_pos = elem.$.Pos;
+                    S53.lvs_magn = elem.$.Magn;
+                    S53.fh = parseDate(elem.S53[i].$.Fh);
+                    S53.ai1 = elem.S53[i].$.AI1;
+                    S53.ai2 = elem.S53[i].$.AI2;
+                    S53.ai3 = elem.S53[i].$.AI3;
+                    S53.ae1 = elem.S53[i].$.AE1;
+                    S53.ae2 = elem.S53[i].$.AE2;
+                    S53.ae3 = elem.S53[i].$.AE3;
+                    S53.r11 = elem.S53[i].$.R11;
+                    S53.r12 = elem.S53[i].$.R12;
+                    S53.r13 = elem.S53[i].$.R13;
+                    S53.r21 = elem.S53[i].$.R21;
+                    S53.r22 = elem.S53[i].$.R22;
+                    S53.r23 = elem.S53[i].$.R23;
+                    S53.r31 = elem.S53[i].$.R31;
+                    S53.r32 = elem.S53[i].$.R32;
+                    S53.r33 = elem.S53[i].$.R33;
+                    S53.r41 = elem.S53[i].$.R41;
+                    S53.r42 = elem.S53[i].$.R42;
+                    S53.r43 = elem.S53[i].$.R43;
+                    S53.bc = elem.S53[i].$.Bc;
+                    await S53Repository.save(S53);
                 } catch(err) {
                     console.error(err);
                 }

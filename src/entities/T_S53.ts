@@ -7,6 +7,9 @@ export class T_S53 {
     id: number;
 
     @Column()
+    rtu_id: string;
+
+    @Column()
     lvs_id: string;
 
     @Column()
