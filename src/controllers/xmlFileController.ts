@@ -29,6 +29,7 @@ import { T_G59 } from '../entities/T_G59';
 import { T_S52 } from '../entities/T_S52';
 import { T_S53 } from '../entities/T_S53';
 import { T_S59 } from '../entities/T_S59';
+import { T_S64 } from '../entities/T_S64';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -154,7 +155,8 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processS59(report, mag, reportDate, dataSource);
             break;
         case 'S64':
-            //await processS64(report, mag, reportDate, dataSource);
+            await processS64(report, mag, reportDate, dataSource);
+            break;
         case 'S82':
             //await processS82(report, mag, reportDate, dataSource);
         default:
@@ -1160,7 +1162,7 @@ async function processS53(report: any, mag: number, reportDate: string, dataSour
     }
 }
 
-async function processS59(report: any, mag: number, reportDate: string, dataSource: DataSource) {
+async function processS59(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S59Repository = dataSource.getRepository(T_S59);
     for(const elem of report?.Rtu[0].LVSLine) {
         if(elem != undefined) {
@@ -1174,6 +1176,36 @@ async function processS59(report: any, mag: number, reportDate: string, dataSour
                     S59.et = elem.S59[i].$.Et;
                     S59.c = elem.S59[i].$.C;
                     await S59Repository.save(S59);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS64(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const S64Repository = dataSource.getRepository(T_S64);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S64).length; i++) {
+                try {
+                    var S64 = new T_S64();
+                    S64.rtu_id = report.Rtu[0].$.Id;
+                    S64.lvs_id = elem.$.Id;
+                    S64.lvs_pos = elem.$.Pos;
+                    S64.fh = parseDate(elem.S64[i].$.Fh);
+                    S64.v1 = elem.S64[i].$.V1;
+                    S64.v2 = elem.S64[i].$.V2;
+                    S64.v3 = elem.S64[i].$.V3;
+                    S64.i1 = elem.S64[i].$.I1;
+                    S64.i2 = elem.S64[i].$.I2;
+                    S64.i3 = elem.S64[i].$.I3;
+                    S64.in = elem.S64[i].$.In;
+                    S64.simp = elem.S64[i].$.Simp;
+                    S64.sexp = elem.S64[i].$.Sexp;
+                    S64.bc = elem.S64[i].$.Bc;
+                    await S64Repository.save(S64);
                 } catch(err) {
                     console.error(err);
                 }
