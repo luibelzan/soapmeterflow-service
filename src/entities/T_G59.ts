@@ -10,7 +10,7 @@ export class T_G59 {
     rtu_id: string;
 
     @Column()
-    lvs_id: number;
+    lvs_id: string;
 
     @Column()
     lvs_pos: number;
