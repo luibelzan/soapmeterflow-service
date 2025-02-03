@@ -18,10 +18,10 @@ export class T_G59 {
     @Column()
     fh: Date;
 
-    @Column()
+    @Column({ type: 'float' })
     momCph1: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momVph1: number;
 
     @Column()
@@ -36,13 +36,13 @@ export class T_G59 {
     @Column()
     momQexph1: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momPF1: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momCph2: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momVph2: number;
 
     @Column()
@@ -57,13 +57,13 @@ export class T_G59 {
     @Column()
     momQexph2: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momPF2: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momChph3: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momVph3: number;
 
     @Column()
@@ -78,10 +78,10 @@ export class T_G59 {
     @Column()
     momQexph3: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momPF3: number;
 
-    @Column()
+    @Column({ type: 'float' })
     momCn: number;
 
     @Column()
