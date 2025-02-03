@@ -28,6 +28,7 @@ import { DataSource } from 'typeorm';
 import { T_G59 } from '../entities/T_G59';
 import { T_S52 } from '../entities/T_S52';
 import { T_S53 } from '../entities/T_S53';
+import { T_S59 } from '../entities/T_S59';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -150,7 +151,8 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processS53(report, mag, reportDate, dataSource);
             break;
         case 'S59':
-            //await processS59(report, mag, reportDate, dataSource);
+            await processS59(report, mag, reportDate, dataSource);
+            break;
         case 'S64':
             //await processS64(report, mag, reportDate, dataSource);
         case 'S82':
@@ -1150,6 +1152,28 @@ async function processS53(report: any, mag: number, reportDate: string, dataSour
                     S53.r43 = elem.S53[i].$.R43;
                     S53.bc = elem.S53[i].$.Bc;
                     await S53Repository.save(S53);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS59(report: any, mag: number, reportDate: string, dataSource: DataSource) {
+    const S59Repository = dataSource.getRepository(T_S59);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S59).length; i++) {
+                try {
+                    var S59 = new T_S59();
+                    S59.rtu_id = report.Rtu[0].$.Id;
+                    S59.lvs_id = elem.$.Id;
+                    S59.lvs_pos = elem.$.Pos;
+                    S59.fh = parseDate(elem.S59[i].$.Fh);
+                    S59.et = elem.S59[i].$.Et;
+                    S59.c = elem.S59[i].$.C;
+                    await S59Repository.save(S59);
                 } catch(err) {
                     console.error(err);
                 }
