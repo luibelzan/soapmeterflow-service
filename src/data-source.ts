@@ -84,3 +84,19 @@ export const pastor = new DataSource({
     migrations: [],
     subscribers: [],
 })
+
+export const sotdechera = new DataSource({
+    type: "postgres",
+    host: "localhost",
+    port: 5432,
+    username: "postgres",
+    password: "Lu1smigu3l",
+    database: "sotdechera",
+    synchronize: true,
+    logging: false,
+    entities: [T_S02_TEMP, S13, S15, S31, S63, S65, T_S04_TEMP, T_S09_TEMP, T_S05_TEMP, T_G01_TEMP, T_G02_TEMP, T_G03_TEMP, T_G04_TEMP, T_G05_TEMP, T_G06_TEMP, T_G07_TEMP,
+        T_G56, T_G57, T_G58, T_S93, T_S94, T_S96, T_S97, T_S06, T_S12, T_S14, T_S17, T_S24, T_READING_INDEX_S04, T_READING_INDEX_S05, T_READING_INDEX_S02, T_CUPS, T_CT, REQUESTS, T_CONCENTRADORES, REQUESTS2
+    ],
+    migrations: [],
+    subscribers: [],
+})
