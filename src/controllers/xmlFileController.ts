@@ -30,6 +30,7 @@ import { T_S52 } from '../entities/T_S52';
 import { T_S53 } from '../entities/T_S53';
 import { T_S59 } from '../entities/T_S59';
 import { T_S64 } from '../entities/T_S64';
+import { T_S82 } from '../entities/T_S82';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -158,7 +159,8 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             await processS64(report, mag, reportDate, dataSource);
             break;
         case 'S82':
-            //await processS82(report, mag, reportDate, dataSource);
+            await processS82(report, mag, reportDate, dataSource);
+            break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
             break;
@@ -1206,6 +1208,111 @@ async function processS64(report: any, mag: number, reportDate: string, dataSour
                     S64.sexp = elem.S64[i].$.Sexp;
                     S64.bc = elem.S64[i].$.Bc;
                     await S64Repository.save(S64);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS82(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const S82Repository = dataSource.getRepository(T_S82);
+    for(const elem of report?.Rtu[0].LVSLine) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S82).length; i++) {
+                try {
+                    var S82 = new T_S82();
+                    S82.rtu_id = report.Rtu[0].$.Id;
+                    S82.lvs_id = elem.$.Id;
+                    S82.lvs_pos = elem.$.Pos;
+                    S82.fh = parseDate(elem.S82[i].$.Fh);
+
+                    S82.i1max_fh = parseDate(elem.S82[i].I1max[0].$.Fh);
+                    S82.i1max_v1 = elem.S82[i].I1max[0].$.V1;
+                    S82.i1max_v2 = elem.S82[i].I1max[0].$.V2;
+                    S82.i1max_v3 = elem.S82[i].I1max[0].$.V3;
+                    S82.i1max_i1 = elem.S82[i].I1max[0].$.I1;
+                    S82.i1max_i2 = elem.S82[i].I1max[0].$.I2;
+                    S82.i1max_i3 = elem.S82[i].I1max[0].$.I3;
+                    S82.i1max_in = elem.S82[i].I1max[0].$.In;
+                    S82.i1max_simp = elem.S82[i].I1max[0].$.Simp;
+                    S82.i1max_sexp = elem.S82[i].I1max[0].$.Sexp;
+                    S82.i1max_bc = elem.S82[i].I1max[0].$.Bc;
+
+                    S82.i2max_fh = parseDate(elem.S82[i].I2max[0].$.Fh);
+                    S82.i2max_v1 = elem.S82[i].I2max[0].$.V1;
+                    S82.i2max_v2 = elem.S82[i].I2max[0].$.V2;
+                    S82.i2max_v3 = elem.S82[i].I2max[0].$.V3;
+                    S82.i2max_i1 = elem.S82[i].I2max[0].$.I1;
+                    S82.i2max_i2 = elem.S82[i].I2max[0].$.I2;
+                    S82.i2max_i3 = elem.S82[i].I2max[0].$.I3;
+                    S82.i2max_in = elem.S82[i].I2max[0].$.In;
+                    S82.i2max_simp = elem.S82[i].I2max[0].$.Simp;
+                    S82.i2max_sexp = elem.S82[i].I2max[0].$.Sexp;
+                    S82.i2max_bc = elem.S82[i].I2max[0].$.Bc;
+
+                    S82.i3max_fh = parseDate(elem.S82[i].I3max[0].$.Fh);
+                    S82.i3max_v1 = elem.S82[i].I3max[0].$.V1;
+                    S82.i3max_v2 = elem.S82[i].I3max[0].$.V2;
+                    S82.i3max_v3 = elem.S82[i].I3max[0].$.V3;
+                    S82.i3max_i1 = elem.S82[i].I3max[0].$.I1;
+                    S82.i3max_i2 = elem.S82[i].I3max[0].$.I2;
+                    S82.i3max_i3 = elem.S82[i].I3max[0].$.I3;
+                    S82.i3max_in = elem.S82[i].I3max[0].$.In;
+                    S82.i3max_simp = elem.S82[i].I3max[0].$.Simp;
+                    S82.i3max_sexp = elem.S82[i].I3max[0].$.Sexp;
+                    S82.i3max_bc = elem.S82[i].I3max[0].$.Bc;
+
+                    S82.inmax_fh = parseDate(elem.S82[i].Inmax[0].$.Fh);
+                    S82.inmax_v1 = elem.S82[i].Inmax[0].$.V1;
+                    S82.inmax_v2 = elem.S82[i].Inmax[0].$.V2;
+                    S82.inmax_v3 = elem.S82[i].Inmax[0].$.V3;
+                    S82.inmax_i1 = elem.S82[i].Inmax[0].$.I1;
+                    S82.inmax_i2 = elem.S82[i].Inmax[0].$.I2;
+                    S82.inmax_i3 = elem.S82[i].Inmax[0].$.I3;
+                    S82.inmax_in = elem.S82[i].Inmax[0].$.In;
+                    S82.inmax_simp = elem.S82[i].Inmax[0].$.Simp;
+                    S82.inmax_sexp = elem.S82[i].Inmax[0].$.Sexp;
+                    S82.inmax_bc = elem.S82[i].Inmax[0].$.Bc;
+
+                    S82.v1max_fh = parseDate(elem.S82[i].V1max[0].$.Fh);
+                    S82.v1max_v1 = elem.S82[i].V1max[0].$.V1;
+                    S82.v1max_v2 = elem.S82[i].V1max[0].$.V2;
+                    S82.v1max_v3 = elem.S82[i].V1max[0].$.V3;
+                    S82.v1max_i1 = elem.S82[i].V1max[0].$.I1;
+                    S82.v1max_i2 = elem.S82[i].V1max[0].$.I2;
+                    S82.v1max_i3 = elem.S82[i].V1max[0].$.I3;
+                    S82.v1max_in = elem.S82[i].V1max[0].$.In;
+                    S82.v1max_simp = elem.S82[i].V1max[0].$.Simp;
+                    S82.v1max_sexp = elem.S82[i].V1max[0].$.Sexp;
+                    S82.v1max_bc = elem.S82[i].V1max[0].$.Bc;
+
+                    S82.v2max_fh = parseDate(elem.S82[i].V2max[0].$.Fh);
+                    S82.v2max_v1 = elem.S82[i].V2max[0].$.V1;
+                    S82.v2max_v2 = elem.S82[i].V2max[0].$.V2;
+                    S82.v2max_v3 = elem.S82[i].V2max[0].$.V3;
+                    S82.v2max_i1 = elem.S82[i].V2max[0].$.I1;
+                    S82.v2max_i2 = elem.S82[i].V2max[0].$.I2;
+                    S82.v2max_i3 = elem.S82[i].V2max[0].$.I3;
+                    S82.v2max_in = elem.S82[i].V2max[0].$.In;
+                    S82.v2max_simp = elem.S82[i].V2max[0].$.Simp;
+                    S82.v2max_sexp = elem.S82[i].V2max[0].$.Sexp;
+                    S82.v2max_bc = elem.S82[i].V2max[0].$.Bc;
+
+                    S82.v3max_fh = parseDate(elem.S82[i].V3max[0].$.Fh);
+                    S82.v3max_v1 = elem.S82[i].V3max[0].$.V1;
+                    S82.v3max_v2 = elem.S82[i].V3max[0].$.V2;
+                    S82.v3max_v3 = elem.S82[i].V3max[0].$.V3;
+                    S82.v3max_i1 = elem.S82[i].V3max[0].$.I1;
+                    S82.v3max_i2 = elem.S82[i].V3max[0].$.I2;
+                    S82.v3max_i3 = elem.S82[i].V3max[0].$.I3;
+                    S82.v3max_in = elem.S82[i].V3max[0].$.In;
+                    S82.v3max_simp = elem.S82[i].V3max[0].$.Simp;
+                    S82.v3max_sexp = elem.S82[i].V3max[0].$.Sexp;
+                    S82.v3max_bc = elem.S82[i].V3max[0].$.Bc;
+
+                    await S82Repository.save(S82);
                 } catch(err) {
                     console.error(err);
                 }
