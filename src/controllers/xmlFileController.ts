@@ -595,34 +595,42 @@ async function processG06(report: any, mag: number, reportDate: string, dataSour
 
 async function processG07(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g07Repository = dataSource.getRepository(T_G07_TEMP);
-    for(const elem of report?.Cnc[0].Cnt) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G07).length; i++) {
-                try {
-                    var g07 = new T_G07_TEMP();
-                    g07.cnt_id = elem.$.Id;
-                    g07.fh = parseDate(elem.G07[i].$.Fh);
-                    g07.unbal = elem.G07[i].$.Unbal;
-                    g07.harm3_ph1 = elem.G07[i].$.Harm3_ph1;
-                    g07.harm3_ph2 = elem.G07[i].$.Harm3_ph2;
-                    g07.harm3_ph3 = elem.G07[i].$.Harm3_ph3;
-                    g07.harm5_ph1 = elem.G07[i].$.Harm5_ph1;
-                    g07.harm5_ph2 = elem.G07[i].$.Harm5_ph2;
-                    g07.harm5_ph3 = elem.G07[i].$.Harm5_ph3;
-                    g07.harm7_ph1 = elem.G07[i].$.Harm7_ph1;
-                    g07.harm7_ph2 = elem.G07[i].$.Harm7_ph2;
-                    g07.harm7_ph3 = elem.G07[i].$.Harm7_ph3;
-                    g07.thd_ph1 = elem.G07[i].$.Thd_ph1;
-                    g07.thd_ph2 = elem.G07[i].$.Thd_ph2;
-                    g07.thd_ph3 = elem.G07[i].$.Thd_ph3;
-                    g07.bc = elem.G07[i].$.Bc;
-                    await g07Repository.save(g07);
-                    //console.log('G07 insertado');
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Cnc[0].Cnt) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G07).length; i++) {
+                        var g07 = new T_G07_TEMP();
+                        g07.cnt_id = elem.$.Id;
+                        g07.fh = parseDate(elem.G07[i].$.Fh);
+                        g07.unbal = elem.G07[i].$.Unbal;
+                        g07.harm3_ph1 = elem.G07[i].$.Harm3_ph1;
+                        g07.harm3_ph2 = elem.G07[i].$.Harm3_ph2;
+                        g07.harm3_ph3 = elem.G07[i].$.Harm3_ph3;
+                        g07.harm5_ph1 = elem.G07[i].$.Harm5_ph1;
+                        g07.harm5_ph2 = elem.G07[i].$.Harm5_ph2;
+                        g07.harm5_ph3 = elem.G07[i].$.Harm5_ph3;
+                        g07.harm7_ph1 = elem.G07[i].$.Harm7_ph1;
+                        g07.harm7_ph2 = elem.G07[i].$.Harm7_ph2;
+                        g07.harm7_ph3 = elem.G07[i].$.Harm7_ph3;
+                        g07.thd_ph1 = elem.G07[i].$.Thd_ph1;
+                        g07.thd_ph2 = elem.G07[i].$.Thd_ph2;
+                        g07.thd_ph3 = elem.G07[i].$.Thd_ph3;
+                        g07.bc = elem.G07[i].$.Bc;
+                        res.push(g07);
+                        if(res.length >= batchSize) {
+                            await g07Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await g07Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
