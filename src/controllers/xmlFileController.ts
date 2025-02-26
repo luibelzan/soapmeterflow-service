@@ -1277,29 +1277,38 @@ async function processG59(report: any, mag: number, reportDate: string, dataSour
 
 async function processS52(report:any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S52Repository = dataSource.getRepository(T_S52);
-    for(const elem of report?.Rtu[0].LVSLine) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S52).length; i++) {
-                try {
-                    var S52 = new T_S52();
-                    S52.rtu_id = report.Rtu[0].$.Id;
-                    S52.lvs_id = elem.$.Id;
-                    S52.lvs_pos = elem.$.Pos;
-                    S52.lvs_magn = elem.$.Magn;
-                    S52.fh = parseDate(elem.S52[i].$.Fh);
-                    S52.ai = elem.S52[i].$.AI;
-                    S52.ae = elem.S52[i].$.AE;
-                    S52.r1 = elem.S52[i].$.R1;
-                    S52.r2 = elem.S52[i].$.R2;
-                    S52.r3 = elem.S52[i].$.R3;
-                    S52.r4 = elem.S52[i].$.R4;
-                    S52.bc = elem.S52[i].$.Bc;
-                    await S52Repository.save(S52);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu[0].LVSLine) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S52).length; i++) {
+                        var S52 = new T_S52();
+                        S52.rtu_id = report.Rtu[0].$.Id;
+                        S52.lvs_id = elem.$.Id;
+                        S52.lvs_pos = elem.$.Pos;
+                        S52.lvs_magn = elem.$.Magn;
+                        S52.fh = parseDate(elem.S52[i].$.Fh);
+                        S52.ai = elem.S52[i].$.AI;
+                        S52.ae = elem.S52[i].$.AE;
+                        S52.r1 = elem.S52[i].$.R1;
+                        S52.r2 = elem.S52[i].$.R2;
+                        S52.r3 = elem.S52[i].$.R3;
+                        S52.r4 = elem.S52[i].$.R4;
+                        S52.bc = elem.S52[i].$.Bc;
+                        res.push(S52);
+                        if(res.length >= batchSize) {
+                            await S52Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await S52Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
