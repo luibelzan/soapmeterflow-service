@@ -690,44 +690,53 @@ async function processG56(report: any, mag: number, reportDate: string, dataSour
 
 async function processG57(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g57Repository = dataSource.getRepository(T_G57);
-    for(const elem of report?.Rtu[0].LVSLine) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G57).length; i++) {
-                try {
-                    var g57 = new T_G57();
-                    g57.rtu_id = report.Rtu[0].$.Id;
-                    g57.lvs_id = elem.$.Id;
-                    g57.lvs_pos = elem.$.Pos;
-                    g57.fh = parseDate(elem.G57[i].$.Fh);
-                    g57.maxcph1 = elem.G57[i].$.MaxCph1;
-                    g57.maxvph1 = elem.G57[i].$.MaxVph1;
-                    g57.maxpimph1 = elem.G57[i].$.MaxPimph1;
-                    g57.maxpexph1 = elem.G57[i].$.MaxPexph1;
-                    g57.maxqimph1 = elem.G57[i].$.MaxQimph1;
-                    g57.maxqexph1 = elem.G57[i].$.MaxQexph1;
-                    g57.maxpf1 = elem.G57[i].$.MaxPF1;
-                    g57.maxcph2 = elem.G57[i].$.MaxCph2;
-                    g57.maxvph2 = elem.G57[i].$.MaxVph2;
-                    g57.maxpimph2 = elem.G57[i].$.MaxPimph2;
-                    g57.maxpexph2 = elem.G57[i].$.MaxPexph2;
-                    g57.maxqimph2 = elem.G57[i].$.MaxQimph2;
-                    g57.maxqexph2 = elem.G57[i].$.MaxQexph2;
-                    g57.maxpf2 = elem.G57[i].$.MaxPF2;
-                    g57.maxcph3 = elem.G57[i].$.MaxCph3;
-                    g57.maxvph3 = elem.G57[i].$.MaxVph3;
-                    g57.maxpimph3 = elem.G57[i].$.MaxPimph3;
-                    g57.maxpexph3 = elem.G57[i].$.MaxPexph3;
-                    g57.maxqimph3 = elem.G57[i].$.MaxQimph3;
-                    g57.maxqexph3 = elem.G57[i].$.MaxQexph3;
-                    g57.maxpf3 = elem.G57[i].$.MaxPF3;
-                    g57.maxcn = elem.G57[i].$.MaxCn;
-                    g57.bc = elem.G57[i].$.Bc;
-                    await g57Repository.save(g57);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu[0].LVSLine) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G57).length; i++) {
+                        var g57 = new T_G57();
+                        g57.rtu_id = report.Rtu[0].$.Id;
+                        g57.lvs_id = elem.$.Id;
+                        g57.lvs_pos = elem.$.Pos;
+                        g57.fh = parseDate(elem.G57[i].$.Fh);
+                        g57.maxcph1 = elem.G57[i].$.MaxCph1;
+                        g57.maxvph1 = elem.G57[i].$.MaxVph1;
+                        g57.maxpimph1 = elem.G57[i].$.MaxPimph1;
+                        g57.maxpexph1 = elem.G57[i].$.MaxPexph1;
+                        g57.maxqimph1 = elem.G57[i].$.MaxQimph1;
+                        g57.maxqexph1 = elem.G57[i].$.MaxQexph1;
+                        g57.maxpf1 = elem.G57[i].$.MaxPF1;
+                        g57.maxcph2 = elem.G57[i].$.MaxCph2;
+                        g57.maxvph2 = elem.G57[i].$.MaxVph2;
+                        g57.maxpimph2 = elem.G57[i].$.MaxPimph2;
+                        g57.maxpexph2 = elem.G57[i].$.MaxPexph2;
+                        g57.maxqimph2 = elem.G57[i].$.MaxQimph2;
+                        g57.maxqexph2 = elem.G57[i].$.MaxQexph2;
+                        g57.maxpf2 = elem.G57[i].$.MaxPF2;
+                        g57.maxcph3 = elem.G57[i].$.MaxCph3;
+                        g57.maxvph3 = elem.G57[i].$.MaxVph3;
+                        g57.maxpimph3 = elem.G57[i].$.MaxPimph3;
+                        g57.maxpexph3 = elem.G57[i].$.MaxPexph3;
+                        g57.maxqimph3 = elem.G57[i].$.MaxQimph3;
+                        g57.maxqexph3 = elem.G57[i].$.MaxQexph3;
+                        g57.maxpf3 = elem.G57[i].$.MaxPF3;
+                        g57.maxcn = elem.G57[i].$.MaxCn;
+                        g57.bc = elem.G57[i].$.Bc;
+                        res.push(g57);
+                        if(res.length >= batchSize) {
+                            await g57Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await g57Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
