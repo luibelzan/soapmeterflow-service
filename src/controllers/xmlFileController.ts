@@ -245,23 +245,32 @@ async function processS04(report: any, mag: number, reportDate: string, dataSour
 
 
 async function processS09(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    let res = [];
+    const batchSize = 5000;
     const s09Repository = dataSource.getRepository(T_S09_TEMP);
-    for (const elem of report?.Cnc[0]?.Cnt) {
-        if(elem.S09 != undefined) {
-            for(let i=0; i<Object.keys(elem.S09).length; i++) {
-                try {
+    try {
+        for (const elem of report?.Cnc[0]?.Cnt) {
+            if(elem.S09 != undefined) {
+                for(let i=0; i<Object.keys(elem.S09).length; i++) {
                     var s09 = new T_S09_TEMP();
                     s09.cnt_id = elem.$.Id;
                     s09.fh = parseDate(elem.S09[i].$.Fh);
                     s09.et = elem.S09[i].$.Et;
                     s09.c = elem.S09[i].$.C;
                     s09.d1 =  elem?.S09[i]?.D1
-                    await s09Repository.save(s09);
-                } catch(err) {
-                    console.error(err);
+                    res.push(s09);
+                    if(res.length >= batchSize) {
+                        await s09Repository.save(res);
+                        res = [];
+                    }
                 }
             }
         }
+        if(res.length > 0) {
+            await s09Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
