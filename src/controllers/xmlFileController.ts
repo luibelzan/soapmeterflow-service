@@ -1578,22 +1578,31 @@ async function processS98(report: any, mag: number, reportDate: string, dataSour
 
 async function processS95(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S95Repository = dataSource.getRepository(T_S95);
-    for(const elem of report?.Rtu) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S95).length; i++) {
-                try {
-                    var S95 = new T_S95();
-                    S95.rtu_id = elem.$.Id;
-                    S95.fh = parseDate(elem.S95[i].$.Fh);
-                    S95.vu = elem.S95[i].$.Vu;
-                    S95.pi = elem.S95[i].$.Pi;
-                    S95.bc = elem.S95[i].$Bc;
-                    await S95Repository.save(S95);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S95).length; i++) {
+                        var S95 = new T_S95();
+                        S95.rtu_id = elem.$.Id;
+                        S95.fh = parseDate(elem.S95[i].$.Fh);
+                        S95.vu = elem.S95[i].$.Vu;
+                        S95.pi = elem.S95[i].$.Pi;
+                        S95.bc = elem.S95[i].$Bc;
+                        res.push(S95);
+                        if(res.length >= batchSize) {
+                            await S95Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await S95Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
