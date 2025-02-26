@@ -549,39 +549,47 @@ async function processG05(report: any, mag: number, reportDate: string, dataSour
 
 async function processG06(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g06Repository = dataSource.getRepository(T_G06_TEMP);
-    for(const elem of report?.Cnc[0].Cnt) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G06).length; i++) {
-                try {
-                    var g06 = new T_G06_TEMP();
-                    g06.cnt_id = elem.$.Id;
-                    g06.fh = parseDate(elem.G06[i].$.Fh);
-                    g06.momvph1_lv = elem.G06[i].$.MomVph1_lv;
-                    g06.momvph2_lv = elem.G06[i].$.MomVph2_lv;
-                    g06.momvph3_lv = elem.G06[i].$.MomVph3_lv;
-                    g06.momiph1_lv = elem.G06[i].$.MomIph1_lv;
-                    g06.momiph2_lv = elem.G06[i].$.MomIph2_lv;
-                    g06.momiph3_lv = elem.G06[i].$.MomIph3_lv;
-                    g06.mompplus_triph = elem.G06[i].$.MomPplus_triph;
-                    g06.mompminus_triph = elem.G06[i].$.MomPminus_triph;
-                    g06.momqplus_triph = elem.G06[i].$.MomQplus_triph;
-                    g06.momqminus_triph = elem.G06[i].$.MomQminus_triph;
-                    g06.momvph1_mv = elem.G06[i].$.MomVph1_mv;
-                    g06.momvph2_mv = elem.G06[i].$.MomVph2_mv;
-                    g06.momvph3_mv = elem.G06[i].$.MomVph3_mv;
-                    g06.momineutral = elem.G06[i].$.MomIneutral;
-                    g06.momv0_comp = elem.G06[i].$.MomVo_comp;
-                    g06.momv1_comp = elem.G06[i].$.MomV1_comp;
-                    g06.momv2_comp = elem.G06[i].$.MomV2_comp;
-                    g06.momvhs = elem.G06[i].$.MomVhs;
-                    g06.bc = elem.G06[i].$.Bc;
-                    await g06Repository.save(g06);
-                    //console.log('G06 insertado');
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Cnc[0].Cnt) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G06).length; i++) {
+                        var g06 = new T_G06_TEMP();
+                        g06.cnt_id = elem.$.Id;
+                        g06.fh = parseDate(elem.G06[i].$.Fh);
+                        g06.momvph1_lv = elem.G06[i].$.MomVph1_lv;
+                        g06.momvph2_lv = elem.G06[i].$.MomVph2_lv;
+                        g06.momvph3_lv = elem.G06[i].$.MomVph3_lv;
+                        g06.momiph1_lv = elem.G06[i].$.MomIph1_lv;
+                        g06.momiph2_lv = elem.G06[i].$.MomIph2_lv;
+                        g06.momiph3_lv = elem.G06[i].$.MomIph3_lv;
+                        g06.mompplus_triph = elem.G06[i].$.MomPplus_triph;
+                        g06.mompminus_triph = elem.G06[i].$.MomPminus_triph;
+                        g06.momqplus_triph = elem.G06[i].$.MomQplus_triph;
+                        g06.momqminus_triph = elem.G06[i].$.MomQminus_triph;
+                        g06.momvph1_mv = elem.G06[i].$.MomVph1_mv;
+                        g06.momvph2_mv = elem.G06[i].$.MomVph2_mv;
+                        g06.momvph3_mv = elem.G06[i].$.MomVph3_mv;
+                        g06.momineutral = elem.G06[i].$.MomIneutral;
+                        g06.momv0_comp = elem.G06[i].$.MomVo_comp;
+                        g06.momv1_comp = elem.G06[i].$.MomV1_comp;
+                        g06.momv2_comp = elem.G06[i].$.MomV2_comp;
+                        g06.momvhs = elem.G06[i].$.MomVhs;
+                        g06.bc = elem.G06[i].$.Bc;
+                        res.push(g06);
+                        if(res.length >= batchSize) {
+                            await g06Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await g06Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
