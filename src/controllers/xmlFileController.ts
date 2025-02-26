@@ -33,6 +33,7 @@ import { T_S64 } from '../entities/T_S64';
 import { T_S82 } from '../entities/T_S82';
 import { T_S98 } from '../entities/T_S98';
 import { T_S95 } from '../entities/T_S95';
+import { T_S67 } from '../entities/T_S67';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -168,6 +169,9 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             break;
         case 'S95':
             await processS95(report, mag, reportDate, dataSource);
+            break;
+        case 'S67':
+            await processS67(report, mag, reportDate, dataSource);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -1365,6 +1369,27 @@ async function processS95(report: any, mag: number, reportDate: string, dataSour
                     S95.pi = elem.S95[i].$.Pi;
                     S95.bc = elem.S95[i].$Bc;
                     await S95Repository.save(S95);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+}
+
+async function processS67(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const S67Repository = dataSource.getRepository(T_S67);
+    for(const elem of report?.Rtu) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S67).length; i++) {
+                try {
+                    var S67 = new T_S67();
+                    S67.rtu_id = elem.$.Id;
+                    S67.fh = parseDate(elem.S67[i].$.Fh);
+                    S67.et = elem.S67[i].$.Et;
+                    S67.c = elem.S67[i].$.C;
+                    S67.d1 = elem.S67[i].D1;
+                    await S67Repository.save(S67);
                 } catch(err) {
                     console.error(err);
                 }
