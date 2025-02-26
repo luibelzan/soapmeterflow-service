@@ -32,6 +32,7 @@ import { T_S59 } from '../entities/T_S59';
 import { T_S64 } from '../entities/T_S64';
 import { T_S82 } from '../entities/T_S82';
 import { T_S98 } from '../entities/T_S98';
+import { T_S95 } from '../entities/T_S95';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -164,6 +165,9 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             break;
         case 'S98':
             await processS98(report, mag, reportDate, dataSource);
+            break;
+        case 'S95':
+            await processS95(report, mag, reportDate, dataSource);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -1346,4 +1350,25 @@ async function processS98(report: any, mag: number, reportDate: string, dataSour
         }
     }
 
+}
+
+async function processS95(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const S95Repository = dataSource.getRepository(T_S95);
+    for(const elem of report?.Rtu) {
+        if(elem != undefined) {
+            for(let i=0; i<Object.keys(elem.S95).length; i++) {
+                try {
+                    var S95 = new T_S95();
+                    S95.rtu_id = elem.$.Id;
+                    S95.fh = parseDate(elem.S95[i].$.Fh);
+                    S95.vu = elem.S95[i].$.Vu;
+                    S95.pi = elem.S95[i].$.Pi;
+                    S95.bc = elem.S95[i].$Bc;
+                    await S95Repository.save(S95);
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
 }
