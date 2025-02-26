@@ -1363,23 +1363,32 @@ async function processS53(report: any, mag: number, reportDate: string, dataSour
 
 async function processS59(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S59Repository = dataSource.getRepository(T_S59);
-    for(const elem of report?.Rtu[0].LVSLine) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S59).length; i++) {
-                try {
-                    var S59 = new T_S59();
-                    S59.rtu_id = report.Rtu[0].$.Id;
-                    S59.lvs_id = elem.$.Id;
-                    S59.lvs_pos = elem.$.Pos;
-                    S59.fh = parseDate(elem.S59[i].$.Fh);
-                    S59.et = elem.S59[i].$.Et;
-                    S59.c = elem.S59[i].$.C;
-                    await S59Repository.save(S59);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu[0].LVSLine) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S59).length; i++) {
+                        var S59 = new T_S59();
+                        S59.rtu_id = report.Rtu[0].$.Id;
+                        S59.lvs_id = elem.$.Id;
+                        S59.lvs_pos = elem.$.Pos;
+                        S59.fh = parseDate(elem.S59[i].$.Fh);
+                        S59.et = elem.S59[i].$.Et;
+                        S59.c = elem.S59[i].$.C;
+                        res.push(S59);
+                        if(res.length >= batchSize) {
+                            await S59Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await S59Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
