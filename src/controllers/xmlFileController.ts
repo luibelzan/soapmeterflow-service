@@ -637,45 +637,54 @@ async function processG07(report: any, mag: number, reportDate: string, dataSour
 
 async function processG56(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g56Repository = dataSource.getRepository(T_G56);
-    for(const elem of report?.Rtu[0].LVSLine) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G56).length; i++) {
-                try {
-                    var g56 = new T_G56();
-                    g56.rtu_id = report.Rtu[0].$.Id;
-                    g56.lvs_id = elem.$.Id;
-                    g56.lvs_pos = elem.$.Pos;
-                    g56.fh = parseDate(elem.G56[i].$.Fh);
-                    g56.avgcph1 = elem.G56[i].$.AvgCph1;
-                    g56.avgvph1 = elem.G56[i].$.AvgVph1;
-                    g56.avgpimph1 = elem.G56[i].$.AvgPimph1;
-                    g56.avgpexph1 = elem.G56[i].$.AvgPexph1; 
-                    g56.avgqimph1 = elem.G56[i].$.AvgQimph1;
-                    g56.avgqexph1 = elem.G56[i].$.AvgQexph1;
-                    g56.avgpf1 = elem.G56[i].$.AvgPF1;
-                    g56.avgcph2 = elem.G56[i].$.AvgCph2;
-                    g56.avgvph2 = elem.G56[i].$.AvgVph2;
-                    g56.avgpimph2 = elem.G56[i].$.AvgPimph2;
-                    g56.avgpexph2 = elem.G56[i].$.AvgPexph2;
-                    g56.avgqimph2 = elem.G56[i].$.AvgQimph2;
-                    g56.avgqexph2 = elem.G56[i].$.AvgQexph2;
-                    g56.avgpf2 = elem.G56[i].$.AvgPF2;
-                    g56.avgcph3 = elem.G56[i].$.AvgCph3;
-                    g56.avgvph3 = elem.G56[i].$.AvgVph3;
-                    g56.avgpimph3 = elem.G56[i].$.AvgPimph3;
-                    g56.avgpexph3 = elem.G56[i].$.AvgPexph3;
-                    g56.avgqimph3 = elem.G56[i].$.AvgQimph3;
-                    g56.avgqexph3 = elem.G56[i].$.AvgQexph3;
-                    g56.avgpf3 = elem.G56[i].$.AvgPF3;
-                    g56.avgcn = elem.G56[i].$.AvgCn;
-                    g56.temp = elem.G56[i].$.Temp;
-                    g56.bc = elem.G56[i].$.Bc;
-                    await g56Repository.save(g56);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu[0].LVSLine) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G56).length; i++) {
+                        var g56 = new T_G56();
+                        g56.rtu_id = report.Rtu[0].$.Id;
+                        g56.lvs_id = elem.$.Id;
+                        g56.lvs_pos = elem.$.Pos;
+                        g56.fh = parseDate(elem.G56[i].$.Fh);
+                        g56.avgcph1 = elem.G56[i].$.AvgCph1;
+                        g56.avgvph1 = elem.G56[i].$.AvgVph1;
+                        g56.avgpimph1 = elem.G56[i].$.AvgPimph1;
+                        g56.avgpexph1 = elem.G56[i].$.AvgPexph1; 
+                        g56.avgqimph1 = elem.G56[i].$.AvgQimph1;
+                        g56.avgqexph1 = elem.G56[i].$.AvgQexph1;
+                        g56.avgpf1 = elem.G56[i].$.AvgPF1;
+                        g56.avgcph2 = elem.G56[i].$.AvgCph2;
+                        g56.avgvph2 = elem.G56[i].$.AvgVph2;
+                        g56.avgpimph2 = elem.G56[i].$.AvgPimph2;
+                        g56.avgpexph2 = elem.G56[i].$.AvgPexph2;
+                        g56.avgqimph2 = elem.G56[i].$.AvgQimph2;
+                        g56.avgqexph2 = elem.G56[i].$.AvgQexph2;
+                        g56.avgpf2 = elem.G56[i].$.AvgPF2;
+                        g56.avgcph3 = elem.G56[i].$.AvgCph3;
+                        g56.avgvph3 = elem.G56[i].$.AvgVph3;
+                        g56.avgpimph3 = elem.G56[i].$.AvgPimph3;
+                        g56.avgpexph3 = elem.G56[i].$.AvgPexph3;
+                        g56.avgqimph3 = elem.G56[i].$.AvgQimph3;
+                        g56.avgqexph3 = elem.G56[i].$.AvgQexph3;
+                        g56.avgpf3 = elem.G56[i].$.AvgPF3;
+                        g56.avgcn = elem.G56[i].$.AvgCn;
+                        g56.temp = elem.G56[i].$.Temp;
+                        g56.bc = elem.G56[i].$.Bc;
+                        res.push(g56);
+                        if(res.length >= batchSize) {
+                            await g56Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await g56Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
