@@ -411,39 +411,47 @@ async function processG02(report: any, mag: number, reportDate: string, dataSour
 
 async function processG03(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g03Repository = dataSource.getRepository(T_G03_TEMP);
-    for(const elem of report?.Cnc[0].Cnt) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G03).length; i++) {
-                try {
-                    var g03 = new T_G03_TEMP;
-                    g03.cnt_id = elem.$.Id;
-                    g03.fh = parseDate(elem.G03[i].$.Fh);
-                    g03.avvph1_lv = elem.G03[i].$.AvVph1_lv;
-                    g03.avvph2_lv = elem.G03[i].$.AvVph2_lv;
-                    g03.avvph3_lv = elem.G03[i].$.AvVph3_lv;
-                    g03.aviph1_lv = elem.G03[i].$.AvIph1_lv;
-                    g03.aviph2_lv = elem.G03[i].$.AvIph2_lv;
-                    g03.aviph3_lv = elem.G03[i].$.AvIph3_lv;
-                    g03.avpplus_triph = elem.G03[i].$.AvPplus_triph;
-                    g03.avpminus_triph = elem.G03[i].$.AvPminus_triph;
-                    g03.avqplus_triph = elem.G03[i].$.AvQplus_triph;
-                    g03.avqminus_triph = elem.G03[i].$.AvQminus_triph;
-                    g03.avvph1_mv = elem.G03[i].$.AvVph1_mv;
-                    g03.avvph2_mv = elem.G03[i].$.AvVph2_mv;
-                    g03.avvph3_mv = elem.G03[i].$.AvVph3_mv;
-                    g03.avineutral = elem.G03[i].$.AvIneutral;
-                    g03.avv0_comp = elem.G03[i].$.AvVo_comp;
-                    g03.avv1_comp = elem.G03[i].$.AvV1_comp;
-                    g03.avv2_comp = elem.G03[i].$.AvV2_comp;
-                    g03.avvhs = elem.G03[i].$.AvVhs;
-                    g03.bc = elem.G03[i].$.Bc;
-                    await g03Repository.save(g03);
-                    //console.log('G03 insertado');
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Cnc[0].Cnt) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G03).length; i++) {
+                        var g03 = new T_G03_TEMP;
+                        g03.cnt_id = elem.$.Id;
+                        g03.fh = parseDate(elem.G03[i].$.Fh);
+                        g03.avvph1_lv = elem.G03[i].$.AvVph1_lv;
+                        g03.avvph2_lv = elem.G03[i].$.AvVph2_lv;
+                        g03.avvph3_lv = elem.G03[i].$.AvVph3_lv;
+                        g03.aviph1_lv = elem.G03[i].$.AvIph1_lv;
+                        g03.aviph2_lv = elem.G03[i].$.AvIph2_lv;
+                        g03.aviph3_lv = elem.G03[i].$.AvIph3_lv;
+                        g03.avpplus_triph = elem.G03[i].$.AvPplus_triph;
+                        g03.avpminus_triph = elem.G03[i].$.AvPminus_triph;
+                        g03.avqplus_triph = elem.G03[i].$.AvQplus_triph;
+                        g03.avqminus_triph = elem.G03[i].$.AvQminus_triph;
+                        g03.avvph1_mv = elem.G03[i].$.AvVph1_mv;
+                        g03.avvph2_mv = elem.G03[i].$.AvVph2_mv;
+                        g03.avvph3_mv = elem.G03[i].$.AvVph3_mv;
+                        g03.avineutral = elem.G03[i].$.AvIneutral;
+                        g03.avv0_comp = elem.G03[i].$.AvVo_comp;
+                        g03.avv1_comp = elem.G03[i].$.AvV1_comp;
+                        g03.avv2_comp = elem.G03[i].$.AvV2_comp;
+                        g03.avvhs = elem.G03[i].$.AvVhs;
+                        g03.bc = elem.G03[i].$.Bc;
+                        res.push(g03);
+                        if(res.length >= batchSize) {
+                            await g03Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await g03Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
