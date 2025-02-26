@@ -1125,31 +1125,39 @@ async function processS12(report: any, mag: number, reportDate: string, dataSour
 
 async function processS14(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s14Repository = dataSource.getRepository(T_S14);
-    for(const elem of report.Cnc[0].Cnt) {
-        if(elem.S14 != undefined) {
-            for(let i=0; i<Object.keys(elem.S14).length; i++) {
-                try{
-                    var s14 = new T_S14();
-                    s14.cnc_id = report.Cnc[0].$.Id;
-                    s14.cnt_id = elem.$.Id;					
-                    s14.fh = parseDate(elem.S14[i].$.Fh);
-                    s14.bc = elem.S14[i].$.Bc;
-                    s14.v1 = elem.S14[i].$.V1;
-                    s14.v2 = elem.S14[i].$.V2;
-					s14.v3 = elem.S14[i].$.V3;
-					s14.i1 = elem.S14[i].$.I1;
-					s14.i2 = elem.S14[i].$.I2;
-					s14.i3 = elem.S14[i].$.I3;
-					s14.in = elem.S14[i].$.In;
-					s14.simp = elem.S14[i].$.Simp;
-					s14.sexp = elem.S14[i].$.Sexp;					
-                    await s14Repository.save(s14);
-                    //console.log('S14 insertado')
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report.Cnc[0].Cnt) {
+            if(elem.S14 != undefined) {
+                for(let i=0; i<Object.keys(elem.S14).length; i++) {
+                        var s14 = new T_S14();
+                        s14.cnc_id = report.Cnc[0].$.Id;
+                        s14.cnt_id = elem.$.Id;					
+                        s14.fh = parseDate(elem.S14[i].$.Fh);
+                        s14.bc = elem.S14[i].$.Bc;
+                        s14.v1 = elem.S14[i].$.V1;
+                        s14.v2 = elem.S14[i].$.V2;
+                        s14.v3 = elem.S14[i].$.V3;
+                        s14.i1 = elem.S14[i].$.I1;
+                        s14.i2 = elem.S14[i].$.I2;
+                        s14.i3 = elem.S14[i].$.I3;
+                        s14.in = elem.S14[i].$.In;
+                        s14.simp = elem.S14[i].$.Simp;
+                        s14.sexp = elem.S14[i].$.Sexp;					
+                        res.push(s14);
+                        if(res.length >= batchSize) {
+                            await s14Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await s14Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
