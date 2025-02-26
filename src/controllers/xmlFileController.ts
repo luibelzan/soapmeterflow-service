@@ -1547,25 +1547,33 @@ async function processS82(report: any, mag: number, reportDate: string, dataSour
 
 async function processS98(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S98Repository = dataSource.getRepository(T_S98);
-    for(const elem of report?.Rtu) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S98).length; i++) {
-                try {
-                    var S98 = new T_S98();
-                    S98.rtu_id = elem.$.Id;
-                    S98.fh = parseDate(elem.S98[i].$.Fh);
-                    S98.ift1 = elem.S98[i].$.Ift1;
-                    S98.ift2 = elem.S98[i].$.Ift2;
-                    S98.ift3 = elem.S98[i].$.Ift3;
-                    S98.bc = elem.S98[i].$.Bc;
-                    await S98Repository.save(S98);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S98).length; i++) {
+                        var S98 = new T_S98();
+                        S98.rtu_id = elem.$.Id;
+                        S98.fh = parseDate(elem.S98[i].$.Fh);
+                        S98.ift1 = elem.S98[i].$.Ift1;
+                        S98.ift2 = elem.S98[i].$.Ift2;
+                        S98.ift3 = elem.S98[i].$.Ift3;
+                        S98.bc = elem.S98[i].$.Bc;
+                        res.push(S98);
+                        if(res.length >= batchSize) {
+                            await S98Repository.save(S98);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await S98Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
-
 }
 
 async function processS95(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
