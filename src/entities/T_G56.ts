@@ -87,6 +87,6 @@ export class T_G56 {
     @Column()
     temp: number;
 
-    @Column()
-    bc: number;
+    @Column({nullable: true})
+    bc: string;
 }

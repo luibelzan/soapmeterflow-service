@@ -90,8 +90,8 @@ export class T_S96 {
     @Column({ type: 'float' })
     hr_thd: number;
 
-    @Column()
-    hr_bc: number;
+    @Column({ nullable: true })
+    hr_bc: string;
 
     @Column({ type: 'float' })
     hs_h1: number;
@@ -171,8 +171,8 @@ export class T_S96 {
     @Column({ type: 'float' })
     hs_thd: number;
 
-    @Column()
-    hs_bc: number;
+    @Column({ nullable: true })
+    hs_bc: string;
 
     @Column({ type: 'float' })
     ht_h1: number;
@@ -252,6 +252,6 @@ export class T_S96 {
     @Column({ type: 'float' })
     ht_thd: number;
 
-    @Column()
-    ht_bc: number;
+    @Column({ nullable: true })
+    ht_bc: string;
 }

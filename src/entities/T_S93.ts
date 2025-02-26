@@ -21,6 +21,6 @@ export class T_S93 {
     @Column({ type: 'float' })
     vt: number;
 
-    @Column()
-    bc: number;
+    @Column({ nullable: true })
+    bc: string;
 }

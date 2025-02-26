@@ -85,5 +85,5 @@ export class T_G57 {
     maxcn: number;
 
     @Column()
-    bc: number;
+    bc: string;
 }
