@@ -742,44 +742,53 @@ async function processG57(report: any, mag: number, reportDate: string, dataSour
 
 async function processG58(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g58Repository = dataSource.getRepository(T_G58);
-    for(const elem of report?.Rtu[0].LVSLine) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G58).length; i++) {
-                try {
-                    var g58 = new T_G58();
-                    g58.rtu_id = report.Rtu[0].$.Id;
-                    g58.lvs_id = elem.$.Id;
-                    g58.lvs_pos = elem.$.Pos;
-                    g58.fh = parseDate(elem.G58[i].$.Fh);
-                    g58.mincph1 = elem.G58[i].$.MinCph1;
-                    g58.minvph1 = elem.G58[i].$.MinVph1;
-                    g58.minpimph1 = elem.G58[i].$.MinPimph1;
-                    g58.minpexph1 = elem.G58[i].$.MinPexph1;
-                    g58.minqimph1 = elem.G58[i].$.MinQimph1;
-                    g58.minqexph1 = elem.G58[i].$.MinQexph1;
-                    g58.minpf1 = elem.G58[i].$.MinPF1;
-                    g58.mincph2 = elem.G58[i].$.MinCph2;
-                    g58.minvph2 = elem.G58[i].$.MinVph2;
-                    g58.minpimph2 = elem.G58[i].$.MinPimph2;
-                    g58.minpexph2 = elem.G58[i].$.MinPexph2;
-                    g58.minqimph2 = elem.G58[i].$.MinQimph2;
-                    g58.minqexph2 = elem.G58[i].$.MinQexph2;
-                    g58.minpf2 = elem.G58[i].$.MinPF2;
-                    g58.mincph3 = elem.G58[i].$.MinCph3;
-                    g58.minvph3 = elem.G58[i].$.MinVph3;
-                    g58.minpimph3 = elem.G58[i].$.MinPimph3;
-                    g58.minpexph3 = elem.G58[i].$.MinPexph3;
-                    g58.minqimph3 = elem.G58[i].$.MinQimph3;
-                    g58.minqexph3 = elem.G58[i].$.MinQexph3;
-                    g58.minpf3 = elem.G58[i].$.MinPF3;
-                    g58.mimcn = elem.G58[i].$.MimCn;
-                    g58.bc = elem.G58[i].$.Bc;
-                    await g58Repository.save(g58);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu[0].LVSLine) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G58).length; i++) {
+                        var g58 = new T_G58();
+                        g58.rtu_id = report.Rtu[0].$.Id;
+                        g58.lvs_id = elem.$.Id;
+                        g58.lvs_pos = elem.$.Pos;
+                        g58.fh = parseDate(elem.G58[i].$.Fh);
+                        g58.mincph1 = elem.G58[i].$.MinCph1;
+                        g58.minvph1 = elem.G58[i].$.MinVph1;
+                        g58.minpimph1 = elem.G58[i].$.MinPimph1;
+                        g58.minpexph1 = elem.G58[i].$.MinPexph1;
+                        g58.minqimph1 = elem.G58[i].$.MinQimph1;
+                        g58.minqexph1 = elem.G58[i].$.MinQexph1;
+                        g58.minpf1 = elem.G58[i].$.MinPF1;
+                        g58.mincph2 = elem.G58[i].$.MinCph2;
+                        g58.minvph2 = elem.G58[i].$.MinVph2;
+                        g58.minpimph2 = elem.G58[i].$.MinPimph2;
+                        g58.minpexph2 = elem.G58[i].$.MinPexph2;
+                        g58.minqimph2 = elem.G58[i].$.MinQimph2;
+                        g58.minqexph2 = elem.G58[i].$.MinQexph2;
+                        g58.minpf2 = elem.G58[i].$.MinPF2;
+                        g58.mincph3 = elem.G58[i].$.MinCph3;
+                        g58.minvph3 = elem.G58[i].$.MinVph3;
+                        g58.minpimph3 = elem.G58[i].$.MinPimph3;
+                        g58.minpexph3 = elem.G58[i].$.MinPexph3;
+                        g58.minqimph3 = elem.G58[i].$.MinQimph3;
+                        g58.minqexph3 = elem.G58[i].$.MinQexph3;
+                        g58.minpf3 = elem.G58[i].$.MinPF3;
+                        g58.mimcn = elem.G58[i].$.MimCn;
+                        g58.bc = elem.G58[i].$.Bc;
+                        res.push(g58);
+                        if(res.length >= batchSize) {
+                            await g58Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await g58Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
