@@ -1394,31 +1394,40 @@ async function processS59(report: any, mag: number, reportDate: string, dataSour
 
 async function processS64(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S64Repository = dataSource.getRepository(T_S64);
-    for(const elem of report?.Rtu[0].LVSLine) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S64).length; i++) {
-                try {
-                    var S64 = new T_S64();
-                    S64.rtu_id = report.Rtu[0].$.Id;
-                    S64.lvs_id = elem.$.Id;
-                    S64.lvs_pos = elem.$.Pos;
-                    S64.fh = parseDate(elem.S64[i].$.Fh);
-                    S64.v1 = elem.S64[i].$.V1;
-                    S64.v2 = elem.S64[i].$.V2;
-                    S64.v3 = elem.S64[i].$.V3;
-                    S64.i1 = elem.S64[i].$.I1;
-                    S64.i2 = elem.S64[i].$.I2;
-                    S64.i3 = elem.S64[i].$.I3;
-                    S64.in = elem.S64[i].$.In;
-                    S64.simp = elem.S64[i].$.Simp;
-                    S64.sexp = elem.S64[i].$.Sexp;
-                    S64.bc = elem.S64[i].$.Bc;
-                    await S64Repository.save(S64);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu[0].LVSLine) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S64).length; i++) {
+                        var S64 = new T_S64();
+                        S64.rtu_id = report.Rtu[0].$.Id;
+                        S64.lvs_id = elem.$.Id;
+                        S64.lvs_pos = elem.$.Pos;
+                        S64.fh = parseDate(elem.S64[i].$.Fh);
+                        S64.v1 = elem.S64[i].$.V1;
+                        S64.v2 = elem.S64[i].$.V2;
+                        S64.v3 = elem.S64[i].$.V3;
+                        S64.i1 = elem.S64[i].$.I1;
+                        S64.i2 = elem.S64[i].$.I2;
+                        S64.i3 = elem.S64[i].$.I3;
+                        S64.in = elem.S64[i].$.In;
+                        S64.simp = elem.S64[i].$.Simp;
+                        S64.sexp = elem.S64[i].$.Sexp;
+                        S64.bc = elem.S64[i].$.Bc;
+                        res.push(S64);
+                        if(res.length >= batchSize) {
+                            await S64Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await S64Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
