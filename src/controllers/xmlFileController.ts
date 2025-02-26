@@ -1193,26 +1193,33 @@ async function processS17(report: any, mag: number, reportDate: string, dataSour
 }
 
 async function processS24(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
-    //console.log(report.Cnc[0].S24[0].Meter);
     const S24Repository = dataSource.getRepository(T_S24);
-    for(const elem of report.Cnc[0].S24[0].Meter) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem).length; i++) {
-                try{
-                    var S24 = new T_S24();
-                    S24.cnc_id = report.Cnc[0].$.Id;					
-                    S24.fh = parseDate(report.Cnc[0].S24[0].$.Fh);
-                    S24.meter_id = elem.$.MeterId;
-                    S24.comstatus = elem.$.ComStatus;
-                    S24.date = parseDate(elem.$.Date);
-					S24.active = elem.$.Active;										
-                    await S24Repository.save(S24);
-                    //console.log('S24 insertado')
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report.Cnc[0].S24[0].Meter) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem).length; i++) {
+                        var S24 = new T_S24();
+                        S24.cnc_id = report.Cnc[0].$.Id;					
+                        S24.fh = parseDate(report.Cnc[0].S24[0].$.Fh);
+                        S24.meter_id = elem.$.MeterId;
+                        S24.comstatus = elem.$.ComStatus;
+                        S24.date = parseDate(elem.$.Date);
+                        S24.active = elem.$.Active;										
+                        res.push(S24);
+                        if(res.length >= batchSize) {
+                            await S24Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await S24Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
