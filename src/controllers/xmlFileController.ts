@@ -457,40 +457,47 @@ async function processG03(report: any, mag: number, reportDate: string, dataSour
 
 async function processG04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g04Repository = dataSource.getRepository(T_G04_TEMP);
-    for(const elem of report?.Cnc[0].Cnt) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G04).length; i++) {
-                try {
-                    var g04 = new T_G04_TEMP();
-                    g04.cnt_id = elem.$.Id;
-                    g04.fh = parseDate(elem.G04[i].$.Fh);
-                    g04.maxvph1_lv = elem.G04[i].$.MaxVph1_lv;
-                    g04.maxvph2_lv = elem.G04[i].$.MaxVph2_lv;
-                    g04.maxvph3_lv = elem.G04[i].$.MaxVph3_lv;
-                    g04.maxiph1_lv = elem.G04[i].$.MaxIph1_lv;
-                    g04.maxiph2_lv = elem.G04[i].$.MaxIph2_lv;
-                    g04.maxiph3_lv = elem.G04[i].$.MaxIph3_lv;
-                    g04.maxpplus_triph = elem.G04[i].$.MaxPplus_triph;
-                    g04.maxpminus_triph = elem.G04[i].$.MaxPminus_triph;
-                    g04.maxqplus_triph = elem.G04[i].$.MaxQplus_triph;
-                    g04.maxqminus_triph = elem.G04[i].$.MaxQminus_triph;
-                    g04.maxvph1_mv = elem.G04[i].$.MaxVph1_mv;
-                    g04.maxvph2_mv = elem.G04[i].$.MaxVph2_mv;
-                    g04.maxvph3_mv = elem.G04[i].$.MaxVph3_mv;
-                    g04.maxineutral = elem.G04[i].$.MaxIneutral;
-                    g04.maxv0_comp = elem.G04[i].$.MaxVo_comp;
-                    g04.maxv1_comp = elem.G04[i].$.MaxV1_comp;
-                    g04.maxv2_comp = elem.G04[i].$.MaxV2_comp;
-                    g04.maxvhs = elem.G04[i].$.MaxVhs;
-                    g04.bc = elem.G04[i].$.Bc;
-                    await g04Repository.save(g04);
-                    //console.log('G04 insertado');
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Cnc[0].Cnt) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G04).length; i++) {
+                        var g04 = new T_G04_TEMP();
+                        g04.cnt_id = elem.$.Id;
+                        g04.fh = parseDate(elem.G04[i].$.Fh);
+                        g04.maxvph1_lv = elem.G04[i].$.MaxVph1_lv;
+                        g04.maxvph2_lv = elem.G04[i].$.MaxVph2_lv;
+                        g04.maxvph3_lv = elem.G04[i].$.MaxVph3_lv;
+                        g04.maxiph1_lv = elem.G04[i].$.MaxIph1_lv;
+                        g04.maxiph2_lv = elem.G04[i].$.MaxIph2_lv;
+                        g04.maxiph3_lv = elem.G04[i].$.MaxIph3_lv;
+                        g04.maxpplus_triph = elem.G04[i].$.MaxPplus_triph;
+                        g04.maxpminus_triph = elem.G04[i].$.MaxPminus_triph;
+                        g04.maxqplus_triph = elem.G04[i].$.MaxQplus_triph;
+                        g04.maxqminus_triph = elem.G04[i].$.MaxQminus_triph;
+                        g04.maxvph1_mv = elem.G04[i].$.MaxVph1_mv;
+                        g04.maxvph2_mv = elem.G04[i].$.MaxVph2_mv;
+                        g04.maxvph3_mv = elem.G04[i].$.MaxVph3_mv;
+                        g04.maxineutral = elem.G04[i].$.MaxIneutral;
+                        g04.maxv0_comp = elem.G04[i].$.MaxVo_comp;
+                        g04.maxv1_comp = elem.G04[i].$.MaxV1_comp;
+                        g04.maxv2_comp = elem.G04[i].$.MaxV2_comp;
+                        g04.maxvhs = elem.G04[i].$.MaxVhs;
+                        g04.bc = elem.G04[i].$.Bc;
+                        res.push(g04);
+                        if(res.length >= batchSize) {
+                            await g04Repository.save(res);
+                            res = [];
+                        }
                 }
-                
             }
         }
+        if(res.length > 0) {
+            await g04Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
