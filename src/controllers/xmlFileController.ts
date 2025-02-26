@@ -349,47 +349,63 @@ async function processS02(report: any, mag: number, reportDate: string, dataSour
 
 async function processG01(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g01Repository = dataSource.getRepository(T_G01_TEMP);
-    for(const elem of report?.Cnc) {
-        if(elem.G01 != undefined) {
-            for(let i=0; i<Object.keys(elem.G01).length; i++) {
-                try{
-                    var g01 = new T_G01_TEMP();
-                    g01.cnc_id = elem.$.Id;
-                    g01.fh = parseDate(elem.G01[i].$.Fh);
-                    g01.amed = elem.G01[i].$.Amed;
-                    g01.amax = elem.G01[i].$.Amax;
-                    g01.tot = elem.G01[i].$.Tot;
-                    g01.aperc = elem.G01[i].$.Aperc;
-                    await g01Repository.save(g01);
-                    //console.log('G01 insertado')
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Cnc) {
+            if(elem.G01 != undefined) {
+                for(let i=0; i<Object.keys(elem.G01).length; i++) {
+                        var g01 = new T_G01_TEMP();
+                        g01.cnc_id = elem.$.Id;
+                        g01.fh = parseDate(elem.G01[i].$.Fh);
+                        g01.amed = elem.G01[i].$.Amed;
+                        g01.amax = elem.G01[i].$.Amax;
+                        g01.tot = elem.G01[i].$.Tot;
+                        g01.aperc = elem.G01[i].$.Aperc;
+                        res.push(g01);
+                        if(res.length >= batchSize) {
+                            await g01Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length>0) {
+            await g01Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
 async function processG02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g02Repository = dataSource.getRepository(T_G02_TEMP);
-    for(const elem of report?.Cnc[0].Cnt) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.G02).length; i++) {
-                try {
-                var g02 = new T_G02_TEMP();
-                g02.cnt_id = elem.$.Id;
-                g02.fh = parseDate(elem.G02[i].$.Fh);
-                g02.atime = elem.G02[i].$.Atime;
-                g02.nchanges = elem.G02[i].$.Nchanges;
-                g02.aconc = elem.G02[i].$.Aconc;
-                g02.atimeperc = elem.G02[i].$.Atimeperc;
-                await g02Repository.save(g02);
-                //console.log('G02 insertado');
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000; 
+    try {
+        for(const elem of report?.Cnc[0].Cnt) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.G02).length; i++) {
+                    var g02 = new T_G02_TEMP();
+                    g02.cnt_id = elem.$.Id;
+                    g02.fh = parseDate(elem.G02[i].$.Fh);
+                    g02.atime = elem.G02[i].$.Atime;
+                    g02.nchanges = elem.G02[i].$.Nchanges;
+                    g02.aconc = elem.G02[i].$.Aconc;
+                    g02.atimeperc = elem.G02[i].$.Atimeperc;
+                    res.push(g02);
+                    if(res.length>=batchSize) {
+                        await g02Repository.save(res);
+                        res = [];
+                    }
                 }
             }
         }
+        if(res.length > 0) {
+            await g02Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
