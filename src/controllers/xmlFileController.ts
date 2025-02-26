@@ -794,23 +794,32 @@ async function processG58(report: any, mag: number, reportDate: string, dataSour
 
 async function processS93(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s93Repository = dataSource.getRepository(T_S93);
-    for(const elem of report?.Rtu) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S93).length; i++) {
-                try {
-                    var s93 = new T_S93();
-                    s93.rtu_id = elem.$.Id;
-                    s93.fh = parseDate(elem.S93[i].$.Fh);
-                    s93.vr = elem.S93[i].$.Vr;
-                    s93.vs = elem.S93[i].$.Vs;
-                    s93.vt = elem.S93[i].$.Vt;
-                    s93.bc = elem.S93[i].$.Bc;
-                    await s93Repository.save(s93);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S93).length; i++) {
+                        var s93 = new T_S93();
+                        s93.rtu_id = elem.$.Id;
+                        s93.fh = parseDate(elem.S93[i].$.Fh);
+                        s93.vr = elem.S93[i].$.Vr;
+                        s93.vs = elem.S93[i].$.Vs;
+                        s93.vt = elem.S93[i].$.Vt;
+                        s93.bc = elem.S93[i].$.Bc;
+                        res.push(s93);
+                        if(res.length >= batchSize) {
+                            await s93Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await s93Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
