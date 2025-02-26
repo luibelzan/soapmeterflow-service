@@ -1163,24 +1163,32 @@ async function processS14(report: any, mag: number, reportDate: string, dataSour
 
 async function processS17(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s17Repository = dataSource.getRepository(T_S17);
-    for(const elem of report.Cnc) {
-        if(elem.S17 != undefined) {
-            for(let i=0; i<Object.keys(elem.S17).length; i++) {
-                try{
-                    var s17 = new T_S17();
-                    s17.cnc_id = elem.$.Id;					
-                    s17.fh = parseDate(elem.S17[i].$.Fh);
-                    s17.et = elem.S17[i].$.Et;
-                    s17.c = elem.S17[i].$.C;
-                    s17.d1 = elem.S17[i].D1;
-					s17.d2 = elem.S17[i].D2;								
-                    await s17Repository.save(s17);
-                    //console.log('S17 insertado')
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report.Cnc) {
+            if(elem.S17 != undefined) {
+                for(let i=0; i<Object.keys(elem.S17).length; i++) {
+                        var s17 = new T_S17();
+                        s17.cnc_id = elem.$.Id;					
+                        s17.fh = parseDate(elem.S17[i].$.Fh);
+                        s17.et = elem.S17[i].$.Et;
+                        s17.c = elem.S17[i].$.C;
+                        s17.d1 = elem.S17[i].D1;
+                        s17.d2 = elem.S17[i].D2;
+                        res.push(s17);
+                        if(res.length >= batchSize) {
+                            await s17Repository.save(res);
+                            res = [];
+                        }								
                 }
             }
         }
+        if(res.length > 0) {
+            await s17Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
