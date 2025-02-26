@@ -1002,47 +1002,55 @@ async function processS97(report: any, mag: number, reportDate: string, dataSour
 
 async function processS06(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s06Repository = dataSource.getRepository(T_S06);
-    for(const elem of report.Cnc[0].Cnt) {
-        if(elem.S06 != undefined) {
-            for(let i=0; i<Object.keys(elem.S06).length; i++) {
-                try{
-                    var s06 = new T_S06();
-                    s06.cnt_id = report.Cnc[0].$.Id;
-                    s06.cnc_id = elem.$.Id;
-                    s06.fh = parseDate(elem.S06[i].$.Fh);
-                    s06.ns = elem.S06[i].$.NS;
-                    s06.fab = elem.S06[i].$.Fab;
-                    s06.mod = elem.S06[i].$.Mod;
-					s06.af = elem.S06[i].$.Af;
-					s06.te = elem.S06[i].$.Te;
-					s06.vf = elem.S06[i].$.Vf;
-					s06.vprime = elem.S06[i].$.VPrime;
-					s06.pro = elem.S06[i].$.Pro;
-					s06.idm = elem.S06[i].$.Idm;
-					s06.mac = elem.S06[i].$.Mac;
-					s06.tp = elem.S06[i].$.Tp;
-					s06.ts = elem.S06[i].$.Ts;
-					s06.ip = elem.S06[i].$.Ip;
-					s06.is = elem.S06[i].$.Is;
-					s06.usag = elem.S06[i].$.Usag;
-					s06.uswell = elem.S06[i].$.Uswell;
-					s06.per = elem.S06[i].$.Per;
-					s06.dctcp = elem.S06[i].$.Dctcp;
-					s06.vr = elem.S06[i].$.Vr;
-					s06.ut = elem.S06[i].$.Ut;
-					s06.usubt = elem.S06[i].$.UsubT;
-					s06.usobt = elem.S06[i].$.UsobT;
-					s06.ucortet = elem.S06[i].$.UcorteT;
-					s06.autmothbill = elem.S06[i].$.AutMothBill;
-					s06.scrolldispmode = elem.S06[i].$.ScrollDispMode;
-					s06.scrolldisptime = elem.S06[i].$.ScrollDispTime;
-                    await s06Repository.save(s06);
-                    //console.log('S06 insertado')
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report.Cnc[0].Cnt) {
+            if(elem.S06 != undefined) {
+                for(let i=0; i<Object.keys(elem.S06).length; i++) {
+                        var s06 = new T_S06();
+                        s06.cnt_id = report.Cnc[0].$.Id;
+                        s06.cnc_id = elem.$.Id;
+                        s06.fh = parseDate(elem.S06[i].$.Fh);
+                        s06.ns = elem.S06[i].$.NS;
+                        s06.fab = elem.S06[i].$.Fab;
+                        s06.mod = elem.S06[i].$.Mod;
+                        s06.af = elem.S06[i].$.Af;
+                        s06.te = elem.S06[i].$.Te;
+                        s06.vf = elem.S06[i].$.Vf;
+                        s06.vprime = elem.S06[i].$.VPrime;
+                        s06.pro = elem.S06[i].$.Pro;
+                        s06.idm = elem.S06[i].$.Idm;
+                        s06.mac = elem.S06[i].$.Mac;
+                        s06.tp = elem.S06[i].$.Tp;
+                        s06.ts = elem.S06[i].$.Ts;
+                        s06.ip = elem.S06[i].$.Ip;
+                        s06.is = elem.S06[i].$.Is;
+                        s06.usag = elem.S06[i].$.Usag;
+                        s06.uswell = elem.S06[i].$.Uswell;
+                        s06.per = elem.S06[i].$.Per;
+                        s06.dctcp = elem.S06[i].$.Dctcp;
+                        s06.vr = elem.S06[i].$.Vr;
+                        s06.ut = elem.S06[i].$.Ut;
+                        s06.usubt = elem.S06[i].$.UsubT;
+                        s06.usobt = elem.S06[i].$.UsobT;
+                        s06.ucortet = elem.S06[i].$.UcorteT;
+                        s06.autmothbill = elem.S06[i].$.AutMothBill;
+                        s06.scrolldispmode = elem.S06[i].$.ScrollDispMode;
+                        s06.scrolldisptime = elem.S06[i].$.ScrollDispTime;
+                        res.push(s06);
+                        if(res.length >= batchSize) {
+                            await s06Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await s06Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
