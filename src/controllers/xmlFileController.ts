@@ -826,24 +826,33 @@ async function processS93(report: any, mag: number, reportDate: string, dataSour
 
 async function processS94(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s94Repository = dataSource.getRepository(T_S94);
-    for(const elem of report?.Rtu) {
-        if(elem != undefined) {
-            for(let i=0; i<Object.keys(elem.S94).length; i++) {
-                try {
-                    var s94 = new T_S94();
-                    s94.rtu_id = elem.$.Id;
-                    s94.tp = elem.S94[i].$.Tp;
-                    s94.fh = parseDate(elem.S94[i].$.Fh);
-                    s94.fr = elem.S94[i].$.Fr;
-                    s94.fs = elem.S94[i].$.Fs;
-                    s94.ft = elem.S94[i].$.Ft;
-                    s94.bc = elem.S94[i].$.Bc;
-                    await s94Repository.save(s94);
-                } catch(err) {
-                    console.error(err);
+    let res = [];
+    const batchSize = 5000;
+    try {
+        for(const elem of report?.Rtu) {
+            if(elem != undefined) {
+                for(let i=0; i<Object.keys(elem.S94).length; i++) {
+                        var s94 = new T_S94();
+                        s94.rtu_id = elem.$.Id;
+                        s94.tp = elem.S94[i].$.Tp;
+                        s94.fh = parseDate(elem.S94[i].$.Fh);
+                        s94.fr = elem.S94[i].$.Fr;
+                        s94.fs = elem.S94[i].$.Fs;
+                        s94.ft = elem.S94[i].$.Ft;
+                        s94.bc = elem.S94[i].$.Bc;
+                        res.push(s94);
+                        if(res.length >= batchSize) {
+                            await s94Repository.save(res);
+                            res = [];
+                        }
                 }
             }
         }
+        if(res.length > 0) {
+            await s94Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
