@@ -182,10 +182,10 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
 async function processS04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     let res = [];
     const s04Repository = dataSource.getRepository(T_S04_TEMP);
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
-            if(elem.S04 != undefined) {
+            if(elem?.S04 && Array.isArray(elem.S04)) {
                 for(let i=0; i<Object.keys(elem.S04).length; i++) {
                     var s04 = new T_S04_TEMP();
                     s04.cnt_id = elem.$.Id;
@@ -246,11 +246,11 @@ async function processS04(report: any, mag: number, reportDate: string, dataSour
 
 async function processS09(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     const s09Repository = dataSource.getRepository(T_S09_TEMP);
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
-            if(elem.S09 != undefined) {
+            if(elem?.S09 && Array.isArray(elem.S09)) {
                 for(let i=0; i<Object.keys(elem.S09).length; i++) {
                     var s09 = new T_S09_TEMP();
                     s09.cnt_id = elem.$.Id;
@@ -277,10 +277,10 @@ async function processS09(report: any, mag: number, reportDate: string, dataSour
 async function processS05(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s05Repository = dataSource.getRepository(T_S05_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
-            if(elem.S05 != undefined) {
+            if(elem?.S05 && Array.isArray(elem.S05)) {
                 for(let i=0; i<Object.keys(elem.S05).length; i++) {
                     var s05 = new T_S05_TEMP();
                     s05.cnt_id = elem.$.Id;
@@ -313,10 +313,10 @@ async function processS05(report: any, mag: number, reportDate: string, dataSour
 async function processS02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s02Repository = dataSource.getRepository(T_S02_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for (const elem of report?.Cnc[0]?.Cnt) {
-            if(elem.S02 != undefined) {
+            if(elem?.S02 && Array.isArray(elem.S02)) {
                 for(let i=0; i<Object.keys(elem.S02).length; i++) {
                     var s02 = new T_S02_TEMP();
                     s02.cnt_id = elem.$.Id;
@@ -350,10 +350,10 @@ async function processS02(report: any, mag: number, reportDate: string, dataSour
 async function processG01(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g01Repository = dataSource.getRepository(T_G01_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Cnc) {
-            if(elem.G01 != undefined) {
+            if(elem?.G01 && Array.isArray(elem.G01)) {
                 for(let i=0; i<Object.keys(elem.G01).length; i++) {
                         var g01 = new T_G01_TEMP();
                         g01.cnc_id = elem.$.Id;
@@ -381,10 +381,10 @@ async function processG01(report: any, mag: number, reportDate: string, dataSour
 async function processG02(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g02Repository = dataSource.getRepository(T_G02_TEMP);
     let res = [];
-    const batchSize = 5000; 
+    const batchSize = 1000; 
     try {
         for(const elem of report?.Cnc[0].Cnt) {
-            if(elem != undefined) {
+            if(elem?.G02 && Array.isArray(elem.G02)) {
                 for(let i=0; i<Object.keys(elem.G02).length; i++) {
                     var g02 = new T_G02_TEMP();
                     g02.cnt_id = elem.$.Id;
@@ -412,10 +412,10 @@ async function processG02(report: any, mag: number, reportDate: string, dataSour
 async function processG03(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g03Repository = dataSource.getRepository(T_G03_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Cnc[0].Cnt) {
-            if(elem != undefined) {
+            if(elem?.G03 && Array.isArray(elem.G03)) {
                 for(let i=0; i<Object.keys(elem.G03).length; i++) {
                         var g03 = new T_G03_TEMP;
                         g03.cnt_id = elem.$.Id;
@@ -458,10 +458,10 @@ async function processG03(report: any, mag: number, reportDate: string, dataSour
 async function processG04(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g04Repository = dataSource.getRepository(T_G04_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Cnc[0].Cnt) {
-            if(elem != undefined) {
+            if(elem?.G04 && Array.isArray(elem.G04)) {
                 for(let i=0; i<Object.keys(elem.G04).length; i++) {
                         var g04 = new T_G04_TEMP();
                         g04.cnt_id = elem.$.Id;
@@ -504,10 +504,10 @@ async function processG04(report: any, mag: number, reportDate: string, dataSour
 async function processG05(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g05Repository = dataSource.getRepository(T_G05_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Cnc[0].Cnt) {
-            if(elem != undefined) {
+            if(elem?.G05 && Array.isArray(elem.G05)) {
                 for(let i=0; i<Object.keys(elem.G05).length; i++) {
                         var g05 = new T_G05_TEMP();
                         g05.cnt_id = elem.$.Id;
@@ -550,10 +550,10 @@ async function processG05(report: any, mag: number, reportDate: string, dataSour
 async function processG06(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g06Repository = dataSource.getRepository(T_G06_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Cnc[0].Cnt) {
-            if(elem != undefined) {
+            if(elem?.G06 && Array.isArray(elem.G06)) {
                 for(let i=0; i<Object.keys(elem.G06).length; i++) {
                         var g06 = new T_G06_TEMP();
                         g06.cnt_id = elem.$.Id;
@@ -596,10 +596,10 @@ async function processG06(report: any, mag: number, reportDate: string, dataSour
 async function processG07(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g07Repository = dataSource.getRepository(T_G07_TEMP);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Cnc[0].Cnt) {
-            if(elem != undefined) {
+            if(elem?.G07 && Array.isArray(elem.G07)) {
                 for(let i=0; i<Object.keys(elem.G07).length; i++) {
                         var g07 = new T_G07_TEMP();
                         g07.cnt_id = elem.$.Id;
@@ -638,10 +638,10 @@ async function processG07(report: any, mag: number, reportDate: string, dataSour
 async function processG56(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g56Repository = dataSource.getRepository(T_G56);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if (elem?.G56 && Array.isArray(elem.G56)) {
                 for(let i=0; i<Object.keys(elem.G56).length; i++) {
                         var g56 = new T_G56();
                         g56.rtu_id = report.Rtu[0].$.Id;
@@ -691,10 +691,10 @@ async function processG56(report: any, mag: number, reportDate: string, dataSour
 async function processG57(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g57Repository = dataSource.getRepository(T_G57);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.G57 && Array.isArray(elem.G57)) {
                 for(let i=0; i<Object.keys(elem.G57).length; i++) {
                         var g57 = new T_G57();
                         g57.rtu_id = report.Rtu[0].$.Id;
@@ -743,10 +743,10 @@ async function processG57(report: any, mag: number, reportDate: string, dataSour
 async function processG58(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const g58Repository = dataSource.getRepository(T_G58);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.G58 && Array.isArray(elem.G58)) {
                 for(let i=0; i<Object.keys(elem.G58).length; i++) {
                         var g58 = new T_G58();
                         g58.rtu_id = report.Rtu[0].$.Id;
@@ -795,10 +795,10 @@ async function processG58(report: any, mag: number, reportDate: string, dataSour
 async function processS93(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s93Repository = dataSource.getRepository(T_S93);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S93 && Array.isArray(elem.S93)) {
                 for(let i=0; i<Object.keys(elem.S93).length; i++) {
                         var s93 = new T_S93();
                         s93.rtu_id = elem.$.Id;
@@ -827,10 +827,10 @@ async function processS93(report: any, mag: number, reportDate: string, dataSour
 async function processS94(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s94Repository = dataSource.getRepository(T_S94);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S94 && Array.isArray(elem.S94)) {
                 for(let i=0; i<Object.keys(elem.S94).length; i++) {
                         var s94 = new T_S94();
                         s94.rtu_id = elem.$.Id;
@@ -859,10 +859,10 @@ async function processS94(report: any, mag: number, reportDate: string, dataSour
 async function processS96(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s96Repository = dataSource.getRepository(T_S96);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S96 && Array.isArray(elem.S96)) {
                 for(let i=0; i<Object.keys(elem.S96).length; i++) {
                         var s96 = new T_S96;
                         s96.rtu_id = elem.$.Id;
@@ -972,10 +972,10 @@ async function processS96(report: any, mag: number, reportDate: string, dataSour
 async function processS97(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s97Repository = dataSource.getRepository(T_S97);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S97 && Array.isArray(elem.S97)) {
                 for(let i=0; i<Object.keys(elem.S97).length; i++) {
                         var s97 = new T_S97();
                         s97.rtu_id = elem.$.Id;
@@ -1003,10 +1003,10 @@ async function processS97(report: any, mag: number, reportDate: string, dataSour
 async function processS06(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s06Repository = dataSource.getRepository(T_S06);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report.Cnc[0].Cnt) {
-            if(elem.S06 != undefined) {
+            if(elem?.S06 && Array.isArray(elem.S06)) {
                 for(let i=0; i<Object.keys(elem.S06).length; i++) {
                         var s06 = new T_S06();
                         s06.cnt_id = report.Cnc[0].$.Id;
@@ -1126,10 +1126,10 @@ async function processS12(report: any, mag: number, reportDate: string, dataSour
 async function processS14(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s14Repository = dataSource.getRepository(T_S14);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report.Cnc[0].Cnt) {
-            if(elem.S14 != undefined) {
+            if(elem?.S14 && Array.isArray(elem.S14)) {
                 for(let i=0; i<Object.keys(elem.S14).length; i++) {
                         var s14 = new T_S14();
                         s14.cnc_id = report.Cnc[0].$.Id;
@@ -1164,10 +1164,10 @@ async function processS14(report: any, mag: number, reportDate: string, dataSour
 async function processS17(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const s17Repository = dataSource.getRepository(T_S17);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report.Cnc) {
-            if(elem.S17 != undefined) {
+            if(elem?.S17 && Array.isArray(elem.S17)) {
                 for(let i=0; i<Object.keys(elem.S17).length; i++) {
                         var s17 = new T_S17();
                         s17.cnc_id = elem.$.Id;					
@@ -1195,10 +1195,10 @@ async function processS17(report: any, mag: number, reportDate: string, dataSour
 async function processS24(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S24Repository = dataSource.getRepository(T_S24);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report.Cnc[0].S24[0].Meter) {
-            if(elem != undefined) {
+            if(elem?.S24 && Array.isArray(elem.S24)) {
                 for(let i=0; i<Object.keys(elem).length; i++) {
                         var S24 = new T_S24();
                         S24.cnc_id = report.Cnc[0].$.Id;					
@@ -1226,10 +1226,10 @@ async function processS24(report: any, mag: number, reportDate: string, dataSour
 async function processG59(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const G59Repository = dataSource.getRepository(T_G59);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.G59 && Array.isArray(elem.G59)) {
                 for(let i=0; i<Object.keys(elem.G59).length; i++) {
                         var G59 = new T_G59();
                         G59.rtu_id = report.Rtu[0].$.Id;
@@ -1278,10 +1278,10 @@ async function processG59(report: any, mag: number, reportDate: string, dataSour
 async function processS52(report:any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S52Repository = dataSource.getRepository(T_S52);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.S52 && Array.isArray(elem.S52)) {
                 for(let i=0; i<Object.keys(elem.S52).length; i++) {
                         var S52 = new T_S52();
                         S52.rtu_id = report.Rtu[0].$.Id;
@@ -1315,10 +1315,10 @@ async function processS52(report:any, mag: number, reportDate: string, dataSourc
 async function processS53(report: any, mag: number, reportDate: string, dataSoure: DataSource): Promise<void> {
     const S53Repository = dataSoure.getRepository(T_S53);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.S53 && Array.isArray(elem.S53)) {
                 for(let i=0; i<Object.keys(elem.S53).length; i++) {
                         var S53 = new T_S53();
                         S53.rtu_id = report.Rtu[0].$.Id;
@@ -1364,10 +1364,10 @@ async function processS53(report: any, mag: number, reportDate: string, dataSour
 async function processS59(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S59Repository = dataSource.getRepository(T_S59);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.S59 && Array.isArray(elem.S59)) {
                 for(let i=0; i<Object.keys(elem.S59).length; i++) {
                         var S59 = new T_S59();
                         S59.rtu_id = report.Rtu[0].$.Id;
@@ -1395,10 +1395,10 @@ async function processS59(report: any, mag: number, reportDate: string, dataSour
 async function processS64(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S64Repository = dataSource.getRepository(T_S64);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.S64 && Array.isArray(elem.S64)) {
                 for(let i=0; i<Object.keys(elem.S64).length; i++) {
                         var S64 = new T_S64();
                         S64.rtu_id = report.Rtu[0].$.Id;
@@ -1434,10 +1434,10 @@ async function processS64(report: any, mag: number, reportDate: string, dataSour
 async function processS82(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S82Repository = dataSource.getRepository(T_S82);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
-            if(elem != undefined) {
+            if(elem?.S82 && Array.isArray(elem.S82)) {
                 for(let i=0; i<Object.keys(elem.S82).length; i++) {
                         var S82 = new T_S82();
                         S82.rtu_id = report.Rtu[0].$.Id;
@@ -1548,10 +1548,10 @@ async function processS82(report: any, mag: number, reportDate: string, dataSour
 async function processS98(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S98Repository = dataSource.getRepository(T_S98);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S98 && Array.isArray(elem.S98)) {
                 for(let i=0; i<Object.keys(elem.S98).length; i++) {
                         var S98 = new T_S98();
                         S98.rtu_id = elem.$.Id;
@@ -1579,10 +1579,10 @@ async function processS98(report: any, mag: number, reportDate: string, dataSour
 async function processS95(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S95Repository = dataSource.getRepository(T_S95);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S95 && Array.isArray(elem.S95)) {
                 for(let i=0; i<Object.keys(elem.S95).length; i++) {
                         var S95 = new T_S95();
                         S95.rtu_id = elem.$.Id;
@@ -1609,10 +1609,10 @@ async function processS95(report: any, mag: number, reportDate: string, dataSour
 async function processS67(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     const S67Repository = dataSource.getRepository(T_S67);
     let res = [];
-    const batchSize = 5000;
+    const batchSize = 1000;
     try {
         for(const elem of report?.Rtu) {
-            if(elem != undefined) {
+            if(elem?.S67 && Array.isArray(elem.S67)) {
                 for(let i=0; i<Object.keys(elem.S67).length; i++) {
                         var S67 = new T_S67();
                         S67.rtu_id = elem.$.Id;
