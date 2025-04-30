@@ -18,8 +18,17 @@ export class T_S53 {
     @Column()
     lvs_magn: number;
 
-    @Column()
-    fh: Date;
+    @Column({ type: 'date' })
+    fec_inicio: string; // Solo fecha
+
+    @Column({ type: 'time' })
+    hor_inicio: string; // Solo hora
+
+    @Column({ type: 'date' })
+    fec_fin: string; // Solo fecha
+
+    @Column({ type: 'time' })
+    hor_fin: string; // Solo hora
 
     @Column()
     ai1: number;

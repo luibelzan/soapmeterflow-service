@@ -34,6 +34,7 @@ import { T_S82 } from '../entities/T_S82';
 import { T_S98 } from '../entities/T_S98';
 import { T_S95 } from '../entities/T_S95';
 import { T_S67 } from '../entities/T_S67';
+import { T_G53 } from '../entities/T_G53';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -1282,25 +1283,41 @@ async function processS52(report:any, mag: number, reportDate: string, dataSourc
     try {
         for(const elem of report?.Rtu[0].LVSLine) {
             if(elem?.S52 && Array.isArray(elem.S52)) {
-                for(let i=0; i<Object.keys(elem.S52).length; i++) {
-                        var S52 = new T_S52();
-                        S52.rtu_id = report.Rtu[0].$.Id;
-                        S52.lvs_id = elem.$.Id;
-                        S52.lvs_pos = elem.$.Pos;
-                        S52.lvs_magn = elem.$.Magn;
-                        S52.fh = parseDate(elem.S52[i].$.Fh);
-                        S52.ai = elem.S52[i].$.AI;
-                        S52.ae = elem.S52[i].$.AE;
-                        S52.r1 = elem.S52[i].$.R1;
-                        S52.r2 = elem.S52[i].$.R2;
-                        S52.r3 = elem.S52[i].$.R3;
-                        S52.r4 = elem.S52[i].$.R4;
-                        S52.bc = elem.S52[i].$.Bc;
-                        res.push(S52);
-                        if(res.length >= batchSize) {
-                            await S52Repository.save(res);
-                            res = [];
-                        }
+                for (let i = 0; i < Object.keys(elem.S52).length; i++) {
+                    const S52 = new T_S52();
+                    S52.rtu_id = report.Rtu[0].$.Id;
+                    S52.lvs_id = elem.$.Id;
+                    S52.lvs_pos = elem.$.Pos;
+                    S52.lvs_magn = elem.$.Magn;
+
+                    // Procesar la fecha y hora de fin
+                    const fhFin = parseDate(elem.S52[i].$.Fh); // Esta función debe devolverte un objeto Date
+                    S52.fec_fin = fhFin.toISOString().substring(0, 10); // YYYY-MM-DD
+                    S52.hor_fin = fhFin.toISOString().substring(11, 19); // HH:MM:SS
+
+                    // Calcular la fecha y hora de inicio (1 hora antes)
+                    const fhInicio = new Date(fhFin);
+                    fhInicio.setHours(fhInicio.getHours() - 1);
+
+                    S52.fec_inicio = fhInicio.toISOString().substring(0, 10); // YYYY-MM-DD
+                    S52.hor_inicio = fhInicio.toISOString().substring(11, 19); // HH:MM:SS
+
+                    // Otros campos
+                    S52.ai = elem.S52[i].$.AI;
+                    S52.ae = elem.S52[i].$.AE;
+                    S52.r1 = elem.S52[i].$.R1;
+                    S52.r2 = elem.S52[i].$.R2;
+                    S52.r3 = elem.S52[i].$.R3;
+                    S52.r4 = elem.S52[i].$.R4;
+                    S52.bc = elem.S52[i].$.Bc;
+
+                    res.push(S52);
+
+                    // Guardar en batch si es necesario
+                    if (res.length >= batchSize) {
+                        await S52Repository.save(res);
+                        res = [];
+                    }
                 }
             }
         }
@@ -1325,7 +1342,17 @@ async function processS53(report: any, mag: number, reportDate: string, dataSour
                         S53.lvs_id = elem.$.Id;
                         S53.lvs_pos = elem.$.Pos;
                         S53.lvs_magn = elem.$.Magn;
-                        S53.fh = parseDate(elem.S53[i].$.Fh);
+
+                        const fhFin = parseDate(elem.S53[i].$.Fh);
+                        S53.fec_fin = fhFin.toISOString().substring(0, 10);
+                        S53.hor_fin = fhFin.toISOString().substring(11, 19);
+
+                        const fhInicio = new Date(fhFin);
+                        fhInicio.setHours(fhInicio.getHours() -1);
+
+                        S53.fec_inicio = fhInicio.toISOString().substring(0, 10);
+                        S53.hor_inicio = fhInicio.toISOString().substring(11, 19);
+
                         S53.ai1 = elem.S53[i].$.AI1;
                         S53.ai2 = elem.S53[i].$.AI2;
                         S53.ai3 = elem.S53[i].$.AI3;
@@ -1630,6 +1657,38 @@ async function processS67(report: any, mag: number, reportDate: string, dataSour
         }
         if(res.length > 0) {
             await S67Repository.save(res);
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+async function processG53(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const G53Repository = dataSource.getRepository(T_G53);
+    let res = [];
+    const batchSize = 1000;
+    try {
+        for(const elem of report?.Rtu) {
+            if(elem?.G53 && Array.isArray(elem.G53)) {
+                for(let i=0; i<Object.keys(elem.G53).length; i++) {
+                    var G53 = new T_G53();
+                    G53.rtu_id = elem.$.Id;
+                    G53.fh = parseDate(elem.G53[i].$.Fh);
+                    G53.vtnMin = elem.G53[i].$.VTNMin;
+                    G53.vtnAvg = elem.G53[i].$.VTNAvg;
+                    G53.vtnMax = elem.G53[i].$.VTNMax;
+                    G53.vtnLsm = elem.G53[i].$.VTNLSM;
+                    G53.bc = elem.G53[i].$.Bc;
+                    res.push(G53);
+                    if(res.length >= batchSize) {
+                        await G53Repository.save(G53);
+                        res = [];
+                    }
+                }
+            }
+        }
+        if(res.length > 0) {
+            await G53Repository.save(res);
         }
     } catch(err) {
         console.error(err);
