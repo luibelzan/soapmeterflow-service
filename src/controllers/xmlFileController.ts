@@ -111,6 +111,9 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
         case 'G07':
             await processG07(report, mag, reportDate, dataSource);
             break;
+        case 'G53':
+            await processG53(report, mag, reportDate, dataSource);
+            break;
         case 'G56':
             await processG56(report, mag, reportDate, dataSource);
             break;
