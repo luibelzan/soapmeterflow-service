@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm'
 
 @Entity()
+@Unique(["rtu_id", "lvs_id", "fec_inicio", "hor_inicio"])
 export class T_S53 {
 
     @PrimaryGeneratedColumn()

@@ -1315,22 +1315,34 @@ async function processS52(report:any, mag: number, reportDate: string, dataSourc
 
                     // Guardar en batch si es necesario
                     if (res.length >= batchSize) {
-                        await S52Repository.save(res);
+                        await dataSource
+                            .createQueryBuilder()
+                            .insert()
+                            .into(T_S52)
+                            .values(res)
+                            .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                            .execute();
                         res = [];
                     }
                 }
             }
         }
         if(res.length > 0) {
-            await S52Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S52)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
     }
 }
 
-async function processS53(report: any, mag: number, reportDate: string, dataSoure: DataSource): Promise<void> {
-    const S53Repository = dataSoure.getRepository(T_S53);
+async function processS53(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    const S53Repository = dataSource.getRepository(T_S53);
     let res = [];
     const batchSize = 1000;
     try {
@@ -1374,14 +1386,26 @@ async function processS53(report: any, mag: number, reportDate: string, dataSour
                         S53.bc = elem.S53[i].$.Bc;
                         res.push(S53);
                         if(res.length >= batchSize) {
-                            await S53Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S53)
+                                .values(res)
+                                .orIgnore()
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S53Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S53)
+                .values(res)
+                .orIgnore()
+                .execute();
         }
     } catch(err) {
         console.error(err);
