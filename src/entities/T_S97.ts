@@ -1,15 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class T_S97 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     fh: Date;
 
     @Column()
@@ -23,6 +20,4 @@ export class T_S97 {
 
     @Column()
     bc: number;
-
-
 }

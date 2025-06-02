@@ -1,10 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class S63 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    rtuId: string;
+
+    @PrimaryColumn()
+    lvsId: string;
+
+    @PrimaryColumn()
+    fh: string;
 
     @Column()
     idRpt: string;
@@ -16,12 +22,6 @@ export class S63 {
     version: string;
 
     @Column()
-    rtuId: string;
-
-    @Column()
-    lvsId: string;
-
-    @Column()
     lvsPos: number;
 
     @Column({ nullable: true })
@@ -29,9 +29,6 @@ export class S63 {
 
     @Column({ nullable: true })
     errCode: number;
-
-    @Column()
-    fh: string;
 
     @Column()
     et: number;

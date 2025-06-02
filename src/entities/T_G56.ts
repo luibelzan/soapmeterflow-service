@@ -1,22 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class T_G56 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     lvs_id: string;
+
+    @PrimaryColumn()
+    fh: Date;
 
     @Column()
     lvs_pos: number;
-
-    @Column()
-    fh: Date;
 
     @Column({ type: 'float' })
     avgcph1: number;
@@ -31,7 +28,7 @@ export class T_G56 {
     avgpexph1: number;
 
     @Column()
-    avgqimph1: number
+    avgqimph1: number;
 
     @Column()
     avgqexph1: number;
@@ -87,6 +84,6 @@ export class T_G56 {
     @Column()
     temp: number;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     bc: string;
 }

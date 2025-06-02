@@ -1,22 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class T_S82 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     lvs_id: string;
+
+    @PrimaryColumn()
+    fh: Date;
 
     @Column()
     lvs_pos: number;
-
-    @Column()
-    fh: Date;
 
     @Column()
     i1max_fh: Date;
@@ -248,5 +245,4 @@ export class T_S82 {
 
     @Column()
     v3max_bc: string;
-
 }

@@ -1,15 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class T_G53 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     fh: Date;
 
     @Column({ type: 'float' })

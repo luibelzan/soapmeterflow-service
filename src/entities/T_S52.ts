@@ -1,16 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
-@Unique(["rtu_id", "lvs_id", "fec_inicio", "hor_inicio"])
 export class T_S52 {
-    @PrimaryGeneratedColumn()
-    id: number;
 
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     lvs_id: string;
+
+    @PrimaryColumn({ type: 'date' })
+    fec_inicio: string;
+
+    @PrimaryColumn({ type: 'time' })
+    hor_inicio: string;
 
     @Column()
     lvs_pos: number;
@@ -19,16 +22,10 @@ export class T_S52 {
     lvs_magn: number;
 
     @Column({ type: 'date' })
-    fec_inicio: string; // Solo fecha
+    fec_fin: string;
 
     @Column({ type: 'time' })
-    hor_inicio: string; // Solo hora
-
-    @Column({ type: 'date' })
-    fec_fin: string; // Solo fecha
-
-    @Column({ type: 'time' })
-    hor_fin: string; // Solo hora
+    hor_fin: string;
 
     @Column()
     ai: number;

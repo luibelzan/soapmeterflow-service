@@ -1,10 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class S65 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    rtuId: string;
+
+    @PrimaryColumn()
+    fh: string;
 
     @Column()
     idRpt: string;
@@ -15,17 +18,11 @@ export class S65 {
     @Column()
     version: string;
 
-    @Column()
-    rtuId: string;
-
     @Column({ nullable: true })
     errCat: number;
 
     @Column({ nullable: true })
     errCode: number;
-
-    @Column()
-    fh: string;
 
     @Column()
     et: number;

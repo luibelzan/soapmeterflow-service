@@ -1,27 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class T_S59 {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     lvs_id: string;
+
+    @PrimaryColumn()
+    fh: Date;
 
     @Column()
     lvs_pos: number;
-
-    @Column()
-    fh: Date;
 
     @Column()
     et: number;
 
     @Column()
     c: number;
-    
 }

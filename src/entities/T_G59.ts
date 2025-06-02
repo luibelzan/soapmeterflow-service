@@ -1,22 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
-
 export class T_G59 {
-    @PrimaryGeneratedColumn()
-    id: number;
 
-    @Column()
+    @PrimaryColumn()
     rtu_id: string;
 
-    @Column()
+    @PrimaryColumn()
     lvs_id: string;
+
+    @PrimaryColumn()
+    fh: Date;
 
     @Column()
     lvs_pos: number;
-
-    @Column()
-    fh: Date;
 
     @Column({ type: 'float' })
     momCph1: number;
@@ -86,5 +83,4 @@ export class T_G59 {
 
     @Column()
     bc: string;
-
 }
