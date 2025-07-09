@@ -68,7 +68,7 @@ export class T_CONCENTRADORES {
     @Column({ type: 'integer', nullable: true })
     id_wanlan: number;
 
-    @Column({ type: 'varchar', length: 40, nullable: true })
+    @Column({ type: 'varchar', length: 60, nullable: true })
     ws_url: string;
 
     @Column({ type: 'varchar', length: 1, nullable: true })
@@ -89,6 +89,6 @@ export class T_CONCENTRADORES {
     @Column({ type: 'integer', nullable: true })
     seg_reintintervalo: number;
 
-    @Column({ type: 'varchar', length: 40, nullable: true })
+    @Column({ type: 'varchar', length: 60, nullable: true })
     dc_url: string;
 }

@@ -1911,34 +1911,26 @@ async function processG53(report: any, mag: number, reportDate: string, dataSour
 async function processS62(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
     try {
         const S62Repository = dataSource.getRepository(T_S62);
-        for(const elem of report?.Rtu) {
+        const insertQueryBuilder = S62Repository.createQueryBuilder().insert().orIgnore();
+
+        for (const elem of report?.Rtu) {
             if (elem?.S62 && elem.S62.length > 0) {
                 const s62Data = elem.S62[0].$;
-                //console.log(elem.S62[0].$.Id);
-                const existing = await S62Repository.findOne({ where: { id: s62Data.Id }});
-                
-                if(existing) {
-                    existing.partNumber = s62Data.PartNumber;
-                    existing.mod = s62Data.Mod;
-                    existing.af = s62Data.Af;
-                    existing.te = s62Data.Te;
-                    existing.vf = s62Data.Vf;
-                    existing.revConf = s62Data.revConf;
-                    await S62Repository.save(existing);
-                } else {
-                    var S62 = new T_S62();
-                    S62.id = elem.S62[0].$.Id;
-                    S62.partNumber = elem.S62[0].$.PartNumber;
-                    S62.mod = elem.S62[0].$.Mod;
-                    S62.af = elem.S62[0].$.Af;
-                    S62.te = elem.S62[0].$.Te;
-                    S62.vf = elem.S62[0].$.Vf;
-                    S62.revConf = elem.S62[0].$.revConf;
-                    await S62Repository.save(S62);
-                }                
+
+                const newRecord = {
+                    id_rtu: s62Data.Id,
+                    partNumber: s62Data.PartNumber,
+                    mod: s62Data.Mod,
+                    af: s62Data.Af,
+                    te: s62Data.Te,
+                    vf: s62Data.Vf,
+                    revConf: s62Data.revConf
+                };
+
+                await insertQueryBuilder.values(newRecord).execute();
             }
         }
-    } catch(err) {
+    } catch (err) {
         console.error(err);
     }
 }

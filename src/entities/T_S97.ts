@@ -18,6 +18,6 @@ export class T_S97 {
     @Column()
     nt: number;
 
-    @Column()
+    @Column({ nullable: true })
     bc: number;
 }

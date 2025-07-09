@@ -8,10 +8,22 @@ import { T_READING_INDEX_S02 } from "./entities/T_READING_INDEX_S02";
 const fs = require('fs');
 const path = require('path');
 
-async function moveFile(sourceFile: string, targetDir: string) {
+async function moveFile(sourceFile: string, dataSource:DataSource) {
   try {
     // Obtener el nombre base del archivo
     const fileName = path.basename(sourceFile);
+
+    // Obtener nombre de la distribuidora desde el nombre de la base de datos
+    const distribuidora = dataSource.options.database; // e.g. "Hidroelcarmen"
+
+    // Construir la ruta destino dinámicamente
+    const targetDir = path.join(
+      'C:\\GD\\Distribuidoras',
+      distribuidora,
+      'Import',
+      'Procesados',
+      'SABT'
+    );
     
     // Crear el directorio de destino si no existe
     if (!fs.existsSync(targetDir)) {
@@ -45,7 +57,7 @@ export async function readFile(dir: string, dataSource: DataSource) {
         } else if(!fileDir.includes('Procesados')){
           console.log('Nuevo archivo detectado: ', fileDir);
           await parseFile(fileDir, dataSource);
-          moveFile(fileDir, dir.concat('/Procesados/'));
+          moveFile(fileDir, dataSource);
         }
       }
       var finishDate = new Date();

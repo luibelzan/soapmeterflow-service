@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn } from 'typeorm'
 export class T_S62 {
 
     @PrimaryColumn()
-    id: string;
+    id_rtu: string;
 
     @Column()
     partNumber: string;
