@@ -35,6 +35,7 @@ import { T_S98 } from '../entities/T_S98';
 import { T_S95 } from '../entities/T_S95';
 import { T_S67 } from '../entities/T_S67';
 import { T_G53 } from '../entities/T_G53';
+import { T_S62 } from '../entities/T_S62';
 
 
 export async function parseFile(filePath: any, dataSource: DataSource): Promise<void> {
@@ -78,39 +79,39 @@ async function parseXml(data: string): Promise<any> {
 async function processReport(report: any, idRpt: string, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
 
     switch (idRpt.trim()) {
-        case 'S04':
-            await processS04(report, mag, reportDate, dataSource);
-            break;
-        case 'S09':
-            await processS09(report, mag, reportDate, dataSource);
-            break;
-        case 'S05':
-            await processS05(report, mag, reportDate, dataSource);
-            break;
-        case 'S02':
-            await processS02(report, mag, reportDate, dataSource);
-            break;
-        case 'G01':
-            await processG01(report, mag, reportDate, dataSource);
-            break;
-        case 'G02':
-            await processG02(report, mag, reportDate, dataSource);
-            break;
-        case 'G03':
-            await processG03(report, mag, reportDate, dataSource);
-            break;
-        case 'G04':
-            await processG04(report, mag, reportDate, dataSource);
-            break;
-        case 'G05':
-            await processG05(report, mag, reportDate, dataSource);
-            break;
-        case 'G06':
-            await processG06(report, mag, reportDate, dataSource);
-            break;
-        case 'G07':
-            await processG07(report, mag, reportDate, dataSource);
-            break;
+        //case 'S04':
+        //    await processS04(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S09':
+        //    await processS09(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S05':
+        //    await processS05(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S02':
+        //    await processS02(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'G01':
+        //    await processG01(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'G02':
+        //    await processG02(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'G03':
+        //    await processG03(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'G04':
+        //    await processG04(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'G05':
+        //    await processG05(report, mag, reportDate, dataSource);
+        //   break;
+        //case 'G06':
+        //    await processG06(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'G07':
+        //    await processG07(report, mag, reportDate, dataSource);
+        //    break;
         case 'G53':
             await processG53(report, mag, reportDate, dataSource);
             break;
@@ -135,21 +136,21 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
         case 'S97':
             await processS97(report, mag, reportDate, dataSource);
             break;
-        case 'S06':
-            await processS06(report, mag, reportDate, dataSource);
-            break;
-        case 'S12':
-            await processS12(report, mag, reportDate, dataSource);
-            break;
-        case 'S14': 
-            await processS14(report, mag, reportDate, dataSource);
-            break;
-        case 'S17':
-            await processS17(report, mag, reportDate, dataSource);
-            break;
-        case 'S24':
-            await processS24(report, mag, reportDate, dataSource);
-            break;
+        //case 'S06':
+        //    await processS06(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S12':
+        //    await processS12(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S14': 
+        //    await processS14(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S17':
+        //    await processS17(report, mag, reportDate, dataSource);
+        //    break;
+        //case 'S24':
+        //    await processS24(report, mag, reportDate, dataSource);
+        //    break;
         case 'G59':
             await processG59(report, mag, reportDate, dataSource);
             break;
@@ -176,6 +177,9 @@ async function processReport(report: any, idRpt: string, mag: number, reportDate
             break;
         case 'S67':
             await processS67(report, mag, reportDate, dataSource);
+            break;
+        case 'S62':
+            await processS62(report, mag, reportDate, dataSource);
             break;
         default:
             console.error(`Unknown report type: ${idRpt}`);
@@ -678,14 +682,28 @@ async function processG56(report: any, mag: number, reportDate: string, dataSour
                         g56.bc = elem.G56[i].$.Bc;
                         res.push(g56);
                         if(res.length >= batchSize) {
-                            await g56Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_G56)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
+
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await g56Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_G56)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
+
         }
     } catch(err) {
         console.error(err);
@@ -730,14 +748,26 @@ async function processG57(report: any, mag: number, reportDate: string, dataSour
                         g57.bc = elem.G57[i].$.Bc;
                         res.push(g57);
                         if(res.length >= batchSize) {
-                            await g57Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_G57)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await g57Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_G57)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -782,14 +812,26 @@ async function processG58(report: any, mag: number, reportDate: string, dataSour
                         g58.bc = elem.G58[i].$.Bc;
                         res.push(g58);
                         if(res.length >= batchSize) {
-                            await g58Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_G58)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await g58Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_G58)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -813,14 +855,26 @@ async function processS93(report: any, mag: number, reportDate: string, dataSour
                         s93.bc = elem.S93[i].$.Bc;
                         res.push(s93);
                         if(res.length >= batchSize) {
-                            await s93Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S93)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await s93Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S93)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -846,14 +900,26 @@ async function processS94(report: any, mag: number, reportDate: string, dataSour
                         s94.bc = elem.S94[i].$.Bc;
                         res.push(s94);
                         if(res.length >= batchSize) {
-                            await s94Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S94)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await s94Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S94)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -959,14 +1025,26 @@ async function processS96(report: any, mag: number, reportDate: string, dataSour
                         s96.ht_bc = elem.S96[i].Ht[0].$.Bc;
                         res.push(s96);
                         if(res.length >= batchSize) {
-                            await s96Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S96)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await s96Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S96)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -990,14 +1068,26 @@ async function processS97(report: any, mag: number, reportDate: string, dataSour
                         s97.bc = elem.S97[i].$.Bc;
                         res.push(s97);
                         if(res.length >= batchSize) {
-                            await s97Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S97)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await s97Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S97)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1265,14 +1355,26 @@ async function processG59(report: any, mag: number, reportDate: string, dataSour
                         G59.bc = elem.G59[i].$.Bc;
                         res.push(G59);
                         if(res.length >= batchSize) {
-                            await G59Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_G59)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await G59Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_G59)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1432,14 +1534,26 @@ async function processS59(report: any, mag: number, reportDate: string, dataSour
                         S59.c = elem.S59[i].$.C;
                         res.push(S59);
                         if(res.length >= batchSize) {
-                            await S59Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S59)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S59Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S59)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1471,14 +1585,26 @@ async function processS64(report: any, mag: number, reportDate: string, dataSour
                         S64.bc = elem.S64[i].$.Bc;
                         res.push(S64);
                         if(res.length >= batchSize) {
-                            await S64Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S64)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S64Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S64)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1585,14 +1711,26 @@ async function processS82(report: any, mag: number, reportDate: string, dataSour
 
                         res.push(S82);
                         if(res.length >= batchSize) {
-                            await S82Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S82)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S82Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S82)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1616,14 +1754,26 @@ async function processS98(report: any, mag: number, reportDate: string, dataSour
                         S98.bc = elem.S98[i].$.Bc;
                         res.push(S98);
                         if(res.length >= batchSize) {
-                            await S98Repository.save(S98);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S98)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S98Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S98)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1646,14 +1796,26 @@ async function processS95(report: any, mag: number, reportDate: string, dataSour
                         S95.bc = elem.S95[i].$Bc;
                         res.push(S95);
                         if(res.length >= batchSize) {
-                            await S95Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S95)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S95Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S95)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1676,14 +1838,26 @@ async function processS67(report: any, mag: number, reportDate: string, dataSour
                         S67.d1 = elem.S67[i].D1;
                         res.push(S67);
                         if(res.length >= batchSize) {
-                            await S67Repository.save(res);
+                            await dataSource
+                                .createQueryBuilder()
+                                .insert()
+                                .into(T_S67)
+                                .values(res)
+                                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                                .execute();
                             res = [];
                         }
                 }
             }
         }
         if(res.length > 0) {
-            await S67Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_S67)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
         }
     } catch(err) {
         console.error(err);
@@ -1708,14 +1882,61 @@ async function processG53(report: any, mag: number, reportDate: string, dataSour
                     G53.bc = elem.G53[i].$.Bc;
                     res.push(G53);
                     if(res.length >= batchSize) {
-                        await G53Repository.save(G53);
+                        await dataSource
+                            .createQueryBuilder()
+                            .insert()
+                            .into(T_G53)
+                            .values(res)
+                            .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                            .execute();
                         res = [];
                     }
                 }
             }
         }
         if(res.length > 0) {
-            await G53Repository.save(res);
+            await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(T_G53)
+                .values(res)
+                .orIgnore() // Equivalente a ON CONFLICT DO NOTHING
+                .execute();
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+async function processS62(report: any, mag: number, reportDate: string, dataSource: DataSource): Promise<void> {
+    try {
+        const S62Repository = dataSource.getRepository(T_S62);
+        for(const elem of report?.Rtu) {
+            if (elem?.S62 && elem.S62.length > 0) {
+                const s62Data = elem.S62[0].$;
+                //console.log(elem.S62[0].$.Id);
+                const existing = await S62Repository.findOne({ where: { id: s62Data.Id }});
+                
+                if(existing) {
+                    existing.partNumber = s62Data.PartNumber;
+                    existing.mod = s62Data.Mod;
+                    existing.af = s62Data.Af;
+                    existing.te = s62Data.Te;
+                    existing.vf = s62Data.Vf;
+                    existing.revConf = s62Data.revConf;
+                    await S62Repository.save(existing);
+                } else {
+                    var S62 = new T_S62();
+                    S62.id = elem.S62[0].$.Id;
+                    S62.partNumber = elem.S62[0].$.PartNumber;
+                    S62.mod = elem.S62[0].$.Mod;
+                    S62.af = elem.S62[0].$.Af;
+                    S62.te = elem.S62[0].$.Te;
+                    S62.vf = elem.S62[0].$.Vf;
+                    S62.revConf = elem.S62[0].$.revConf;
+                    await S62Repository.save(S62);
+                }                
+            }
         }
     } catch(err) {
         console.error(err);

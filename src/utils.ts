@@ -179,7 +179,7 @@ export async function scheduleDailyExecution(dataSource: DataSource, dir: string
 export async function run(dir: string, dataSource: DataSource) {
   dataSource.initialize().then(async () => {
     await readFile(dir, dataSource);
-    await getReadIndexAndSendRequests(dataSource);
+    //await getReadIndexAndSendRequests(dataSource);
     closeConnection(dataSource);
   }).catch((err) => console.error(err));
 }

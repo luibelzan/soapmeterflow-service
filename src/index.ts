@@ -1,6 +1,6 @@
 import config from "../configLoader";
 import { initializeApplication } from "./utils";
-import { AppDataSource, chera, pastor } from "./data-source"
+import { AppDataSource, AppDataSource2, chera, pastor } from "./data-source"
 
 const PORT = config.port;
 const startHour = config.startHour;
@@ -17,7 +17,7 @@ const pruebasDir = '../Distribuidoras/pruebas';
 
 try {  
   
-  initializeApplication(AppDataSource, pruebasDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
+  initializeApplication(AppDataSource2, pruebasDir, startHour, startMinute, finishHour, finishMinute, executionInterval);
 
 } catch(err) {
   console.error('Error al calcular los indices de lectura: ', err);
